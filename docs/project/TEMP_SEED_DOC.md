@@ -478,3 +478,288 @@ The CLI should make it obvious which scenarios/features are not done, regardless
 ---
 
 This is the contract for the coding agent: implement the data models, CLI, and test wiring in a way that satisfies these requirements and respects the concerns above. All further behavior (e.g. additional commands) should be consistent with these models rather than inventing new ad-hoc structures.
+
+
+---
+Clarifications
+
+Yeah, you’re right to push on this. Storing “status” in YAML and pretending it’s truth is asking for rot.
+
+Let me reframe things and tighten the design around what you just said:
+
+> **State should come from:**
+>
+> * the current spec + tests (data model)
+> * and the *actual* test results for the current version of those tests/specs
+
+Not from some hand-maintained `status: done` field in YAML.
+
+---
+
+## 1. What we should *not* treat as state anymore
+
+Stuff we sketched earlier that should **not** be authoritative:
+
+* `status:` fields in:
+
+  * `use-cases/*.yml`
+  * `_feature.yml`
+  * `requirements/*.yml`
+* A committed `PROJECT_STATUS.yml` that people might edit by hand or let drift
+
+Those can exist as *hints* or generated snapshots, but they must not be “the thing we trust”.
+
+So:
+
+* **Specs (YAML + Gherkin) = static model.**
+  They define structure and expectations, but not whether it’s currently passing.
+
+* **Tests + their results = state.**
+  Whether something is green or red comes from actually running tests, not from YAML flags.
+
+---
+
+## 2. What *is* the data model vs what is state
+
+### Data model (static, in repo)
+
+This is all versioned with the code and doesn’t try to represent “current pass/fail state”:
+
+* `specs/VISION.md` frontmatter – product-level goals, list of use cases
+* `specs/use-cases/*.yml` – id, name, summary, list of scenario paths
+* `specs/features/**/_feature.yml` – id, area, phase, kind, use_cases, summary
+* `specs/features/**/<slug>.feature` – Gherkin scenarios (one per file)
+* `specs/requirements/*.yml` – requirement keys, feature, scenarios, description
+* `specs/changes/*.yml` – log of spec changes (reason + which scenarios/requirements changed)
+
+**None of these should have `status:` fields we rely on.**
+If we keep a `status` field at all, treat it as a human note, not part of the logic.
+
+### State (dynamic, derived)
+
+Current state should be computed like this:
+
+* Which scenarios exist → from Gherkin files
+* Which E2E tests exist → from test files
+* What’s passing/failing → by running the tests or reading *fresh* test results
+* For each feature: are all its scenarios green?
+* For each requirement: are all its tests green?
+
+Plus your extra constraint:
+
+> “the last time all of our tests passed was associated with the **current version** of the E2E tests”
+
+That means we don’t just want “once passed at some point”, we want “passing for these exact files”.
+
+---
+
+## 3. How to determine current state *correctly*
+
+### 3.1 Minimal, strict approach: always recompute
+
+The strictest and simplest rule is:
+
+* `udd status --live`:
+
+  * Discover all scenarios and tests from the repo.
+  * Run tests now against the current tree.
+  * Report status based on *this run*.
+
+If you do this in CI (and locally when needed), you don’t need to store any state at all.
+Current state == “what just happened when we ran the tests”.
+
+Pros:
+
+* Zero risk of stale metadata.
+* Perfectly aligned with your “current version” requirement.
+
+Cons:
+
+* Running all tests on every status query can be slow for a big system.
+
+### 3.2 Practical approach: cached state with hash checks
+
+If you want to avoid re-running everything all the time, you can cache, but the cache must be tied to file content:
+
+1. **Compute hashes**:
+
+   * For each scenario file: hash of `specs/features/<area>/<feature>/<slug>.feature`
+   * For each E2E test file: hash of `tests/e2e/<area>/<feature>/<slug>.e2e.test.ts`
+   * For each requirement test file: hash of `tests/**/<requirement_key>.test.ts`
+
+2. **When tests are run** (e.g. `udd verify` or CI job):
+
+   * Run the full suite (or targeted subset).
+   * For each scenario:
+
+     * Record:
+       `{ scenarioPath, scenarioHash, testPath, testHash, result: passing|failing, timestamp }`
+   * For each requirement:
+
+     * Record a similar object keyed by `requirementKey`.
+
+3. **Store this in a cache**, e.g.:
+
+   * `.udd/results.json` (gitignored), or
+   * an external CI artifact / database if you’re in a bigger setup.
+
+4. **When `udd status` runs**:
+
+   For each scenario:
+
+   * Re-compute `scenarioHash` and `testHash`.
+   * Look up last result in `.udd/results.json`.
+   * If there is **no record** ⇒ status = `unknown` (or `not_run`).
+   * If record exists but **hashes differ from current** ⇒ status = `stale`.
+
+     * Spec or test changed since last run; you cannot claim it’s green.
+   * If record exists and **hashes match**:
+
+     * If `result = passing` ⇒ status = `passing`.
+     * If `result = failing` ⇒ status = `failing`.
+
+Same for requirements.
+
+Now you get exactly what you asked for:
+
+> “state should come from checking against our data model and checking to see if the last time all of our tests passed was associated with the current version of the e2e tests.”
+
+This translates to:
+
+* Data model → scenario paths + test paths
+* Check: do we have a recorded passing run with *matching hashes*?
+* If yes, treat as passing for this version.
+* If no, treat as unknown, failing, or stale.
+
+### 3.3 Project status file: snapshot, not source of truth
+
+If you *want* a `PROJECT_STATUS.yml`, treat it as:
+
+* Generated from `.udd/results.json` + current file hashes.
+* Marked clearly as “AUTO-GENERATED – do not edit, may be stale”.
+
+And make `udd status --write` regenerate it.
+
+Important: **no logic should ever trust `PROJECT_STATUS.yml` alone**.
+`udd status` should always recompute from raw specs + `.udd/results.json` or by running tests live.
+
+---
+
+## 4. What changes in our data models
+
+Given this, I would change our earlier spec like this:
+
+1. **Remove `status` fields from all YAML models**:
+
+   * `UseCaseSpec`: drop `status`.
+   * `FeatureSpec`: drop `status`.
+   * `TechnicalRequirement`: drop `status`.
+   * Make them pure structure, no state.
+
+2. **Treat `ProjectStatus` as an in-memory model**:
+
+   * It is what `udd status --json` returns.
+   * It may optionally be serialized to `PROJECT_STATUS.yml`, but that file is not authoritative and can be deleted/regenerated at any time.
+
+3. **Define a `TestResultRecord` model in `.udd/results.json`**:
+   Something like:
+
+   ```ts
+   interface ScenarioTestRecord {
+     scenarioPath: string;       // "todos/basic/add_todo_with_title"
+     scenarioHash: string;
+     e2eTestPath: string;
+     e2eTestHash: string;
+     result: "passing" | "failing";
+     lastRunAt: string;          // ISO timestamp
+   }
+
+   interface RequirementTestRecord {
+     requirementKey: string;     // "store_new_todo"
+     testFiles: {
+       path: string;
+       hash: string;
+     }[];
+     result: "passing" | "failing";
+     lastRunAt: string;
+   }
+
+   interface UddResultsCache {
+     scenarios: ScenarioTestRecord[];
+     requirements: RequirementTestRecord[];
+   }
+   ```
+
+   This is the only “stateful” file, and it is explicitly a **cache**, not spec.
+
+---
+
+## 5. Updated picture for “how do we know if a feature is complete?”
+
+Under this model, a feature `<area>/<feature>` is complete only if:
+
+1. For every scenario file under `specs/features/<area>/<feature>/`:
+
+   * Scenario and corresponding E2E test both exist.
+   * `udd status` reports `passing` for that scenario, based on:
+
+     * matching hashes against `.udd/results.json`, or
+     * live test run.
+
+2. For every *required* technical requirement for that feature:
+
+   * At least one test file exists for that requirement key.
+   * `udd status` reports `tests: passing` for that requirement key.
+
+If any scenario/requirement is:
+
+* `missing`, `failing`, `unknown`, or `stale`
+
+then the feature is **not complete**, regardless of task lists or any `status:` fields that might be lying around.
+
+---
+
+## 6. How an agent should think about “current state”
+
+For a fresh agent coming into the repo:
+
+1. Load specs:
+
+   * Discover all features from `specs/features/**/_feature.yml`.
+   * Discover all scenarios from `.feature` files.
+   * Discover all requirements from `specs/requirements/*.yml`.
+
+2. Get status:
+
+   * Run `udd status --json` which:
+
+     * Uses `.udd/results.json` **if** it exists and hashes align.
+     * Or runs tests live if requested / configured.
+   * Or, if no CLI yet, the agent itself:
+
+     * Runs the test suite.
+     * Computes hash-based status in memory.
+
+3. Make decisions:
+
+   * Features with any scenario/requirement not `passing` are candidates for work.
+   * The “current state” is *always* a function of the repo + test execution, never what a YAML file says.
+
+---
+
+## 7. What this means concretely for the spec we hand to a coding agent
+
+We need to tweak the implementation spec like this:
+
+* Strip `status` from all YAML models (Vision, use cases, feature, requirements).
+* Define `UddResultsCache` and `ProjectStatus` as runtime models used by `udd status` and `udd verify`.
+* Clarify in AGENTS/README:
+
+  * “No spec file contains canonical state; state is derived from tests.”
+  * “`PROJECT_STATUS.yml` (if present) is generated only and may be stale; use `udd status --live` or `--json` instead.”
+* Implement `udd status` as:
+
+  * Prefer: compute from `.udd/results.json` + hash comparison.
+  * Or: run tests live and then update `.udd/results.json`.
+
+That lines up with your core point: **state is not something we write in YAML and hope it stays true; it’s something we recompute from the spec + tests, and if we cache it, the cache is explicitly tied to the current version of those files.**
