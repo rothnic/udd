@@ -1,36 +1,44 @@
-import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
-import { expect } from 'vitest';
-import { runUdd } from '../../../utils';
+import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
+import { expect } from "vitest";
+import { runUdd } from "../../../utils";
 
-const feature = await loadFeature('specs/features/udd/cli/lint_valid_specs.feature');
+const feature = await loadFeature(
+	"specs/features/udd/cli/lint_valid_specs.feature",
+);
 
 describeFeature(feature, ({ Scenario }) => {
-  Scenario('Linting a valid spec structure', ({ Given, When, Then, And }) => {
-    let commandOutput: { stdout: string, stderr: string };
-    let commandError: any;
+	Scenario("Linting a valid spec structure", ({ Given, When, Then, And }) => {
+		let commandOutput: { stdout: string; stderr: string };
+		let commandError:
+			| { code: number; stdout: string; stderr: string }
+			| undefined;
 
-    Given('I have a valid UDD spec structure', () => {
-      // Already true in this repo
-    });
+		Given("I have a valid UDD spec structure", () => {
+			// Already true in this repo
+		});
 
-    When('I run "udd lint"', async () => {
-      try {
-        commandOutput = await runUdd('lint');
-      } catch (error: any) {
-        commandError = error;
-      }
-    });
+		When('I run "udd lint"', async () => {
+			try {
+				commandOutput = await runUdd("lint");
+			} catch (error) {
+				commandError = error as {
+					code: number;
+					stdout: string;
+					stderr: string;
+				};
+			}
+		});
 
-    Then('the command should exit with code 0', () => {
-      if (commandError) {
-        console.error(commandError.stdout);
-        console.error(commandError.stderr);
-        throw new Error(`Command failed with code ${commandError.code}`);
-      }
-    });
+		Then("the command should exit with code 0", () => {
+			if (commandError) {
+				console.error(commandError.stdout);
+				console.error(commandError.stderr);
+				throw new Error(`Command failed with code ${commandError.code}`);
+			}
+		});
 
-    And('the output should contain "All specs are valid"', () => {
-      expect(commandOutput.stdout).toContain('All specs are valid');
-    });
-  });
+		And('the output should contain "All specs are valid"', () => {
+			expect(commandOutput.stdout).toContain("All specs are valid");
+		});
+	});
 });
