@@ -1,0 +1,9 @@
+id: "udd/cli"
+area: "udd"
+name: "UDD CLI"
+summary: "Command line interface for UDD"
+use_cases:
+  - "validate_specs"
+  - "scaffold_specs"
+phase: 1
+kind: "core"

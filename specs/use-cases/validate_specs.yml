@@ -1,0 +1,11 @@
+id: "validate_specs"
+name: "Validate Specs"
+summary: "Ensure that the spec files in the repository follow the defined structure and schemas."
+actors:
+  - "developer"
+  - "agent"
+outcomes:
+  - "Valid specs pass linting"
+  - "Invalid specs report errors"
+scenarios:
+  - "udd/cli/lint_valid_specs"
