@@ -6,15 +6,18 @@ current_phase: 1
 phases:
   1: "Core CLI & Validation"
   2: "Research & Tech Specs"
-  3: "Agent Intelligence"
-  4: "Advanced Workflows"
+  3: "OpenCode Integration"
+  4: "Agent Intelligence"
+  5: "Advanced Workflows"
 goals:
   - "Make user-facing scenarios the single source of truth"
   - "Keep everything simple, discoverable, and deterministic"
   - "Enforce guardrails against spec/test tampering"
+  - "Enable autonomous iteration via OpenCode integration"
 use_cases:
   - "validate_specs"
   - "check_status"
+  - "orchestrated_iteration"
 ---
 
 # Vision
@@ -64,12 +67,18 @@ main                              # Stable, all tests pass
 - Tech spec scaffolding
 - Unit test tracing
 
-### Phase 3: Agent Intelligence
+### Phase 3: OpenCode Integration
+- Custom tools for structured status (`udd-status`, `udd-next`)
+- Orchestrator plugin for autonomous iteration
+- JSON output mode for machine consumption
+- Configurable iteration limits and pause conditions
+
+### Phase 4: Agent Intelligence
 - Copilot integration improvements
 - Autonomous maintenance
 - Smart suggestions
 
-### Phase 4: Advanced Workflows
+### Phase 5: Advanced Workflows
 - Spec change tracking
 - Migration tools
 - Team collaboration features

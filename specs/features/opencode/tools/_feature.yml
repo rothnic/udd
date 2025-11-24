@@ -1,0 +1,8 @@
+id: opencode/tools
+area: opencode
+name: UDD Custom Tools
+summary: Provide OpenCode with custom tools that expose UDD CLI functionality (status, lint, etc.) in a structured format optimized for agent decision-making.
+use_cases:
+  - orchestrated_iteration
+phase: 3
+kind: extension

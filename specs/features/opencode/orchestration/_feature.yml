@@ -1,0 +1,10 @@
+id: opencode/orchestration
+area: opencode
+name: Orchestrated Iteration
+summary: Enable OpenCode to autonomously iterate on UDD projects until completion or error, using a plugin that monitors project status and drives the agent loop.
+use_cases:
+  - orchestrated_iteration
+phase: 3
+kind: extension
+requires_research: true
+research: opencode-orchestration-approach
