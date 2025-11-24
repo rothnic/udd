@@ -35,6 +35,23 @@ export const FeatureSpecSchema = z.object({
 	use_cases: z.array(z.string()).optional(),
 	phase: z.number().optional(),
 	kind: z.enum(["core", "extension", "experimental"]).optional(),
+	// Research linkage
+	requires_research: z.boolean().optional(), // If true, blocks scenarios until research decided
+	research: z.string().optional(), // ID of related research in specs/research/<id>/
+	// Tech spec linkage
+	tech_spec: z.boolean().optional(), // If true, has _tech-spec.md in feature folder
+});
+
+export const ResearchStatus = z.enum(["active", "decided", "abandoned"]);
+
+export const ResearchMetadataSchema = z.object({
+	id: z.string(),
+	title: z.string(),
+	status: ResearchStatus,
+	created: z.string(),
+	timebox: z.string().optional(),
+	decision: z.string().optional(),
+	related_features: z.array(z.string()).optional(),
 });
 
 export const RequirementTypeSchema = z.enum(["functional", "non_functional"]);
@@ -75,3 +92,4 @@ export type UseCaseSpec = z.infer<typeof UseCaseSpecSchema>;
 export type FeatureSpec = z.infer<typeof FeatureSpecSchema>;
 export type TechnicalRequirement = z.infer<typeof TechnicalRequirementSchema>;
 export type SpecChange = z.infer<typeof SpecChangeSchema>;
+export type ResearchMetadata = z.infer<typeof ResearchMetadataSchema>;

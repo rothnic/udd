@@ -18,13 +18,15 @@ npm test
 ## The UDD Workflow
 
 ```
-Vision → Use Case → Feature → Scenario → Test → Code
+Vision → [Research] → Use Case → Feature → [Tech Spec] → Scenario → Test → Code
 ```
 
 1. Define **what** users need (Use Cases with Outcomes)
-2. Specify **how** it works (Gherkin Scenarios)  
-3. Verify with **tests** (E2E tests)
-4. Implement **code** (only after failing test exists)
+2. **Research** uncertainty when needed (Analysis of Alternatives)
+3. Specify **how** it works (Gherkin Scenarios)
+4. Document **implementation** details (Tech Specs with unit test tracing)
+5. Verify with **tests** (E2E tests + unit tests)
+6. Implement **code** (only after failing test exists)
 
 ## Project Structure
 
@@ -32,13 +34,20 @@ Vision → Use Case → Feature → Scenario → Test → Code
 specs/
 ├── VISION.md              # Goals, phases, roadmap
 ├── use-cases/*.yml        # User outcomes to achieve
+├── research/<id>/         # Research investigations
+│   └── README.md          # Single source of truth per research
 ├── features/<area>/<feature>/
 │   ├── _feature.yml       # Feature metadata
+│   ├── _tech-spec.md      # Implementation details (optional)
 │   └── *.feature          # Gherkin scenarios
 └── requirements/*.yml     # Technical requirements
 
-tests/e2e/<area>/<feature>/*.e2e.test.ts  # Tests matching scenarios
-src/                                       # Implementation code
+tests/
+├── e2e/<area>/<feature>/*.e2e.test.ts  # E2E tests (match scenarios)
+└── unit/**/*.test.ts                    # Unit tests (traced from tech specs)
+
+src/                       # Implementation code
+templates/                 # Scaffolding templates
 ```
 
 ## CLI Commands
@@ -48,6 +57,12 @@ src/                                       # Implementation code
 udd new use-case <id>
 udd new feature <area> <name>
 udd new scenario <area> <feature> <slug>
+udd new research <id>              # Create research investigation
+udd new tech-spec <area> <feature> # Create tech spec (planned)
+
+# Research (planned)
+udd research list                  # Show active research
+udd research decide <id>           # Record decision
 
 # Validation & Status
 udd lint      # Validate spec structure

@@ -20,21 +20,110 @@ npm test
 ### The UDD Cycle
 
 ```
-Vision → Use Case → Feature → Scenario → Test → Code
+Vision → [Research] → Use Case → Feature → [Tech Spec] → Scenario → Test → Code
 ```
 
 1. **Vision** (`specs/VISION.md`) - High-level goals and phases
-2. **Use Case** (`specs/use-cases/*.yml`) - User outcomes to achieve
-3. **Feature** (`specs/features/<area>/<feature>/_feature.yml`) - Grouped functionality
-4. **Scenario** (`specs/features/<area>/<feature>/*.feature`) - Gherkin specifications
-5. **Test** (`tests/e2e/<area>/<feature>/*.e2e.test.ts`) - Executable verification
-6. **Code** (`src/**`) - Implementation
+2. **Research** (`specs/research/<id>/`) - Resolve uncertainty (when needed)
+3. **Use Case** (`specs/use-cases/*.yml`) - User outcomes to achieve
+4. **Feature** (`specs/features/<area>/<feature>/_feature.yml`) - Grouped functionality
+5. **Tech Spec** (`specs/features/<area>/<feature>/_tech-spec.md`) - Implementation details (when needed)
+6. **Scenario** (`specs/features/<area>/<feature>/*.feature`) - Gherkin specifications
+7. **Test** (`tests/e2e/<area>/<feature>/*.e2e.test.ts`) - E2E verification
+8. **Unit Tests** (`tests/unit/**/*.test.ts`) - Component verification (traced from tech spec)
+9. **Code** (`src/**`) - Implementation
 
 ### Key Principle: Spec is Truth
 
 > If the code doesn't match the spec, **fix the code**, not the spec.
 
 All behavior must be defined in Gherkin scenarios before implementation.
+
+## Branching Strategy
+
+```
+main                              # Stable, all tests pass
+  └── phase/<n>                   # Active development phase
+        ├── feat/<area>/<feature> # One branch per feature
+        └── research/<id>         # Research investigations
+```
+
+### Branch Workflow
+
+1. **Start feature**: `git checkout -b feat/<area>/<feature> phase/<n>`
+2. **Complete feature**: PR to `phase/<n>`, squash merge
+3. **Complete phase**: PR to `main` when phase objectives met
+
+### Research Branches
+
+Research branches only merge documentation (learnings), not prototype code:
+- `git checkout -b research/<id> phase/<n>`
+- Investigate, document findings in `specs/research/<id>/README.md`
+- Prototype code stays LOCAL (never committed)
+- Merge README.md to phase branch when decided
+
+## Research Workflow
+
+Use research when facing uncertainty:
+
+| Uncertainty | Example |
+|-------------|---------|
+| **Value** | "Is this feature worth building?" |
+| **Technical** | "What's the best approach?" |
+| **Feasibility** | "Can we do this within constraints?" |
+
+### Research Process
+
+```bash
+udd new research <id>              # Scaffold research
+git checkout -b research/<id>      # Create branch
+# ... investigate, update README.md ...
+udd research decide <id>           # Record decision
+git checkout phase/<n>
+git merge research/<id>            # Merge learnings only
+```
+
+### Linking Research to Features
+
+```yaml
+# _feature.yml
+id: llm-validation
+requires_research: true            # Blocks scenarios until decided
+research: llm-validation-approach  # Links to specs/research/<id>/
+```
+
+See [specs/research/README.md](specs/research/README.md) for full documentation.
+
+## Tech Specs
+
+Tech specs document **how** to implement complex features and trace to unit tests.
+
+### When to Use
+
+- Feature has non-trivial architecture
+- Multiple implementation options exist
+- Unit test coverage requirements are specific
+
+### Structure
+
+```
+specs/features/<area>/<feature>/
+  _feature.yml      # What & why
+  _tech-spec.md     # How (implementation details)
+  *.feature         # Behavior (Gherkin)
+```
+
+### Unit Test Tracing
+
+Tech specs include a test coverage table:
+
+```markdown
+| Component | Test File | Test Cases |
+|-----------|-----------|------------|
+| `parseConfig()` | `tests/unit/config.test.ts` | `parses valid`, `rejects invalid` |
+```
+
+This ensures every implementation detail has corresponding tests **before** coding.
 
 ## Copilot Prompts
 
