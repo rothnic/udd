@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { Command } from "commander";
-import { validateSpecs } from "../lib/validator";
+import { validateSpecs } from "../lib/validator.js";
 
 export const lintCommand = new Command("lint")
 	.description("Validate spec structure and relationships")

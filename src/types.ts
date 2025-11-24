@@ -4,6 +4,8 @@ export const VisionFrontmatterSchema = z.object({
 	id: z.string(),
 	name: z.string(),
 	version: z.string().optional(),
+	current_phase: z.number().optional(),
+	phases: z.record(z.string(), z.string()).optional(),
 	goals: z.array(z.string()),
 	success_metrics: z.array(z.string()).optional(),
 	use_cases: z.array(z.string()),
@@ -14,8 +16,14 @@ export const UseCaseSpecSchema = z.object({
 	name: z.string(),
 	summary: z.string(),
 	actors: z.array(z.string()).optional(),
-	outcomes: z.array(z.string()).optional(),
-	scenarios: z.array(z.string()),
+	outcomes: z
+		.array(
+			z.object({
+				description: z.string(),
+				scenarios: z.array(z.string()).optional(),
+			}),
+		)
+		.optional(),
 	phase: z.number().optional(),
 });
 

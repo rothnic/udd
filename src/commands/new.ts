@@ -22,8 +22,12 @@ newCommand
 				.join(" "),
 			summary: "TODO: Add summary",
 			actors: ["user"],
-			outcomes: ["TODO: Add outcomes"],
-			scenarios: [],
+			outcomes: [
+				{
+					description: "TODO: Add outcome description",
+					scenarios: [],
+				},
+			],
 		};
 
 		try {
@@ -96,11 +100,41 @@ newCommand
     Then something happens
 `;
 
+		const testDir = path.join(rootDir, "tests/e2e", area, feature);
+		const testFilePath = path.join(testDir, `${slug}.e2e.test.ts`);
+		const testContent = `import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
+import { expect } from "vitest";
+
+const feature = await loadFeature("specs/features/${area}/${feature}/${slug}.feature");
+
+describeFeature(feature, ({ Scenario }) => {
+	Scenario("${scenarioName}", ({ Given, When, Then }) => {
+		Given("I am in the right state", () => {
+			// TODO: Implement
+		});
+
+		When("I do something", () => {
+			// TODO: Implement
+		});
+
+		Then("something happens", () => {
+			// TODO: Implement
+			expect(true).toBe(true);
+		});
+	});
+});
+`;
+
 		try {
 			// Ensure feature dir exists
 			await fs.mkdir(featureDir, { recursive: true });
 			await fs.writeFile(filePath, content);
 			console.log(chalk.green(`Created scenario: ${filePath}`));
+
+			// Ensure test dir exists
+			await fs.mkdir(testDir, { recursive: true });
+			await fs.writeFile(testFilePath, testContent);
+			console.log(chalk.green(`Created test: ${testFilePath}`));
 		} catch (error) {
 			console.error(chalk.red("Error creating scenario:"), error);
 			process.exit(1);

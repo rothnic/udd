@@ -7,7 +7,7 @@ import {
 	TechnicalRequirementSchema,
 	UseCaseSpecSchema,
 	VisionFrontmatterSchema,
-} from "../types";
+} from "../types.js";
 
 export interface ValidationResult {
 	valid: boolean;
@@ -50,20 +50,29 @@ export async function validateSpecs(): Promise<ValidationResult> {
 				errors.push(`${file}: Invalid schema - ${result.error.message}`);
 			} else {
 				// Check scenarios exist
-				for (const scenarioPath of result.data.scenarios) {
-					const featurePath = path.join(
-						specsDir,
-						"features",
-						`${scenarioPath}.feature`,
-					);
-					try {
-						await fs.access(featurePath);
-					} catch {
-						errors.push(`${file}: References missing scenario ${scenarioPath}`);
+				if (result.data.outcomes) {
+					for (const outcome of result.data.outcomes) {
+						if (outcome.scenarios) {
+							for (const scenarioPath of outcome.scenarios) {
+								const featurePath = path.join(
+									specsDir,
+									"features",
+									`${scenarioPath}.feature`,
+								);
+								try {
+									await fs.access(featurePath);
+								} catch {
+									errors.push(
+										`${file}: References missing scenario ${scenarioPath}`,
+									);
+								}
+							}
+						}
 					}
 				}
 			}
-		} catch {
+		} catch (error) {
+			if ((error as { code?: string }).code === "ENOENT") continue;
 			errors.push(`${file}: Error reading or parsing`);
 		}
 	}
@@ -80,7 +89,8 @@ export async function validateSpecs(): Promise<ValidationResult> {
 			if (!result.success) {
 				errors.push(`${file}: Invalid schema - ${result.error.message}`);
 			}
-		} catch {
+		} catch (error) {
+			if ((error as { code?: string }).code === "ENOENT") continue;
 			errors.push(`${file}: Error reading or parsing`);
 		}
 	}
@@ -113,7 +123,8 @@ export async function validateSpecs(): Promise<ValidationResult> {
 					}
 				}
 			}
-		} catch {
+		} catch (error) {
+			if ((error as { code?: string }).code === "ENOENT") continue;
 			errors.push(`${file}: Error reading or parsing`);
 		}
 	}
