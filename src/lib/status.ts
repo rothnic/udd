@@ -4,10 +4,10 @@ import { glob } from "glob";
 import yaml from "yaml";
 
 export interface ScenarioStatus {
-	e2e: "missing" | "failing" | "passing";
+	e2e: "missing" | "failing" | "passing" | "stale";
 }
 export interface RequirementStatus {
-	tests: "missing" | "failing" | "passing";
+	tests: "missing" | "failing" | "passing" | "stale";
 }
 
 export interface FeatureStatus {
@@ -32,6 +32,21 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 		cwd: rootDir,
 	});
 
+	// Load results metadata once
+	const resultsPath = path.join(rootDir, ".udd/results.json");
+	let resultsMtime = 0;
+	let results: {
+		testResults?: { name: string; status: string }[];
+	} | null = null;
+	try {
+		const stats = await fs.stat(resultsPath);
+		resultsMtime = stats.mtimeMs;
+		const resultsContent = await fs.readFile(resultsPath, "utf-8");
+		results = JSON.parse(resultsContent);
+	} catch {
+		// Ignore if missing
+	}
+
 	for (const file of featureFiles) {
 		const content = await fs.readFile(path.join(rootDir, file), "utf-8");
 		const data = yaml.parse(content) as { id: string };
@@ -51,6 +66,8 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 
 		for (const scenarioFile of scenarioFiles) {
 			const slug = path.basename(scenarioFile, ".feature");
+			const absScenarioPath = path.join(rootDir, featureDir, scenarioFile);
+
 			// Check if E2E test exists
 			// Expected path: tests/e2e/<area>/<feature>/<slug>.e2e.test.ts
 			// featureDir is specs/features/<area>/<feature>
@@ -63,27 +80,31 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 			);
 			const absTestPath = path.resolve(rootDir, testPath);
 
-			let e2eStatus: "missing" | "failing" | "passing" = "missing";
+			let e2eStatus: "missing" | "failing" | "passing" | "stale" = "missing";
 			try {
-				await fs.access(absTestPath);
+				const testStats = await fs.stat(absTestPath);
+				const scenarioStats = await fs.stat(absScenarioPath);
 
-				// Check actual test results from .udd/results.json
-				try {
-					const resultsPath = path.join(rootDir, ".udd/results.json");
-					const resultsContent = await fs.readFile(resultsPath, "utf-8");
-					const results = JSON.parse(resultsContent);
-
-					const testResult = results.testResults?.find(
-						(r: { name: string; status: string }) => r.name === absTestPath,
-					);
-					if (testResult) {
-						e2eStatus = testResult.status === "passed" ? "passing" : "failing";
+				if (!results) {
+					e2eStatus = "failing"; // No results yet
+				} else {
+					// Check for staleness
+					if (
+						testStats.mtimeMs > resultsMtime ||
+						scenarioStats.mtimeMs > resultsMtime
+					) {
+						e2eStatus = "stale";
 					} else {
-						e2eStatus = "failing";
+						const testResult = results.testResults?.find(
+							(r: { name: string; status: string }) => r.name === absTestPath,
+						);
+						if (testResult) {
+							e2eStatus =
+								testResult.status === "passed" ? "passing" : "failing";
+						} else {
+							e2eStatus = "failing"; // Test exists but not in results
+						}
 					}
-				} catch {
-					// No results file or parse error
-					e2eStatus = "failing";
 				}
 			} catch {
 				e2eStatus = "missing";

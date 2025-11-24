@@ -25,22 +25,20 @@ export const statusCommand = new Command("status")
 					console.log(chalk.blue(`\n${id}`));
 					console.log("  Scenarios:");
 					for (const [slug, sStatus] of Object.entries(feature.scenarios)) {
-						const color =
-							sStatus.e2e === "passing"
-								? chalk.green
-								: sStatus.e2e === "failing"
-									? chalk.red
-									: chalk.yellow;
+						let color = chalk.yellow;
+						if (sStatus.e2e === "passing") color = chalk.green;
+						else if (sStatus.e2e === "failing") color = chalk.red;
+						else if (sStatus.e2e === "stale") color = chalk.gray;
+
 						console.log(`    ${slug}: ${color(sStatus.e2e)}`);
 					}
 					console.log("  Requirements:");
 					for (const [key, rStatus] of Object.entries(feature.requirements)) {
-						const color =
-							rStatus.tests === "passing"
-								? chalk.green
-								: rStatus.tests === "failing"
-									? chalk.red
-									: chalk.yellow;
+						let color = chalk.yellow;
+						if (rStatus.tests === "passing") color = chalk.green;
+						else if (rStatus.tests === "failing") color = chalk.red;
+						else if (rStatus.tests === "stale") color = chalk.gray;
+
 						console.log(`    ${key}: ${color(rStatus.tests)}`);
 					}
 				}

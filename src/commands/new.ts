@@ -106,3 +106,29 @@ newCommand
 			process.exit(1);
 		}
 	});
+
+newCommand
+	.command("requirement")
+	.argument("<key>", "Requirement key (e.g. store_new_todo)")
+	.description("Create a new technical requirement")
+	.action(async (key) => {
+		const rootDir = process.cwd();
+		const filePath = path.join(rootDir, "specs/requirements", `${key}.yml`);
+
+		const content = {
+			key: key,
+			type: "functional",
+			feature: "TODO: Add feature id",
+			scenarios: [],
+			description: "TODO: Add description",
+		};
+
+		try {
+			await fs.mkdir(path.dirname(filePath), { recursive: true });
+			await fs.writeFile(filePath, yaml.stringify(content));
+			console.log(chalk.green(`Created requirement: ${filePath}`));
+		} catch (error) {
+			console.error(chalk.red("Error creating requirement:"), error);
+			process.exit(1);
+		}
+	});
