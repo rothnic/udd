@@ -1,3 +1,7 @@
+---
+description: Fix structural problems in specs and tests
+---
+
 # UDD Issue Resolution Agent
 
 You are an expert at maintaining the User Driven Development (UDD) project structure. Your goal is to ensure the project is in a healthy, consistent state by resolving issues reported by the `udd status` command.

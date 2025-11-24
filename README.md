@@ -1,49 +1,87 @@
 # User Driven Development (UDD) Tool
 
-This tool helps manage the lifecycle of features in a User Driven Development process. It ensures that specs are the source of truth and that features are only considered done when their E2E tests pass.
+A CLI tool for managing feature development through a spec-first, test-driven workflow. Specs are the source of truth—features are only done when their E2E tests pass.
+
+## Quick Start
+
+```bash
+# Check project health
+udd status
+
+# Run tests
+npm test
+
+# See what to do next (use in Copilot Chat)
+# @iterate
+```
+
+## The UDD Workflow
+
+```
+Vision → Use Case → Feature → Scenario → Test → Code
+```
+
+1. Define **what** users need (Use Cases with Outcomes)
+2. Specify **how** it works (Gherkin Scenarios)  
+3. Verify with **tests** (E2E tests)
+4. Implement **code** (only after failing test exists)
 
 ## Project Structure
 
-- `specs/`: Contains the source of truth for the project.
-  - `VISION.md`: High-level vision and goals.
-  - `use-cases/`: YAML files defining use cases.
-  - `features/`: Feature definitions and Gherkin scenarios.
-  - `requirements/`: Technical requirements.
-- `tests/`: Contains tests.
-  - `e2e/`: End-to-end tests mapping to scenarios.
-- `src/`: Source code for the UDD CLI.
-- `bin/`: CLI entry point.
+```
+specs/
+├── VISION.md              # Goals, phases, roadmap
+├── use-cases/*.yml        # User outcomes to achieve
+├── features/<area>/<feature>/
+│   ├── _feature.yml       # Feature metadata
+│   └── *.feature          # Gherkin scenarios
+└── requirements/*.yml     # Technical requirements
 
-## Usage
-
-### Lint Specs
-
-Validate that the specs follow the defined structure and schemas.
-
-```bash
-npx ts-node bin/udd.ts lint
+tests/e2e/<area>/<feature>/*.e2e.test.ts  # Tests matching scenarios
+src/                                       # Implementation code
 ```
 
-### Check Status
-
-Check the status of the project based on specs and tests.
+## CLI Commands
 
 ```bash
-npx ts-node bin/udd.ts status
+# Scaffolding
+udd new use-case <id>
+udd new feature <area> <name>
+udd new scenario <area> <feature> <slug>
+
+# Validation & Status
+udd lint      # Validate spec structure
+udd status    # Show health and progress
+udd test      # Run all tests
 ```
 
-## Development
+## Copilot Integration
 
-### Run Tests
+This project includes custom prompts and an agent for Copilot:
 
-```bash
-npm test
+| Resource | Purpose |
+|----------|---------|
+| `@iterate` | Autonomous project maintenance (start here!) |
+| `@roadmap` | Phase-based progress view |
+| `@scaffold` | Create new specs |
+| `@udd` | Full workflow guidance |
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow documentation.
+
+## Phased Development
+
+Work is organized into phases. Tag scenarios with `@phase:N` to defer:
+
+```gherkin
+@phase:2
+Feature: Future Work
+  Scenario: Will implement in phase 2
 ```
-(Note: `npm test` is currently not configured in package.json, use `npx vitest run`)
 
-### Add a new feature
+Deferred work automatically becomes active when the phase advances.
 
-1. Create a feature directory in `specs/features/<area>/<feature>`.
-2. Add `_feature.yml`.
-3. Add `.feature` files for scenarios.
-4. Add corresponding E2E tests in `tests/e2e/<area>/<feature>`.
+## Documentation
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow
+- [.github/LEARNINGS.md](.github/LEARNINGS.md) - Patterns and insights
+- [specs/VISION.md](specs/VISION.md) - Project vision and roadmap

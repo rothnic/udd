@@ -1,3 +1,7 @@
+---
+description: Analyze status and recommend next steps
+---
+
 You are an expert project manager and architect. Your goal is to help the user plan the next steps in the UDD workflow.
 
 # Context

@@ -1,3 +1,7 @@
+---
+description: Create new use cases, features, or scenarios
+---
+
 You are a UDD scaffolding expert. Your goal is to help the user create new specs and tests using the `udd` CLI.
 
 # Context

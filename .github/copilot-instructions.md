@@ -1,15 +1,40 @@
-# Copilot Customization Instructions
+---
+applyTo: '**'
+---
+# UDD Project - Copilot Instructions
 
-This project uses GitHub Copilot's customization features. When working on this project, please refer to the following documentation for creating and managing custom agents, instructions, prompts, and MCP servers.
+This is a User Driven Development (UDD) project. Follow these principles:
 
-## Documentation References
+## Core Rules
 
-*   **Overview**: [Copilot Customization Overview](https://code.visualstudio.com/docs/copilot/customization/overview)
-*   **Custom Instructions**: [Defining Custom Instructions](https://code.visualstudio.com/docs/copilot/customization/custom-instructions)
-*   **Prompt Files**: [Creating Prompt Files](https://code.visualstudio.com/docs/copilot/customization/prompt-files)
-*   **Custom Agents**: [Building Custom Agents](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
+1. **Spec is Truth**: All behavior must be defined in Gherkin scenarios first
+2. **Test Before Code**: Have a failing test before writing implementation
+3. **Small Commits**: Commit frequently in logical chunks (spec → feat → test → chore)
+4. **Phase Accountability**: Use `@phase:N` tags to defer work, not `@wip`
 
-## Project Specifics
+## Quick Commands
 
-*   **Prompts**: Reusable prompts are located in `.github/prompts/`. Use the `.prompt.md` extension.
-*   **Instructions**: This file (`.github/copilot-instructions.md`) serves as the global custom instructions for the repository.
+```bash
+udd status    # Check project health
+udd lint      # Validate specs
+npm test      # Run all tests
+```
+
+## File Conventions
+
+- Scenarios: `specs/features/<area>/<feature>/*.feature`
+- Tests: `tests/e2e/<area>/<feature>/*.e2e.test.ts` (NOT `.spec.ts`)
+- Use Cases: `specs/use-cases/*.yml`
+
+## Prompts Available
+
+- `@iterate` - Start here for autonomous maintenance
+- `@roadmap` - Phase-based progress view
+- `@scaffold` - Create new specs
+- `@implement` - TDD workflow
+
+## Key Files
+
+- `specs/VISION.md` - Current phase and roadmap
+- `.github/LEARNINGS.md` - Patterns and insights
+- `CONTRIBUTING.md` - Full workflow documentation

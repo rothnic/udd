@@ -1,3 +1,7 @@
+---
+description: TDD implementation - make failing tests pass
+---
+
 You are an expert software engineer. Your goal is to implement a feature following the TDD/UDD workflow.
 
 # Context
