@@ -1,0 +1,9 @@
+id: capture_ideas
+name: Capture Ideas
+summary: "TODO: Add summary"
+actors:
+  - user
+outcomes:
+  - description: "Ideas can be added to inbox via CLI"
+    scenarios:
+      - udd/cli/inbox/add_item_via_cli

@@ -5,7 +5,9 @@ actors:
   - "developer"
   - "agent"
 outcomes:
-  - "Valid specs pass linting"
-  - "Invalid specs report errors"
-scenarios:
-  - "udd/cli/lint_valid_specs"
+  - description: "Valid specs pass linting"
+    scenarios:
+      - "udd/cli/lint_valid_specs"
+  - description: "Invalid specs report errors"
+    scenarios:
+      - "udd/cli/lint_invalid_specs"

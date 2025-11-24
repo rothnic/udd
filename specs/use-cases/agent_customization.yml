@@ -1,0 +1,12 @@
+id: agent_customization
+name: Agent Customization
+summary: "Customize the GitHub Copilot agent for UDD"
+actors:
+  - user
+outcomes:
+  - description: "Agent has access to project status"
+    scenarios:
+      - "udd/agent/status_prompt"
+  - description: "Agent guides user through UDD process"
+    scenarios:
+      - "udd/agent/guide_user"

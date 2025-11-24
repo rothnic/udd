@@ -1,0 +1,12 @@
+id: run_tests
+name: Run Tests
+summary: "TODO: Add summary"
+actors:
+  - user
+outcomes:
+  - description: "Tests can be executed via CLI"
+    scenarios:
+      - udd/cli/run_tests
+  - description: "Project status is visible via CLI"
+    scenarios:
+      - udd/cli/check_status

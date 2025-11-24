@@ -5,8 +5,9 @@ actors:
   - "developer"
   - "agent"
 outcomes:
-  - "New spec files are created with correct structure"
-scenarios:
-  - "udd/cli/new_use_case"
-  - "udd/cli/new_feature"
-  - "udd/cli/new_scenario"
+  - description: "New spec files are created with correct structure"
+    scenarios:
+      - "udd/cli/new_use_case"
+      - "udd/cli/new_feature"
+      - "udd/cli/new_scenario"
+      - "udd/cli/new_requirement"

@@ -1,0 +1,13 @@
+id: manage_wip
+name: Manage Work In Progress
+summary: "Help developers avoid accumulating too many changes at once"
+actors:
+  - developer
+  - agent
+outcomes:
+  - description: "Agent warns when too many files are changed"
+    scenarios:
+      - "udd/agent/wip_enforcement/warn_on_large_changeset"
+  - description: "Developer is encouraged to commit small changes"
+    scenarios:
+      - "udd/agent/wip_enforcement/encourage_small_commits"

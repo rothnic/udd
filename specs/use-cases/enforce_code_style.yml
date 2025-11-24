@@ -1,0 +1,16 @@
+id: enforce_code_style
+name: Enforce Code Style
+summary: "Ensure code styles are automatically applied and enforced"
+actors:
+  - developer
+  - agent
+outcomes:
+  - description: "Imports are sorted automatically"
+    scenarios:
+      - "udd/dev-experience/sort_imports"
+  - description: "Code formatting is consistent"
+    scenarios:
+      - "udd/dev-experience/code_formatting"
+  - description: "Commits fail if style checks fail (unless overridden)"
+    scenarios:
+      - "udd/dev-experience/commit_hooks"

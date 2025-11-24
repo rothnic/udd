@@ -5,5 +5,6 @@ summary: "Command line interface for UDD"
 use_cases:
   - "validate_specs"
   - "scaffold_specs"
+  - "run_tests"
 phase: 1
 kind: "core"
