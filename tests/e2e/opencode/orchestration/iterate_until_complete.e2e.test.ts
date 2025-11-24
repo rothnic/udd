@@ -15,7 +15,7 @@ describeFeature(feature, ({ Scenario }) => {
 			// TODO: Implement - Phase 3
 		});
 
-		When(/I start an iteration session with "(.*)"/, (prompt: string) => {
+		When('I start an iteration session with "iterate on this project"', () => {
 			// TODO: Implement - Phase 3
 		});
 
@@ -28,7 +28,7 @@ describeFeature(feature, ({ Scenario }) => {
 			// TODO: Implement - Phase 3
 		});
 
-		And(/automatically continue until status is "(.*)"/, (status: string) => {
+		And('automatically continue until status is "complete"', () => {
 			// TODO: Implement - Phase 3
 		});
 

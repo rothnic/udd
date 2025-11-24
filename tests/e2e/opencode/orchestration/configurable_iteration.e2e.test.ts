@@ -11,26 +11,20 @@ describeFeature(feature, ({ Scenario }) => {
 			// TODO: Implement - Phase 3
 		});
 
-		And(
-			/OpenCode config has "(.*)" set to (\d+)/,
-			(key: string, value: string) => {
-				// TODO: Implement - Phase 3
-			},
-		);
+		And('OpenCode config has "udd.maxIterations" set to 10', () => {
+			// TODO: Implement - Phase 3
+		});
 
-		When(
-			/the agent reaches (\d+) iterations without completion/,
-			(count: string) => {
-				// TODO: Implement - Phase 3
-			},
-		);
+		When("the agent reaches 10 iterations without completion", () => {
+			// TODO: Implement - Phase 3
+		});
 
 		Then("the agent should pause", () => {
 			// TODO: Implement - Phase 3
 			expect(true).toBe(true);
 		});
 
-		And(/report "(.*)"/, (message: string) => {
+		And('report "Max iterations reached"', () => {
 			// TODO: Implement - Phase 3
 		});
 
@@ -44,12 +38,9 @@ describeFeature(feature, ({ Scenario }) => {
 			// TODO: Implement - Phase 3
 		});
 
-		And(
-			/OpenCode config has "(.*)" set to \["(.*)"]/,
-			(key: string, value: string) => {
-				// TODO: Implement - Phase 3
-			},
-		);
+		And('OpenCode config has "udd.pauseOn" set to ["test_failure"]', () => {
+			// TODO: Implement - Phase 3
+		});
 
 		When("a test fails during iteration", () => {
 			// TODO: Implement - Phase 3

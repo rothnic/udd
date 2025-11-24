@@ -11,11 +11,11 @@ describeFeature(feature, ({ Scenario }) => {
 			// TODO: Implement - Phase 3
 		});
 
-		When(/the agent calls the "(.*)" tool/, (toolName: string) => {
+		When('the agent calls the "udd-status" tool', () => {
 			// TODO: Implement - Phase 3
 		});
 
-		Then(/it should return a JSON object with:/, () => {
+		Then("it should return a JSON object with:", () => {
 			// TODO: Implement - Phase 3
 			expect(true).toBe(true);
 		});
@@ -26,11 +26,11 @@ describeFeature(feature, ({ Scenario }) => {
 			// TODO: Implement - Phase 3
 		});
 
-		When(/the agent calls the "(.*)" tool/, (toolName: string) => {
+		When('the agent calls the "udd-status" tool', () => {
 			// TODO: Implement - Phase 3
 		});
 
-		Then(/the recommendation should be "(.*)"/, (recommendation: string) => {
+		Then('the recommendation should be "Fix failing test: <test_name>"', () => {
 			// TODO: Implement - Phase 3
 			expect(true).toBe(true);
 		});
@@ -45,11 +45,11 @@ describeFeature(feature, ({ Scenario }) => {
 			// TODO: Implement - Phase 3
 		});
 
-		When(/the agent calls the "(.*)" tool/, (toolName: string) => {
+		When('the agent calls the "udd-status" tool', () => {
 			// TODO: Implement - Phase 3
 		});
 
-		Then(/health should be "(.*)"/, (health: string) => {
+		Then('health should be "complete"', () => {
 			// TODO: Implement - Phase 3
 			expect(true).toBe(true);
 		});
