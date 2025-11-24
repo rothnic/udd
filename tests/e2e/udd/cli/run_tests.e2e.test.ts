@@ -2,24 +2,23 @@ import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
 import { runUdd } from "../../../utils.js";
 
-const feature = await loadFeature(
-	"specs/features/udd/cli/lint_valid_specs.feature",
-);
+const feature = await loadFeature("specs/features/udd/cli/run_tests.feature");
 
 describeFeature(feature, ({ Scenario }) => {
-	Scenario("Linting a valid spec structure", ({ Given, When, Then, And }) => {
+	Scenario("Run tests with visual feedback", ({ Given, When, Then, And }) => {
 		let commandOutput: { stdout: string; stderr: string };
 		let commandError:
 			| { code: number; stdout: string; stderr: string }
 			| undefined;
 
 		Given("I have a valid UDD spec structure", () => {
-			// Already true in this repo
+			// Already true in this workspace
 		});
 
-		When('I run "udd lint"', async () => {
+		When('I run "udd test"', async () => {
 			try {
-				commandOutput = await runUdd("lint");
+				// Run only check_status tests to avoid infinite recursion and save time
+				commandOutput = await runUdd("test check_status");
 			} catch (error) {
 				commandError = error as {
 					code: number;
@@ -37,8 +36,12 @@ describeFeature(feature, ({ Scenario }) => {
 			}
 		});
 
-		And('the output should contain "All specs are valid"', () => {
-			expect(commandOutput.stdout).toContain("All specs are valid");
+		And('the output should contain "Feature:"', () => {
+			expect(commandOutput.stdout).toContain("Feature:");
+		});
+
+		And('the output should contain "Scenario:"', () => {
+			expect(commandOutput.stdout).toContain("Scenario:");
 		});
 	});
 });

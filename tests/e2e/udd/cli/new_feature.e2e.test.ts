@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { afterAll, expect } from "vitest";
-import { rootDir, runUdd } from "../../../utils";
+import { rootDir, runUdd } from "../../../utils.js";
 
 const feature = await loadFeature("specs/features/udd/cli/new_feature.feature");
 

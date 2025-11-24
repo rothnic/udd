@@ -1,6 +1,6 @@
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
-import { runUdd } from "../../../utils";
+import { runUdd } from "../../../utils.js";
 
 const feature = await loadFeature(
 	"specs/features/udd/cli/check_status.feature",

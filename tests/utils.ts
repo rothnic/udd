@@ -7,6 +7,6 @@ export const rootDir = process.cwd();
 export const uddBin = path.resolve(rootDir, "bin/udd.ts");
 
 export async function runUdd(args: string) {
-	const command = `node --loader ts-node/esm --experimental-specifier-resolution=node ${uddBin} ${args}`;
+	const command = `npx tsx ${uddBin} ${args}`;
 	return execAsync(command);
 }
