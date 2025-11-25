@@ -34,13 +34,21 @@ export const statusCommand = new Command("status")
 				let unsatisfiedOutcomes = 0;
 				let deferredOutcomes = 0;
 				let failingScenarios = 0;
+				let missingScenarios = 0;
+				let staleScenarios = 0;
 				let deferredScenarios = 0;
 
 				for (const feature of Object.values(status.features)) {
 					for (const scenario of Object.values(feature.scenarios)) {
 						if (scenario.e2e === "deferred") {
 							deferredScenarios++;
-						} else if (scenario.e2e !== "passing") failingScenarios++;
+						} else if (scenario.e2e === "missing") {
+							missingScenarios++;
+						} else if (scenario.e2e === "stale") {
+							staleScenarios++;
+						} else if (scenario.e2e === "failing") {
+							failingScenarios++;
+						}
 					}
 				}
 
@@ -54,16 +62,18 @@ export const statusCommand = new Command("status")
 
 				// Health Summary (deferred items don't count as blockers)
 				console.log(chalk.bold("\nHealth Summary:"));
-				const isHealthy =
-					unsatisfiedOutcomes === 0 &&
-					failingScenarios === 0 &&
-					status.orphaned_scenarios.length === 0;
+				const hasProblems =
+					unsatisfiedOutcomes > 0 ||
+					failingScenarios > 0 ||
+					missingScenarios > 0 ||
+					status.orphaned_scenarios.length > 0;
+				const needsTestRun = staleScenarios > 0;
 
-				if (isHealthy && deferredOutcomes === 0) {
+				if (!hasProblems && !needsTestRun && deferredOutcomes === 0) {
 					console.log(
 						chalk.green("  ✓ All outcomes satisfied, all tests passing"),
 					);
-				} else if (isHealthy) {
+				} else if (!hasProblems && !needsTestRun) {
 					console.log(chalk.green("  ✓ Current phase complete"));
 					console.log(
 						chalk.blue(
@@ -85,9 +95,21 @@ export const statusCommand = new Command("status")
 							),
 						);
 					}
+					if (missingScenarios > 0) {
+						console.log(
+							chalk.yellow(`  ○ ${missingScenarios} scenario(s) missing tests`),
+						);
+					}
 					if (failingScenarios > 0) {
 						console.log(
 							chalk.red(`  ✗ ${failingScenarios} scenario(s) failing`),
+						);
+					}
+					if (staleScenarios > 0) {
+						console.log(
+							chalk.gray(
+								`  ◌ ${staleScenarios} scenario(s) stale (run tests to update)`,
+							),
 						);
 					}
 					if (status.orphaned_scenarios.length > 0) {
