@@ -34,15 +34,13 @@ export const statusCommand = new Command("status")
 				let unsatisfiedOutcomes = 0;
 				let deferredOutcomes = 0;
 				let failingScenarios = 0;
-				let todoScenarios = 0;
 				let deferredScenarios = 0;
 
 				for (const feature of Object.values(status.features)) {
 					for (const scenario of Object.values(feature.scenarios)) {
 						if (scenario.e2e === "deferred") {
 							deferredScenarios++;
-						} else if (scenario.e2e === "todo") todoScenarios++;
-						else if (scenario.e2e !== "passing") failingScenarios++;
+						} else if (scenario.e2e !== "passing") failingScenarios++;
 					}
 				}
 
@@ -59,7 +57,6 @@ export const statusCommand = new Command("status")
 				const isHealthy =
 					unsatisfiedOutcomes === 0 &&
 					failingScenarios === 0 &&
-					todoScenarios === 0 &&
 					status.orphaned_scenarios.length === 0;
 
 				if (isHealthy && deferredOutcomes === 0) {
@@ -90,16 +87,7 @@ export const statusCommand = new Command("status")
 					}
 					if (failingScenarios > 0) {
 						console.log(
-							chalk.red(
-								`  ✗ ${failingScenarios} scenario(s) failing (tests broken)`,
-							),
-						);
-					}
-					if (todoScenarios > 0) {
-						console.log(
-							chalk.magenta(
-								`  ○ ${todoScenarios} scenario(s) todo (not implemented)`,
-							),
+							chalk.red(`  ✗ ${failingScenarios} scenario(s) failing`),
 						);
 					}
 					if (status.orphaned_scenarios.length > 0) {
@@ -169,7 +157,7 @@ export const statusCommand = new Command("status")
 							if (sStatus === "passing") color = chalk.green;
 							else if (sStatus === "failing") color = chalk.red;
 							else if (sStatus === "stale") color = chalk.gray;
-							else if (sStatus === "todo") color = chalk.magenta;
+							else if (sStatus === "deferred") color = chalk.blue;
 
 							console.log(`    - ${scenarioId}: ${color(sStatus)}`);
 						}
@@ -201,7 +189,6 @@ export const statusCommand = new Command("status")
 						if (sStatus.e2e === "passing") color = chalk.green;
 						else if (sStatus.e2e === "failing") color = chalk.red;
 						else if (sStatus.e2e === "stale") color = chalk.gray;
-						else if (sStatus.e2e === "todo") color = chalk.magenta;
 						else if (sStatus.e2e === "deferred") color = chalk.blue;
 
 						const phaseInfo = sStatus.phase

@@ -16,7 +16,7 @@ export interface GitStatus {
 }
 
 export interface ScenarioStatus {
-	e2e: "missing" | "failing" | "passing" | "stale" | "todo" | "deferred";
+	e2e: "missing" | "failing" | "passing" | "stale" | "deferred";
 	phase?: number;
 	isDeferred: boolean;
 }
@@ -39,7 +39,7 @@ export interface UseCaseStatus {
 	name: string;
 	scenarios: Record<
 		string,
-		"missing" | "failing" | "passing" | "stale" | "todo" | "deferred"
+		"missing" | "failing" | "passing" | "stale" | "deferred"
 	>;
 	outcomes: UseCaseOutcome[];
 	validation_errors: string[];
@@ -203,24 +203,16 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 			);
 			const absTestPath = path.resolve(rootDir, testPath);
 
-			let e2eStatus:
-				| "missing"
-				| "failing"
-				| "passing"
-				| "stale"
-				| "todo"
-				| "deferred" = "missing";
+			let e2eStatus: "missing" | "failing" | "passing" | "stale" | "deferred" =
+				"missing";
 			try {
 				const testStats = await fs.stat(absTestPath);
 				const scenarioStats = await fs.stat(absScenarioPath);
-				const testContent = await fs.readFile(absTestPath, "utf-8");
 
 				if (isDeferred) {
 					e2eStatus = "deferred";
-				} else if (testContent.includes('throw new Error("Not implemented")')) {
-					e2eStatus = "todo";
 				} else if (!results) {
-					e2eStatus = "failing"; // No results yet
+					e2eStatus = "stale"; // No results yet, need to run tests
 				} else {
 					// Check for staleness
 					if (
@@ -236,7 +228,7 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 							e2eStatus =
 								testResult.status === "passed" ? "passing" : "failing";
 						} else {
-							e2eStatus = "failing"; // Test exists but not in results
+							e2eStatus = "stale"; // Test exists but not in results, need to run
 						}
 					}
 				}
