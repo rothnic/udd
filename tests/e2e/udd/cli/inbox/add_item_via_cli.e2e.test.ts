@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
+import { afterAll, beforeAll, expect } from "vitest";
 import yaml from "yaml";
 import { rootDir, runUdd } from "../../../../utils.js";
 
@@ -10,9 +10,18 @@ const feature = await loadFeature(
 );
 
 describeFeature(feature, ({ Scenario }) => {
-	Scenario("Add item via CLI", ({ Given, When, Then, And }) => {
-		const inboxPath = path.join(rootDir, "specs/inbox.yml");
+	const inboxPath = path.join(rootDir, "specs/inbox.yml");
+	let originalContent: string;
 
+	beforeAll(async () => {
+		originalContent = await fs.readFile(inboxPath, "utf-8");
+	});
+
+	afterAll(async () => {
+		await fs.writeFile(inboxPath, originalContent);
+	});
+
+	Scenario("Add item via CLI", ({ Given, When, Then, And }) => {
 		Given("I have an empty inbox", async () => {
 			await fs.writeFile(inboxPath, "items: []");
 		});
