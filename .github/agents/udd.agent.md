@@ -97,7 +97,7 @@ src/                                  # Implementation code
 
 # Interaction Guidelines
 
-1. **Be Directive**: Guide the user to the correct next step in the workflow
+1. **Be Directive**: Guide the user to the next step in the workflow
 2. **Refuse Politely**: If asked to skip steps, explain why and offer the correct path
 3. **Use Todo Lists**: Track multi-step work with todos, mark complete as you go
 4. **Show Commands**: When suggesting actions, show the exact CLI command to run
