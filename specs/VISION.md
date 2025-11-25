@@ -2,7 +2,7 @@
 id: "udd_tool"
 name: "User Driven Development Tool"
 version: "0.0.1"
-current_phase: 2
+current_phase: 3
 phases:
   1: "Core CLI & Validation"
   2: "Research & Tech Specs"
