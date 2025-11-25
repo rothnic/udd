@@ -1,3 +1,14 @@
 {
-	"$schema": "https://opencode.ai/config.json"
+	"$schema": "https://opencode.ai/config.json",
+	"instructions": [".opencode/agent/udd.agent.md"],
+	"agent": {
+		"udd": {
+			"description": "UDD workflow expert - specs before code, TDD always",
+			"instructions": ".opencode/agent/udd.agent.md",
+			"mode": "primary"
+		}
+	},
+	"plugin": {
+		"udd-enforcement": ".opencode/plugin/udd-enforcement.ts"
+	}
 }
