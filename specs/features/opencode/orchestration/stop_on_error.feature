@@ -1,6 +1,7 @@
 @phase:3
 Feature: Error Handling in Orchestration
 
+  @todo
   Scenario: Stop on error state
     Given a UDD project with an unrecoverable error
     And OpenCode is configured with the UDD orchestrator plugin

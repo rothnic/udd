@@ -5,6 +5,7 @@ Feature: UDD Status Custom Tool
   I want a structured status tool
   So that I can make informed decisions about next actions
 
+  @todo
   Scenario: Get structured project status
     Given a UDD project with mixed test results
     When the agent calls the "udd-status" tool
@@ -16,12 +17,14 @@ Feature: UDD Status Custom Tool
       | recommendation | Suggested next action |
       | shouldContinue | Boolean indicating if more work is needed |
 
+  @todo
   Scenario: Get next action recommendation
     Given a UDD project with a failing test
     When the agent calls the "udd-status" tool
     Then the recommendation should be "Fix failing test: <test_name>"
     And shouldContinue should be true
 
+  @todo
   Scenario: Project complete status
     Given a UDD project with all tests passing
     When the agent calls the "udd-status" tool

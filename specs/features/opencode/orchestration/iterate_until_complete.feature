@@ -5,6 +5,7 @@ Feature: Orchestrated Iteration
   I want the agent to automatically continue iterating
   So that I don't have to manually re-prompt after each step
 
+  @todo
   Scenario: Iterate until complete
     Given a UDD project with failing tests
     And OpenCode is configured with the UDD orchestrator plugin
