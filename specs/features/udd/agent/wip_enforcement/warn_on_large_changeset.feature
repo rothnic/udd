@@ -1,7 +1,8 @@
 @phase:2
-Feature: Wip Enforcement
+Feature: Agent WIP Enforcement
 
   Scenario: Warn On Large Changeset
-    Given I am in the right state
-    When I do something
-    Then something happens
+    Given the iterate prompt defines WIP limits
+    When the agent runs the iteration checklist
+    Then the agent should warn if uncommitted changes exceed the threshold
+    And the agent should encourage committing in logical chunks
