@@ -1,1 +1,18 @@
-items: []
+items:
+  - id: research-multi-agent
+    title: "Review: Multi-agent orchestration research"
+    description: "Decide on approach for state machine enforcement, parallel workers, and model cost optimization"
+    research: multi-agent-orchestration
+    created: 2025-11-25
+    
+  - id: research-traceability
+    title: "Review: Traceability simplification research"
+    description: "Decide whether to keep bidirectional use-case/feature linking or simplify"
+    research: traceability-simplification
+    created: 2025-11-25
+    
+  - id: research-tech-requirements
+    title: "Review: Technical requirements strategy"
+    description: "Decide where non-functional requirements belong (separate files vs tech specs)"
+    research: technical-requirements-strategy
+    created: 2025-11-25

@@ -16,7 +16,7 @@ goals:
   - "Enable autonomous iteration via OpenCode integration"
 use_cases:
   - "validate_specs"
-  - "check_status"
+  - "run_tests"
   - "orchestrated_iteration"
 ---
 

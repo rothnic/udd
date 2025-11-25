@@ -1,7 +1,7 @@
 id: udd/cli/wip_support
 area: udd/cli
 name: Wip Support
-summary: "TODO: Add summary"
+summary: "CLI display of WIP tags and deferred work in status output"
 use_cases: []
 phase: 1
 kind: core

@@ -1,7 +1,7 @@
 id: udd/cli/inbox
 area: udd/cli
 name: Inbox
-summary: "TODO: Add summary"
+summary: "CLI commands for managing the inbox of raw ideas and tasks"
 use_cases: []
 phase: 1
 kind: core

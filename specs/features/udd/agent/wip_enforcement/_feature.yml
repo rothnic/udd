@@ -1,7 +1,7 @@
 id: udd/agent/wip_enforcement
 area: udd/agent
 name: Wip Enforcement
-summary: "TODO: Add summary"
+summary: "Agent guidance for small commits and controlled changeset scope"
 use_cases: []
 phase: 1
 kind: core

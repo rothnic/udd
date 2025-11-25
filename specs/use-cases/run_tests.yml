@@ -1,6 +1,6 @@
 id: run_tests
 name: Run Tests
-summary: "TODO: Add summary"
+summary: "Execute tests and view project status to track implementation progress"
 actors:
   - user
 outcomes:

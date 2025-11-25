@@ -20,6 +20,7 @@ export async function validateSpecs(): Promise<ValidationResult> {
 	const specsDir = path.join(rootDir, "specs");
 
 	// 1. Validate Vision
+	let visionUseCases: string[] = [];
 	try {
 		const visionPath = path.join(specsDir, "VISION.md");
 		const visionContent = await fs.readFile(visionPath, "utf-8");
@@ -33,6 +34,8 @@ export async function validateSpecs(): Promise<ValidationResult> {
 				errors.push(
 					`specs/VISION.md: Invalid frontmatter - ${result.error.message}`,
 				);
+			} else {
+				visionUseCases = result.data.use_cases || [];
 			}
 		}
 	} catch {
@@ -41,6 +44,7 @@ export async function validateSpecs(): Promise<ValidationResult> {
 
 	// 2. Validate Use Cases
 	const useCaseFiles = await glob("specs/use-cases/*.yml", { cwd: rootDir });
+	const useCaseIds = new Set<string>();
 	for (const file of useCaseFiles) {
 		try {
 			const content = await fs.readFile(path.join(rootDir, file), "utf-8");
@@ -49,6 +53,7 @@ export async function validateSpecs(): Promise<ValidationResult> {
 			if (!result.success) {
 				errors.push(`${file}: Invalid schema - ${result.error.message}`);
 			} else {
+				useCaseIds.add(result.data.id);
 				// Check scenarios exist
 				if (result.data.outcomes) {
 					for (const outcome of result.data.outcomes) {
@@ -74,6 +79,15 @@ export async function validateSpecs(): Promise<ValidationResult> {
 		} catch (error) {
 			if ((error as { code?: string }).code === "ENOENT") continue;
 			errors.push(`${file}: Error reading or parsing`);
+		}
+	}
+
+	// 2b. Validate VISION.md use_cases references exist
+	for (const useCaseId of visionUseCases) {
+		if (!useCaseIds.has(useCaseId)) {
+			errors.push(
+				`specs/VISION.md: References missing use case "${useCaseId}"`,
+			);
 		}
 	}
 

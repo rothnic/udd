@@ -1,7 +1,7 @@
 id: udd/agent
 area: udd
 name: Agent
-summary: "TODO: Add summary"
+summary: "AI agent integration for guiding users through the UDD workflow"
 use_cases: []
 phase: 1
 kind: core

@@ -1,6 +1,6 @@
 id: capture_ideas
 name: Capture Ideas
-summary: "TODO: Add summary"
+summary: "Quickly capture raw ideas into an inbox for later triage and refinement"
 actors:
   - user
 outcomes:

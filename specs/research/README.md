@@ -2,6 +2,15 @@
 
 Research is a structured investigation to resolve uncertainty before committing to implementation. This document defines the workflow, artifact structure, and rules.
 
+## Current Research
+
+| ID | Status | Question |
+|----|--------|----------|
+| [opencode-orchestration-approach](./opencode-orchestration-approach/README.md) | decided | How to integrate UDD with OpenCode for autonomous iteration |
+| [multi-agent-orchestration](./multi-agent-orchestration/README.md) | active | How to support parallel workers with process enforcement |
+| [traceability-simplification](./traceability-simplification/README.md) | active | Should we simplify use-case/feature linking? |
+| [technical-requirements-strategy](./technical-requirements-strategy/README.md) | active | Where should non-functional requirements live? |
+
 ## When to Use Research
 
 | Uncertainty Type | Example | Research Question |

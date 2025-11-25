@@ -1,7 +1,7 @@
 id: udd/dev-experience
 area: udd
 name: Dev-experience
-summary: "TODO: Add summary"
+summary: "Developer experience features including formatting, linting, and editor integration"
 use_cases: []
 phase: 1
 kind: core

@@ -1,7 +1,7 @@
 id: udd/dev-experience/test_discovery
 area: udd/dev-experience
 name: Test Discovery
-summary: "TODO: Add summary"
+summary: "Integration with VS Code and other editors for test discovery and execution"
 use_cases: []
 phase: 1
 kind: core
