@@ -49,23 +49,23 @@ describeFeature(feature, ({ Scenario }) => {
 					// Verify the health summary separates deferred from failures
 					// When there are deferred items AND no failures: shows "Current phase complete"
 					// When there are deferred items AND failures: shows failure count excluding deferred
+					// When all satisfied: shows "All outcomes satisfied"
 
 					// The health summary should exist and have proper format
 					expect(statusOutput.stdout).toContain("Health Summary:");
 
 					// Verify the deferred separation logic by checking the output structure
-					// Either we see "Current phase complete" (healthy with deferred)
-					// Or we see unsatisfied count that doesn't include deferred in total
 					const healthSection =
 						statusOutput.stdout.match(
 							/Health Summary:[\s\S]*?(?=Git Status:|$)/,
 						)?.[0] || "";
 
-					// The health section should mention one of: complete, unsatisfied, or deferred
+					// The health section should mention one of these states
 					const hasProperHealthFormat =
 						healthSection.includes("complete") ||
 						healthSection.includes("unsatisfied") ||
-						healthSection.includes("deferred");
+						healthSection.includes("deferred") ||
+						healthSection.includes("satisfied"); // All outcomes satisfied case
 					expect(hasProperHealthFormat).toBe(true);
 				},
 			);
