@@ -7,7 +7,7 @@
 | Status | `decided` |
 | Created | 2025-11-24 |
 | Timebox | 2 days |
-| Decision | Option B (Custom Tools), evolving to Option D (Hybrid) |
+| Decision | Custom Commands + Plugins (for blocking behavior) |
 | Related Features | [opencode/orchestration](../../features/opencode/orchestration/_feature.yml), [opencode/tools](../../features/opencode/tools/_feature.yml) |
 
 ## Question
@@ -23,9 +23,10 @@ Currently, when using AI agents (VS Code Copilot, OpenCode, etc.) with UDD proje
 3. Performs the action
 4. Loops back to step 1 until status is "complete" or "error"
 
-OpenCode provides three extension mechanisms:
-- **Plugins**: JavaScript/TypeScript modules with event hooks
-- **Custom Tools**: Functions the LLM can call
+OpenCode provides four extension mechanisms:
+- **Custom Commands**: Prompt files with shell command injection (`.opencode/command/*.prompt.md`)
+- **Plugins**: JavaScript/TypeScript modules with event hooks (stateful, can block actions)
+- **Custom Tools**: Functions the LLM can call (for complex operations)
 - **MCP Servers**: External tool integrations
 
 ## Alternatives
@@ -205,31 +206,41 @@ From OpenCode documentation review:
 
 ## Decision
 
-**Selected**: Option B (Custom Tools Only), with planned evolution to Option D (Hybrid)
+**Selected**: Custom Commands for status injection, Plugins for blocking/enforcement
 
 **Rationale**: 
-1. **UDD Principle - Smallest Step First**: Tools are simpler than plugins. Start simple, add complexity only when needed.
-2. **Transparency**: Custom tools show their calls in the conversation, making debugging easier during development.
-3. **Portability**: Tools can work with VS Code Copilot (via MCP), OpenCode, and potentially other agents.
-4. **Agent Guidance**: The existing iterate prompt already defines a checklist. Tools provide the data; the prompt defines the loop.
-5. **Evolution Path**: If autonomy is insufficient, we add the plugin layer (Option D) without discarding tool work.
+1. **Custom Commands are simplest for status**: `.opencode/command/iterate.prompt.md` can inject `udd status` output via `!`udd status --json`` syntax - no code needed.
+2. **Plugins for enforcement**: Use `tool.execute.before` hooks to block file writes when project is in bad state (failing tests, missing specs).
+3. **Custom Tools reserved for complex operations**: Only needed if we want stateful tool behavior or complex return values.
+4. **Agent guidance via prompts**: The iterate prompt already defines the workflow; commands inject the context.
+
+**Architecture**:
+```
+.opencode/
+├── command/
+│   └── iterate.prompt.md      # Injects !`udd status --json`
+├── plugin/
+│   └── udd-enforcement.ts     # Blocks writes when tests fail
+└── tool/                      # Reserved for future complex tools
+```
 
 **Trade-offs Accepted**:
-- LLM must be instructed to iterate (not automatic) - acceptable for Phase 3
-- May require explicit "continue until complete" prompting - can improve with better agent instructions
-- Less control over loop behavior - will add plugin in Phase 4 if needed
+- Agent must be instructed to call `/iterate` command - acceptable
+- Enforcement plugin adds complexity - but critical for spec-first discipline
+- No automatic re-prompting (yet) - can add `session.idle` hook in Phase 4
 
 ## Learnings
 
-1. Start with tools because they're testable and portable
-2. Plugin orchestration is a Phase 4 enhancement, not Phase 3 blocker
-3. The `udd status --json` output format becomes critical - design it carefully
+1. **Commands > Tools for context injection**: Simpler, no code, agent can run any command
+2. **Plugins for blocking**: Use `tool.execute.before` to enforce project state before allowing changes
+3. **Tools for complex returns**: Only when we need structured data beyond CLI output
+4. **udd status --json already exists**: No new implementation needed for status!
 
 ## Follow-up
 
-- [x] Decide on approach (Option B)
-- [ ] Implement `udd status --json` output format
-- [ ] Create `udd-status` custom tool
-- [ ] Create `udd-next` custom tool (optional, may combine with status)
-- [ ] Test with OpenCode `opencode run "iterate prompt"`
-- [ ] Evaluate if plugin needed for Phase 4
+- [x] Decide on approach
+- [x] `udd status --json` already implemented!
+- [ ] Create `.opencode/command/iterate.prompt.md`
+- [ ] Create `.opencode/plugin/udd-enforcement.ts` for blocking behavior
+- [ ] Test with OpenCode `opencode run "/iterate"`
+- [ ] Consider `session.idle` auto-continue in Phase 4
