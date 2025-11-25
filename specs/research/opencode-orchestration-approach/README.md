@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| Status | `active` |
+| Status | `decided` |
 | Created | 2025-11-24 |
 | Timebox | 2 days |
-| Decision | _TBD_ |
+| Decision | Option B (Custom Tools), evolving to Option D (Hybrid) |
 | Related Features | [opencode/orchestration](../../features/opencode/orchestration/_feature.yml), [opencode/tools](../../features/opencode/tools/_feature.yml) |
 
 ## Question
@@ -205,20 +205,31 @@ From OpenCode documentation review:
 
 ## Decision
 
-**Selected**: _TBD_
+**Selected**: Option B (Custom Tools Only), with planned evolution to Option D (Hybrid)
 
-**Rationale**: _TBD_
+**Rationale**: 
+1. **UDD Principle - Smallest Step First**: Tools are simpler than plugins. Start simple, add complexity only when needed.
+2. **Transparency**: Custom tools show their calls in the conversation, making debugging easier during development.
+3. **Portability**: Tools can work with VS Code Copilot (via MCP), OpenCode, and potentially other agents.
+4. **Agent Guidance**: The existing iterate prompt already defines a checklist. Tools provide the data; the prompt defines the loop.
+5. **Evolution Path**: If autonomy is insufficient, we add the plugin layer (Option D) without discarding tool work.
 
-**Trade-offs Accepted**: _TBD_
+**Trade-offs Accepted**:
+- LLM must be instructed to iterate (not automatic) - acceptable for Phase 3
+- May require explicit "continue until complete" prompting - can improve with better agent instructions
+- Less control over loop behavior - will add plugin in Phase 4 if needed
 
 ## Learnings
 
-_To be captured after decision_
+1. Start with tools because they're testable and portable
+2. Plugin orchestration is a Phase 4 enhancement, not Phase 3 blocker
+3. The `udd status --json` output format becomes critical - design it carefully
 
 ## Follow-up
 
-- [ ] Prototype Option A (Plugin) - 2 hours
-- [ ] Prototype Option B (Tools) - 1 hour
-- [ ] Test with real UDD workflow
-- [ ] Measure iteration speed and context retention
-- [ ] Update feature files with selected approach
+- [x] Decide on approach (Option B)
+- [ ] Implement `udd status --json` output format
+- [ ] Create `udd-status` custom tool
+- [ ] Create `udd-next` custom tool (optional, may combine with status)
+- [ ] Test with OpenCode `opencode run "iterate prompt"`
+- [ ] Evaluate if plugin needed for Phase 4
