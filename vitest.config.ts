@@ -15,5 +15,6 @@ export default defineConfig({
 		fileParallelism: true,
 		reporters: ["default", "json"],
 		outputFile: ".udd/results.json",
+		setupFiles: ["./vitest.setup.ts"],
 	},
 });
