@@ -1,5 +1,4 @@
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
 
 const feature = await loadFeature(
 	"specs/features/opencode/orchestration/configurable_iteration.feature",
@@ -8,51 +7,49 @@ const feature = await loadFeature(
 describeFeature(feature, ({ Scenario }) => {
 	Scenario("Configure max iterations", ({ Given, When, Then, And }) => {
 		Given("a UDD project in progress", () => {
-			// TODO: Implement - Phase 3
+			throw new Error("Not implemented");
 		});
 
 		And('OpenCode config has "udd.maxIterations" set to 10', () => {
-			// TODO: Implement - Phase 3
+			throw new Error("Not implemented");
 		});
 
 		When("the agent reaches 10 iterations without completion", () => {
-			// TODO: Implement - Phase 3
+			throw new Error("Not implemented");
 		});
 
 		Then("the agent should pause", () => {
-			// TODO: Implement - Phase 3
-			expect(true).toBe(true);
+			throw new Error("Not implemented");
 		});
 
 		And('report "Max iterations reached"', () => {
-			// TODO: Implement - Phase 3
+			throw new Error("Not implemented");
 		});
 
 		And("allow the user to continue manually", () => {
-			// TODO: Implement - Phase 3
+			throw new Error("Not implemented");
 		});
 	});
 
 	Scenario("Configure pause conditions", ({ Given, When, Then, And }) => {
 		Given("a UDD project with test failures", () => {
-			// TODO: Implement - Phase 3
+			throw new Error("Not implemented");
 		});
 
 		And('OpenCode config has "udd.pauseOn" set to ["test_failure"]', () => {
-			// TODO: Implement - Phase 3
+			throw new Error("Not implemented");
 		});
 
 		When("a test fails during iteration", () => {
-			// TODO: Implement - Phase 3
+			throw new Error("Not implemented");
 		});
 
 		Then("the agent should pause for user review", () => {
-			// TODO: Implement - Phase 3
-			expect(true).toBe(true);
+			throw new Error("Not implemented");
 		});
 
 		And("display the failure details", () => {
-			// TODO: Implement - Phase 3
+			throw new Error("Not implemented");
 		});
 	});
 });
