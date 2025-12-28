@@ -1,6 +1,6 @@
 ---
 description: Scaffold a new UDD use case
-agent: udd
+agent: quick-code
 ---
 
 # /udd/new/use-case Command

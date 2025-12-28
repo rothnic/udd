@@ -1,6 +1,6 @@
 ---
 description: Start the UDD workflow for a goal
-agent: udd
+agent: complex-dev
 ---
 
 # /udd/go Command

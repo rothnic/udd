@@ -1,6 +1,6 @@
 ---
 description: Show research status and active investigations
-agent: udd
+agent: quick-status
 ---
 
 # /udd/research Command

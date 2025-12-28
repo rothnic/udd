@@ -1,6 +1,6 @@
 ---
 description: Run E2E tests and update UDD status
-agent: udd
+agent: quick-status
 ---
 
 # /udd/test Command

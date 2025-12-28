@@ -1,6 +1,6 @@
 ---
 description: Validate UDD spec files for structural correctness
-agent: udd
+agent: quick-status
 ---
 
 # /udd/lint Command

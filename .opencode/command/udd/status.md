@@ -1,31 +1,25 @@
 ---
 description: Show UDD project status (use cases, outcomes, scenarios)
-agent: udd
+agent: quick-status
 ---
 
 # /udd/status Command
 
-Check the current UDD project status to understand what needs attention.
+Run the UDD status command and provide a concise assessment.
 
-## Current Status
+## Execute Status
 
 !`./bin/udd status`
 
 ## Analysis
 
-Based on the status output above:
+Based on the status output:
 
-1. **Phase Check**: Note the current phase and what phase objectives remain
-2. **Health Summary**: Focus on unsatisfied outcomes first
-3. **Stale Tests**: If tests are stale, recommend running `/udd/test`
-4. **Git State**: If dirty, consider what should be committed
+1. **Phase Progress**: What phase are we in? What objectives remain?
+2. **Health Check**: Any unsatisfied outcomes or failing scenarios?
+3. **Stale Tests**: Are test results current or stale?
+4. **Git State**: Is the working directory clean?
 
-## Next Steps
+## Summary
 
-Recommend the most impactful next action based on:
-- Failed tests need implementation
-- Pending scenarios need test files
-- Stale results need `npm test`
-- Unsatisfied outcomes need attention
-
-Guide the user toward completing the current phase objectives.
+Provide a brief (2-3 sentence) summary of the project health and the single most impactful next action to take.

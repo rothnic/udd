@@ -1,6 +1,6 @@
 ---
 description: Implement a specific scenario (TDD workflow)
-agent: udd
+agent: complex-dev
 ---
 
 # /udd/implement Command

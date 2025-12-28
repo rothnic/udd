@@ -1,6 +1,6 @@
 ---
 description: Add an idea to the UDD inbox for later triage
-agent: udd
+agent: quick-code
 ---
 
 # /udd/inbox Command

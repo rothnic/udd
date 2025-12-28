@@ -1,6 +1,6 @@
 ---
 description: Commit current changes with UDD-style message
-agent: udd
+agent: quick-code
 ---
 
 # /udd/commit Command

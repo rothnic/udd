@@ -1,6 +1,6 @@
 ---
 description: Show the UDD roadmap and phase objectives
-agent: udd
+agent: quick-status
 ---
 
 # /udd/roadmap Command

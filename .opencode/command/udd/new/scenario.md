@@ -1,6 +1,6 @@
 ---
 description: Scaffold a new UDD scenario (Gherkin feature file)
-agent: udd
+agent: quick-code
 ---
 
 # /udd/new/scenario Command

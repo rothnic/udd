@@ -1,6 +1,6 @@
 ---
 description: Scaffold a new UDD feature
-agent: udd
+agent: quick-code
 ---
 
 # /udd/new/feature Command

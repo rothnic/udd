@@ -1,6 +1,6 @@
 ---
 description: Iterate on UDD project until complete or error
-agent: udd
+agent: complex-dev
 ---
 
 # /udd/iterate Command

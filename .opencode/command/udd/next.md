@@ -1,6 +1,6 @@
 ---
 description: Suggest the next action based on project status
-agent: udd
+agent: quick-status
 ---
 
 # /udd/next Command

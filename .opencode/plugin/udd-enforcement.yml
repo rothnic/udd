@@ -1,0 +1,33 @@
+# UDD Enforcement Plugin Configuration
+# 
+# This file configures the behavior of the UDD workflow enforcement plugin.
+
+# Maximum number of modified files before warning
+# Set to 0 to disable this check
+max_modified_files: 10
+
+# Whether to show toast notifications in the TUI
+# When true, uses tui.toast.show events for warnings
+show_toasts: true
+
+# Toast display duration in milliseconds
+toast_duration: 5000
+
+# Whether to use git status for file tracking
+# When true, uses `git status` instead of tracking edit/write tool calls
+# This is more accurate but slightly slower
+use_git_status: true
+
+# Patterns to exclude from modified file count (gitignore-style globs)
+# These files won't count toward the max_modified_files threshold
+exclude_patterns:
+  - "*.lock"
+  - "package-lock.json"
+  - ".opencode/**"
+  - "node_modules/**"
+
+# Whether to warn about uncommitted changes on session idle
+warn_uncommitted_on_idle: true
+
+# Minimum number of uncommitted files to trigger idle warning
+min_uncommitted_for_warning: 3
