@@ -15,6 +15,40 @@ export const statusCommand = new Command("status")
 				console.log(chalk.bold("Project Status"));
 				console.log(chalk.dim("=============="));
 
+				// V2 Journeys (if product/ exists)
+				if (status.hasProductDir && Object.keys(status.journeys).length > 0) {
+					console.log(chalk.bold("\nUser Journeys:"));
+					for (const [key, journey] of Object.entries(status.journeys)) {
+						const staleMarker = journey.isStale
+							? chalk.yellow(" (needs sync)")
+							: "";
+						const coverageColor =
+							journey.scenariosMissing === 0
+								? chalk.green
+								: journey.scenariosMissing < journey.scenarioCount
+									? chalk.yellow
+									: chalk.red;
+						const coverage =
+							journey.scenarioCount > 0
+								? `${journey.scenariosPassing}/${journey.scenarioCount}`
+								: "no scenarios";
+
+						console.log(
+							`  ${journey.name}${staleMarker}: ${coverageColor(coverage)}`,
+						);
+						if (journey.scenariosMissing > 0) {
+							console.log(
+								chalk.dim(
+									`    → ${journey.scenariosMissing} scenario(s) missing`,
+								),
+							);
+						}
+					}
+				} else if (status.hasProductDir) {
+					console.log(chalk.dim("\nNo journeys found in product/journeys/"));
+					console.log(chalk.dim("  Run `udd sync` to generate from journeys"));
+				}
+
 				// Show current phase info
 				if (status.phases && Object.keys(status.phases).length > 0) {
 					console.log(chalk.bold("\nRoadmap:"));

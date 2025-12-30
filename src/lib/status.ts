@@ -45,6 +45,19 @@ export interface UseCaseStatus {
 	validation_errors: string[];
 }
 
+// V2 Journey types
+export interface JourneyStatus {
+	name: string;
+	actor: string;
+	goal: string;
+	scenarioCount: number;
+	scenariosMissing: number;
+	scenariosPassing: number;
+	scenariosFailing: number;
+	hash: string;
+	isStale: boolean;
+}
+
 export interface ProjectStatus {
 	git: GitStatus;
 	current_phase: number;
@@ -53,6 +66,9 @@ export interface ProjectStatus {
 	features: Record<string, FeatureStatus>;
 	use_cases: Record<string, UseCaseStatus>;
 	orphaned_scenarios: string[];
+	// V2 additions
+	journeys: Record<string, JourneyStatus>;
+	hasProductDir: boolean;
 }
 
 async function getGitStatus(): Promise<GitStatus> {
@@ -114,6 +130,15 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 		// Default to phase 1 if VISION.md is missing
 	}
 
+	// Check if product/ directory exists (V2 model)
+	let hasProductDir = false;
+	try {
+		await fs.access(path.join(rootDir, "product"));
+		hasProductDir = true;
+	} catch {
+		// No product/ directory
+	}
+
 	const status: ProjectStatus = {
 		git: gitStatus,
 		current_phase: currentPhase,
@@ -122,7 +147,92 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 		features: {},
 		use_cases: {},
 		orphaned_scenarios: [],
+		journeys: {},
+		hasProductDir,
 	};
+
+	// V2: Load journeys from product/journeys/
+	if (hasProductDir) {
+		try {
+			const journeysDir = path.join(rootDir, "product/journeys");
+			const journeyFiles = await fs.readdir(journeysDir);
+			const manifestPath = path.join(rootDir, "specs/.udd/manifest.yml");
+			let manifest: { journeys?: Record<string, { hash: string }> } = {};
+			try {
+				const manifestContent = await fs.readFile(manifestPath, "utf-8");
+				manifest = yaml.parse(manifestContent) || {};
+			} catch {
+				// No manifest yet
+			}
+
+			for (const file of journeyFiles) {
+				if (!file.endsWith(".md") || file.startsWith("_")) continue;
+
+				const journeyPath = path.join(journeysDir, file);
+				const content = await fs.readFile(journeyPath, "utf-8");
+				const hash = require("node:crypto")
+					.createHash("sha256")
+					.update(content)
+					.digest("hex")
+					.slice(0, 12);
+
+				const journeyKey = path.basename(file, ".md");
+				const manifestEntry = manifest.journeys?.[journeyKey];
+				const isStale = !manifestEntry || manifestEntry.hash !== hash;
+
+				// Parse journey content
+				let name = journeyKey.replace(/_/g, " ");
+				let actor = "";
+				let goal = "";
+				const linkedScenarios: string[] = [];
+
+				for (const line of content.split("\n")) {
+					if (line.startsWith("# ")) {
+						name = line.replace(/^#\s*(Journey:\s*)?/, "").trim();
+					}
+					if (line.includes("**Actor:**")) {
+						actor = line.replace(/.*\*\*Actor:\*\*\s*/, "").trim();
+					}
+					if (line.includes("**Goal:**")) {
+						goal = line.replace(/.*\*\*Goal:\*\*\s*/, "").trim();
+					}
+					const stepMatch = line.match(/→\s*`([^`]+)`/);
+					if (stepMatch) {
+						linkedScenarios.push(stepMatch[1]);
+					}
+				}
+
+				// Check scenario statuses
+				let scenariosMissing = 0;
+				let scenariosPassing = 0;
+				const scenariosFailing = 0;
+
+				for (const scenarioPath of linkedScenarios) {
+					try {
+						await fs.access(path.join(rootDir, scenarioPath));
+						// For now, assume exists = passing (proper status would need test run)
+						scenariosPassing++;
+					} catch {
+						scenariosMissing++;
+					}
+				}
+
+				status.journeys[journeyKey] = {
+					name,
+					actor,
+					goal,
+					scenarioCount: linkedScenarios.length,
+					scenariosMissing,
+					scenariosPassing,
+					scenariosFailing,
+					hash,
+					isStale,
+				};
+			}
+		} catch {
+			// product/journeys/ doesn't exist or error reading
+		}
+	}
 
 	// 1. Find all features
 	const featureFiles = await glob("specs/features/**/_feature.yml", {
