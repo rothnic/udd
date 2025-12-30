@@ -7,118 +7,86 @@ import yaml from "yaml";
 export const newCommand = new Command("new").description("Scaffold new specs");
 
 newCommand
-	.command("use-case")
-	.argument("<id>", "Use case ID (e.g. capture_quick_todo)")
-	.description("Create a new use case")
-	.action(async (id) => {
+	.command("journey")
+	.argument("<slug>", "Journey slug (e.g. new_user_onboarding)")
+	.description("Create a new user journey")
+	.action(async (slug) => {
 		const rootDir = process.cwd();
-		const filePath = path.join(rootDir, "specs/use-cases", `${id}.yml`);
+		const journeysDir = path.join(rootDir, "product/journeys");
+		const filePath = path.join(journeysDir, `${slug}.md`);
 
-		const content = {
-			id: id,
-			name: id
-				.split("_")
-				.map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-				.join(" "),
-			summary: "TODO: Add summary",
-			actors: ["user"],
-			outcomes: [
-				{
-					description: "TODO: Add outcome description",
-					scenarios: [],
-				},
-			],
-		};
+		const journeyName = slug
+			.split("_")
+			.map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+			.join(" ");
+
+		const content = `# Journey: ${journeyName}
+
+**Actor:** User  
+**Goal:** TODO: Describe the user's goal
+
+## Steps
+
+1. TODO: First step → \`specs/domain/action.feature\`
+
+## Success
+
+TODO: Define success criteria
+`;
 
 		try {
-			await fs.writeFile(filePath, yaml.stringify(content));
-			console.log(chalk.green(`Created use case: ${filePath}`));
+			await fs.mkdir(journeysDir, { recursive: true });
+			await fs.writeFile(filePath, content);
+			console.log(chalk.green(`Created journey: ${filePath}`));
+			console.log(chalk.dim("Next: Run `udd sync` to generate scenarios"));
 		} catch (error) {
-			console.error(chalk.red("Error creating use case:"), error);
-			process.exit(1);
-		}
-	});
-
-newCommand
-	.command("feature")
-	.argument("<area>", "Feature area (e.g. todos)")
-	.argument("<feature>", "Feature name (e.g. basic)")
-	.description("Create a new feature")
-	.action(async (area, feature) => {
-		const rootDir = process.cwd();
-		const featureDir = path.join(rootDir, "specs/features", area, feature);
-		const filePath = path.join(featureDir, "_feature.yml");
-
-		const content = {
-			id: `${area}/${feature}`,
-			area: area,
-			name: feature
-				.split("_")
-				.map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-				.join(" "),
-			summary: "TODO: Add summary",
-			use_cases: [],
-			phase: 1,
-			kind: "core",
-		};
-
-		try {
-			await fs.mkdir(featureDir, { recursive: true });
-			await fs.writeFile(filePath, yaml.stringify(content));
-			console.log(chalk.green(`Created feature: ${filePath}`));
-		} catch (error) {
-			console.error(chalk.red("Error creating feature:"), error);
+			console.error(chalk.red("Error creating journey:"), error);
 			process.exit(1);
 		}
 	});
 
 newCommand
 	.command("scenario")
-	.argument("<area>", "Feature area")
-	.argument("<feature>", "Feature name")
-	.argument("<slug>", "Scenario slug (e.g. add_todo)")
-	.description("Create a new scenario")
-	.action(async (area, feature, slug) => {
+	.argument("<domain>", "Domain (e.g. auth)")
+	.argument("<action>", "Action slug (e.g. login)")
+	.description("Create a new scenario and test stub")
+	.action(async (domain, action) => {
 		const rootDir = process.cwd();
-		const featureDir = path.join(rootDir, "specs/features", area, feature);
-		const filePath = path.join(featureDir, `${slug}.feature`);
+		const specsDir = path.join(rootDir, "specs", domain);
+		const filePath = path.join(specsDir, `${action}.feature`);
 
-		const featureName = feature
-			.split("_")
-			.map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-			.join(" ");
-		const scenarioName = slug
+		const scenarioName = action
 			.split("_")
 			.map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
 			.join(" ");
 
-		const content = `Feature: ${featureName}
+		const content = `Feature: ${domain}
 
   Scenario: ${scenarioName}
-    Given I am in the right state
-    When I do something
-    Then something happens
+    Given I am a User
+    When I ${action.replace(/_/g, " ")}
+    Then the action is completed successfully
 `;
 
-		const testDir = path.join(rootDir, "tests/e2e", area, feature);
-		const testFilePath = path.join(testDir, `${slug}.e2e.test.ts`);
+		const testDir = path.join(rootDir, "tests", domain);
+		const testFilePath = path.join(testDir, `${action}.e2e.test.ts`);
 		const testContent = `import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
 
-const feature = await loadFeature("specs/features/${area}/${feature}/${slug}.feature");
+const feature = await loadFeature("specs/${domain}/${action}.feature");
 
 describeFeature(feature, ({ Scenario }) => {
 	Scenario("${scenarioName}", ({ Given, When, Then }) => {
-		Given("I am in the right state", () => {
-			// TODO: Implement
+		Given(/I am a (.+)/, (actor: string) => {
+			// TODO: Implement - set up actor context
 		});
 
-		When("I do something", () => {
-			// TODO: Implement
+		When(/I (.+)/, (action: string) => {
+			// TODO: Implement - perform action
 		});
 
-		Then("something happens", () => {
-			// TODO: Implement
+		Then("the action is completed successfully", () => {
+			// TODO: Implement - verify outcome
 			expect(true).toBe(true);
 		});
 	});
@@ -126,43 +94,17 @@ describeFeature(feature, ({ Scenario }) => {
 `;
 
 		try {
-			// Ensure feature dir exists
-			await fs.mkdir(featureDir, { recursive: true });
+			// Create scenario
+			await fs.mkdir(specsDir, { recursive: true });
 			await fs.writeFile(filePath, content);
 			console.log(chalk.green(`Created scenario: ${filePath}`));
 
-			// Ensure test dir exists
+			// Create test
 			await fs.mkdir(testDir, { recursive: true });
 			await fs.writeFile(testFilePath, testContent);
 			console.log(chalk.green(`Created test: ${testFilePath}`));
 		} catch (error) {
 			console.error(chalk.red("Error creating scenario:"), error);
-			process.exit(1);
-		}
-	});
-
-newCommand
-	.command("requirement")
-	.argument("<key>", "Requirement key (e.g. store_new_todo)")
-	.description("Create a new technical requirement")
-	.action(async (key) => {
-		const rootDir = process.cwd();
-		const filePath = path.join(rootDir, "specs/requirements", `${key}.yml`);
-
-		const content = {
-			key: key,
-			type: "functional",
-			feature: "TODO: Add feature id",
-			scenarios: [],
-			description: "TODO: Add description",
-		};
-
-		try {
-			await fs.mkdir(path.dirname(filePath), { recursive: true });
-			await fs.writeFile(filePath, yaml.stringify(content));
-			console.log(chalk.green(`Created requirement: ${filePath}`));
-		} catch (error) {
-			console.error(chalk.red("Error creating requirement:"), error);
 			process.exit(1);
 		}
 	});
