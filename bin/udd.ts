@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import { inboxCommand } from "../src/commands/inbox.js";
+import { initCommand } from "../src/commands/init.js";
 import { lintCommand } from "../src/commands/lint.js";
 import { newCommand } from "../src/commands/new.js";
 import { statusCommand } from "../src/commands/status.js";
@@ -10,6 +11,7 @@ const program = new Command();
 
 program.name("udd").description("User Driven Development CLI").version("0.0.1");
 
+program.addCommand(initCommand);
 program.addCommand(lintCommand);
 program.addCommand(statusCommand);
 program.addCommand(newCommand);
