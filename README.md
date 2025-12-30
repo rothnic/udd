@@ -1,102 +1,111 @@
-# User Driven Development (UDD) Tool
+# User Driven Development (UDD)
 
-A CLI tool for managing feature development through a spec-first, test-driven workflow. Specs are the source of truth—features are only done when their E2E tests pass.
+A spec-first CLI tool where **user journeys are requirements** and **BDD scenarios are tests**. Features are done when E2E tests pass.
 
 ## Quick Start
 
 ```bash
-# Check project health
+# Initialize in your project
+npx udd init
+
+# Sync journeys to scenarios
+udd sync
+
+# Check status
 udd status
-
-# Run tests
-npm test
-
-# See what to do next (use in Copilot Chat)
-# @iterate
 ```
 
-## The UDD Workflow
+## How It Works
 
 ```
-Vision → [Research] → Use Case → Feature → [Tech Spec] → Scenario → Test → Code
+product/journeys/  →→→  specs/<domain>/*.feature  →→→  tests/<domain>/*.e2e.test.ts
+  (what users do)        (testable behaviors)          (verification)
 ```
 
-1. Define **what** users need (Use Cases with Outcomes)
-2. **Research** uncertainty when needed (Analysis of Alternatives)
-3. Specify **how** it works (Gherkin Scenarios)
-4. Document **implementation** details (Tech Specs with unit test tracing)
-5. Verify with **tests** (E2E tests + unit tests)
-6. Implement **code** (only after failing test exists)
+1. **Define journeys** in `product/journeys/` - what users accomplish
+2. **Run `udd sync`** - generates BDD scenarios from journeys  
+3. **Implement code** - make the tests pass
+4. **Iterate** - update journeys, sync again
 
 ## Project Structure
 
 ```
-specs/
-├── VISION.md              # Goals, phases, roadmap
-├── use-cases/*.yml        # User outcomes to achieve
-├── research/<id>/         # Research investigations
-│   └── README.md          # Single source of truth per research
-├── features/<area>/<feature>/
-│   ├── _feature.yml       # Feature metadata
-│   ├── _tech-spec.md      # Implementation details (optional)
-│   └── *.feature          # Gherkin scenarios
-└── requirements/*.yml     # Technical requirements
+product/                          # Human-authored
+├── README.md                     # Product overview
+├── actors.md                     # Who uses it
+├── constraints.md                # NFRs, hard rules
+├── changelog.md                  # Decision history (auto)
+└── journeys/                     # User outcomes
+    └── new_user_onboarding.md
 
-tests/
-├── e2e/<area>/<feature>/*.e2e.test.ts  # E2E tests (match scenarios)
-└── unit/**/*.test.ts                    # Unit tests (traced from tech specs)
+specs/                            # Agent-generated
+├── .udd/manifest.yml             # Traceability (auto)
+└── auth/
+    ├── signup.feature
+    └── login.feature
 
-src/                       # Implementation code
-templates/                 # Scaffolding templates
+tests/                            # Agent-generated
+└── auth/
+    ├── signup.e2e.test.ts
+    └── login.e2e.test.ts
 ```
 
-## CLI Commands
+## Commands
 
-```bash
-# Scaffolding
-udd new use-case <id>
-udd new feature <area> <name>
-udd new scenario <area> <feature> <slug>
-udd new research <id>              # Create research investigation
-udd new tech-spec <area> <feature> # Create tech spec (planned)
+| Command | Purpose |
+|---------|---------|
+| `udd init` | Initialize product/ structure with interview |
+| `udd sync` | Detect journey changes, propose scenarios |
+| `udd status` | Show journey → scenario → test coverage |
+| `udd new journey <slug>` | Create new journey file |
+| `udd new scenario <domain> <action>` | Create scenario + test stub |
+| `udd lint` | Validate spec structure |
 
-# Research (planned)
-udd research list                  # Show active research
-udd research decide <id>           # Record decision
+## Journey Format
 
-# Validation & Status
-udd lint      # Validate spec structure
-udd status    # Show health and progress
-udd test      # Run all tests
+```markdown
+# Journey: New User Onboarding
+
+**Actor:** User  
+**Goal:** Sign up and start using the app
+
+## Steps
+
+1. User signs up → `specs/auth/signup.feature`
+2. User creates first task → `specs/tasks/create.feature`
+
+## Success
+
+User has created their first task within 5 minutes.
 ```
 
-## Copilot Integration
+## Feature Evolution
 
-This project includes custom prompts and an agent for Copilot:
+Split features as they grow:
 
-| Resource | Purpose |
-|----------|---------|
-| `@iterate` | Autonomous project maintenance (start here!) |
-| `@roadmap` | Phase-based progress view |
-| `@scaffold` | Create new specs |
-| `@udd` | Full workflow guidance |
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow documentation.
-
-## Phased Development
-
-Work is organized into phases. Tag scenarios with `@phase:N` to defer:
-
-```gherkin
-@phase:2
-Feature: Future Work
-  Scenario: Will implement in phase 2
+```
+specs/auth/
+├── login_basic.feature       # Email + password
+├── login_2fa.feature         # Two-factor
+└── login_social.feature      # OAuth
 ```
 
-Deferred work automatically becomes active when the phase advances.
+## vitest-cucumber Integration
 
-## Documentation
+Uses [@amiceli/vitest-cucumber](https://github.com/amiceli/vitest-cucumber):
 
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Development workflow
-- [.github/LEARNINGS.md](.github/LEARNINGS.md) - Patterns and insights
-- [specs/VISION.md](specs/VISION.md) - Project vision and roadmap
+```typescript
+import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
+
+const feature = await loadFeature("specs/auth/signup.feature");
+
+describeFeature(feature, ({ Scenario }) => {
+  Scenario("User signs up with email", ({ Given, When, Then }) => {
+    // Step implementations
+  });
+});
+```
+
+## License
+
+MIT
