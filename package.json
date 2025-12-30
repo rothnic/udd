@@ -1,12 +1,33 @@
 {
 	"name": "udd",
-	"version": "1.0.0",
-	"description": "",
+	"version": "2.0.0",
+	"description": "User Driven Development - spec-first CLI where journeys are requirements and BDD scenarios are tests",
 	"type": "module",
 	"main": "index.js",
 	"bin": {
 		"udd": "bin/udd"
 	},
+	"files": [
+		"bin/",
+		"src/",
+		"templates/",
+		"README.md"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/nickroth/udd"
+	},
+	"keywords": [
+		"bdd",
+		"tdd",
+		"testing",
+		"gherkin",
+		"cucumber",
+		"specs",
+		"requirements"
+	],
+	"author": "Nick Roth",
+	"license": "MIT",
 	"scripts": {
 		"setup": "npm install && chmod +x bin/udd && npm link",
 		"test": "vitest run",
@@ -27,9 +48,6 @@
 			"bash -c 'npm run lint'"
 		]
 	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
 	"dependencies": {
 		"@inquirer/prompts": "^8.0.1",
 		"@types/glob": "^8.1.0",
