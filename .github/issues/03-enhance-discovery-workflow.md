@@ -1,6 +1,6 @@
 # Enhance Feature Discovery Workflow
 
-**Labels:** enhancement, phase-3, workflow, agent-tools
+**Labels:** enhancement
 
 ## Overview
 

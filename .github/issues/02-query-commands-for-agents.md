@@ -1,6 +1,6 @@
 # Add Query Commands for Agent Access to Requirements
 
-**Labels:** enhancement, phase-3, agent-tools, json-api
+**Labels:** enhancement
 
 ## Overview
 

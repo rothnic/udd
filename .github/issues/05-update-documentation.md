@@ -1,6 +1,6 @@
 # Update Documentation for SysML-Informed Approach
 
-**Labels:** documentation, phase-3, maintenance
+**Labels:** documentation
 
 ## Overview
 

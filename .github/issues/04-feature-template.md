@@ -1,6 +1,6 @@
 # Add Feature Template with SysML Context
 
-**Labels:** enhancement, phase-3, templates, documentation
+**Labels:** enhancement
 
 ## Overview
 

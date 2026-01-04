@@ -1,6 +1,6 @@
 # Use SysML Principles to Enhance Feature Scenarios
 
-**Labels:** enhancement, phase-3, documentation, methodology
+**Labels:** enhancement
 
 ## Overview
 

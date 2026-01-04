@@ -19,7 +19,9 @@ cd .github/issues
 bash create-issues-simple.sh
 ```
 
-This will create all 5 issues automatically.
+This will create all 5 issues automatically using only the `enhancement` and `documentation` labels.
+
+**Note:** Labels like `phase-3`, `agent-tools`, etc. were removed because they don't exist in the repository yet. You can add them manually after the issues are created if desired.
 
 ### Option 2: Manual via GitHub CLI
 
