@@ -1,12 +1,29 @@
 # Lean Requirements Model - GitHub Issues Created
 
 **Date:** 2026-01-04  
-**Status:** Ready for creation  
+**Status:** Updated - Simplified Approach  
 **Location:** `/tmp/udd-issues/`
+
+## ⚠️ Important Clarification: Keep It Simple
+
+**Key Insight**: SysML principles should inform how we create feature scenarios, not add separate artifact layers.
+
+### The Right Approach
+- ✅ Use SysML thinking to create **better feature files**
+- ✅ Let agents help with requirements analysis
+- ✅ Keep feature files as single source of truth
+- ✅ Document alternatives as comments in features
+
+### What NOT to Do
+- ❌ Don't add `functional_workflow` layers to use cases
+- ❌ Don't create parallel SysML artifacts to maintain
+- ❌ Don't add complexity without clear value
+
+See `docs/sysml-informed-discovery.md` for the practical approach.
 
 ## Summary
 
-I have created **12 detailed GitHub issues** (plus README and automation script) for implementing the Lean Requirements Model with JTBD and Agent Query Interface in UDD. These issues break down the comprehensive analysis from the problem statement into manageable, well-defined implementation tasks.
+I have created **12 detailed GitHub issues** (plus README and automation script) for implementing the Lean Requirements Model with JTBD and Agent Query Interface in UDD. These issues should be reviewed with a focus on **simplicity** and avoiding unnecessary artifact layers.
 
 ## What Was Created
 

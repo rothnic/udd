@@ -6,6 +6,17 @@ UDD is a spec-first workflow where **user journeys are requirements** and **BDD 
 
 **Never implement behavior that isn't specified.** If asked to write code without a spec, guide to create the spec first.
 
+## SysML-Informed Discovery
+
+UDD uses **SysML principles to create better feature scenarios**, not to add artifact layers.
+
+**Key insight**: SysML helps us think through requirements more thoroughly. Use this thinking to create richer feature files with:
+- Comments documenting alternatives considered
+- Comprehensive scenarios covering edge cases
+- Clear user context (who, what, why)
+
+**See `docs/sysml-informed-discovery.md` for practical examples.**
+
 ## Project Structure
 
 ```
@@ -85,12 +96,22 @@ User has created their first item within 5 minutes.
 
 User: "Add CSV export feature"
 
-1. Check status: `udd status`
-2. Create journey: `udd new journey export_data`
-3. Edit `product/journeys/export_data.md` with steps
-4. Sync: `udd sync`
-5. Accept proposed scenarios
-6. Run tests (fail): `npm test`
-7. Implement code
-8. Run tests (pass): `npm test`
-9. Verify: `udd status`
+1. **Understand the user need** (SysML-style thinking):
+   - Who needs this? (Data analysts)
+   - Why? (To analyze data in Excel)
+   - What alternatives exist? (Direct Excel, API, CSV)
+   - Which is best for the user? (CSV: simple, universal)
+
+2. Check status: `udd status`
+3. Create journey: `udd new journey export_data`
+4. Edit `product/journeys/export_data.md` with user context
+5. Create rich feature file with:
+   - Comments explaining alternatives considered
+   - Comprehensive scenarios (happy path, errors, edge cases)
+6. Sync: `udd sync`
+7. Run tests (fail): `npm test`
+8. Implement code
+9. Run tests (pass): `npm test`
+10. Verify: `udd status`
+
+**See `docs/sysml-informed-discovery.md` for detailed guidance on using SysML principles to create better feature scenarios.**

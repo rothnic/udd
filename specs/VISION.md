@@ -11,6 +11,8 @@ phases:
   5: "Advanced Workflows"
 goals:
   - "Make user-facing scenarios the single source of truth"
+  - "Use SysML principles to create better scenarios (not add layers)"
+  - "Let agents assist with requirements discovery and analysis"
   - "Keep everything simple, discoverable, and deterministic"
   - "Enforce guardrails against spec/test tampering"
   - "Enable autonomous iteration via OpenCode integration"
