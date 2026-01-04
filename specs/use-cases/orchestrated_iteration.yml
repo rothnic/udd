@@ -5,6 +5,47 @@ actors:
   - developer
   - orchestrator_agent
   - worker_agent
+functional_workflow:
+  - step: Initialize iteration
+    description: Orchestrator reads project state and plans work
+    functions:
+      - status_reader
+      - goal_parser
+      - work_planner
+    interactions:
+      - status_reader gathers current project state from udd status
+      - goal_parser identifies objectives from specs
+      - work_planner creates execution plan based on status and goals
+  - step: Delegate work
+    description: Orchestrator assigns tasks to worker agent
+    functions:
+      - task_delegator
+      - worker_coordinator
+      - session_manager
+    interactions:
+      - task_delegator creates work unit with context
+      - worker_coordinator assigns to worker_agent
+      - session_manager tracks execution state
+  - step: Monitor execution
+    description: Track worker progress and detect errors
+    functions:
+      - progress_monitor
+      - error_detector
+      - state_preserver
+    interactions:
+      - progress_monitor polls worker status
+      - error_detector identifies failures
+      - state_preserver captures session data on error
+  - step: Evaluate completion
+    description: Determine if work is complete or needs iteration
+    functions:
+      - completion_checker
+      - quality_validator
+      - decision_maker
+    interactions:
+      - completion_checker assesses progress against goals
+      - quality_validator verifies acceptance criteria
+      - decision_maker determines continue, complete, or stop
 outcomes:
   - description: Orchestrator delegates work to worker and monitors completion
     scenarios:
