@@ -85,12 +85,17 @@ The original plan proposed adding many separate layers and artifacts:
 
 ## How to Create Issues
 
-### Option 1: Automated (Recommended)
+**Note:** Issue files are prepared in `/tmp/udd-issues-updated/` on the PR build environment.
+
+### Option 1: Run the Script (Recommended)
+
+From your local machine with `gh` authenticated:
 
 ```bash
+# The files are in /tmp/udd-issues-updated/ in the PR environment
+# Copy them locally or access via the PR branch, then:
 cd /tmp/udd-issues-updated
-chmod +x create-issues.sh
-./create-issues.sh
+bash create-issues-simple.sh
 ```
 
 ### Option 2: GitHub CLI (Manual)
@@ -98,21 +103,22 @@ chmod +x create-issues.sh
 ```bash
 cd /tmp/udd-issues-updated
 
-gh issue create \
-  --repo rothnic/udd \
+gh issue create --repo rothnic/udd \
   --title "Use SysML Principles to Enhance Feature Scenarios" \
   --body-file 01-sysml-informed-feature-scenarios.md \
   --label "enhancement,phase-3,documentation,methodology"
 
-# Repeat for issues 02-05
+# Repeat for issues 02-05 (see INSTRUCTIONS.md for all commands)
 ```
 
 ### Option 3: Web UI
 
 1. Go to https://github.com/rothnic/udd/issues/new
 2. Copy title and content from `/tmp/udd-issues-updated/<nn>-*.md`
-3. Add appropriate labels
+3. Add appropriate labels from the `**Labels:**` line
 4. Submit
+
+**See `/tmp/udd-issues-updated/INSTRUCTIONS.md` for detailed steps.**
 
 ## Key Benefits of Simplified Approach
 
