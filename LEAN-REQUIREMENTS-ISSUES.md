@@ -2,7 +2,7 @@
 
 **Date:** 2026-01-04  
 **Status:** ✅ Updated - Simplified SysML-Informed Approach  
-**Location:** `/tmp/udd-issues-updated/`
+**Location:** `.github/issues/` (in repository)
 
 ## 🎯 Key Change: Keep It Simple
 
@@ -26,6 +26,8 @@ After the SysML principles merge, the original 12-issue plan was **revised down 
 ## Summary
 
 **Revised approach:** **5 focused issues** (down from 12) that use SysML principles to enhance feature creation without adding artifact layers.
+
+**All issue files are in the repository** at `.github/issues/` - ready to create!
 
 ## Revised Issues (5 focused, practical enhancements)
 
@@ -85,40 +87,36 @@ The original plan proposed adding many separate layers and artifacts:
 
 ## How to Create Issues
 
-**Note:** Issue files are prepared in `/tmp/udd-issues-updated/` on the PR build environment.
+**Note:** Issue files are in `.github/issues/` directory in the repository.
 
 ### Option 1: Run the Script (Recommended)
 
-From your local machine with `gh` authenticated:
-
 ```bash
-# The files are in /tmp/udd-issues-updated/ in the PR environment
-# Copy them locally or access via the PR branch, then:
-cd /tmp/udd-issues-updated
+cd .github/issues
 bash create-issues-simple.sh
 ```
 
 ### Option 2: GitHub CLI (Manual)
 
 ```bash
-cd /tmp/udd-issues-updated
+cd .github/issues
 
 gh issue create --repo rothnic/udd \
   --title "Use SysML Principles to Enhance Feature Scenarios" \
   --body-file 01-sysml-informed-feature-scenarios.md \
   --label "enhancement,phase-3,documentation,methodology"
 
-# Repeat for issues 02-05 (see INSTRUCTIONS.md for all commands)
+# Repeat for issues 02-05 (see .github/issues/README.md for all commands)
 ```
 
 ### Option 3: Web UI
 
 1. Go to https://github.com/rothnic/udd/issues/new
-2. Copy title and content from `/tmp/udd-issues-updated/<nn>-*.md`
+2. Copy title and content from `.github/issues/<nn>-*.md`
 3. Add appropriate labels from the `**Labels:**` line
 4. Submit
 
-**See `/tmp/udd-issues-updated/INSTRUCTIONS.md` for detailed steps.**
+**See `.github/issues/README.md` for detailed steps.**
 
 ## Key Benefits of Simplified Approach
 
