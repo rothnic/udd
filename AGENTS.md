@@ -6,27 +6,16 @@ UDD is a spec-first workflow where **user journeys are requirements** and **BDD 
 
 **Never implement behavior that isn't specified.** If asked to write code without a spec, guide to create the spec first.
 
-## Requirements Levels (Black/Grey/White Box)
+## SysML-Informed Discovery
 
-UDD supports three levels of specification aligned with SysML principles:
+UDD uses **SysML principles to create better feature scenarios**, not to add artifact layers.
 
-### 1. Black Box (External Behavior)
-- **What:** Observable system behavior from user perspective
-- **In UDD:** BDD scenarios in `*.feature` files
-- **When:** Always - every feature needs black-box scenarios
+**Key insight**: SysML helps us think through requirements more thoroughly. Use this thinking to create richer feature files with:
+- Comments documenting alternatives considered
+- Comprehensive scenarios covering edge cases
+- Clear user context (who, what, why)
 
-### 2. Grey Box (Functional Workflows) ⭐
-- **What:** Functional component interactions without implementation details
-- **In UDD:** Use cases with `functional_workflow` field
-- **When:** Complex features with multiple collaborating components
-- **See:** `docs/functional-requirements.md` for detailed guidance
-
-### 3. White Box (Implementation)
-- **What:** Actual code, architecture, technology choices
-- **In UDD:** Source code in `src/`
-- **When:** After requirements and scenarios are defined
-
-**Key Insight:** Grey-box is NOT white-box. It specifies **functional workflows** (how functions collaborate) without dictating **implementation architecture** (classes, databases, APIs).
+**See `docs/sysml-informed-discovery.md` for practical examples.**
 
 ## Project Structure
 
@@ -41,10 +30,8 @@ product/                          # Human-authored intent
 
 specs/                            # Testable behaviors
 ├── .udd/manifest.yml             # Traceability (auto)
-├── use-cases/                    # System-level requirements
-│   └── *.yml                     # Can include grey-box functional workflows
 └── <domain>/                     # Grouped by domain
-    └── *.feature                 # BDD scenarios (black-box)
+    └── *.feature                 # BDD scenarios
 
 tests/                            # Verification
 └── <domain>/
@@ -100,40 +87,31 @@ User has created their first item within 5 minutes.
 1. **Check `udd status` before starting work**
 2. **Create/update journey before implementing new behavior**
 3. **Run `udd sync` to generate scenarios from journeys**
-4. **Consider grey-box analysis for complex features**
-   - If feature involves multiple functional components, create use case with `functional_workflow`
-   - See `docs/functional-requirements.md` for guidance
-   - Focus on WHAT components do, not HOW they're implemented
-5. **One scenario per file** - keeps files small and focused
-6. **Split by variation** - `login_basic.feature`, `login_2fa.feature`
-7. **Run tests after changes**: `npm test`
-8. **Commit often with meaningful messages**
-
-## When to Use Grey-Box Functional Workflows
-
-✅ **Use grey-box when:**
-- Feature involves multiple functional components working together
-- System-level functional requirements need clarification
-- You want to validate functional design before implementation
-- Complex workflows benefit from decomposition
-
-❌ **Skip grey-box when:**
-- Feature is simple and maps to single behavior
-- Implementation is obvious
-- Over-specification adds no value
-
-**Important:** Grey-box specifies functional workflows (component interactions) WITHOUT implementation details (no technology, architecture, or code design).
+4. **One scenario per file** - keeps files small and focused
+5. **Split by variation** - `login_basic.feature`, `login_2fa.feature`
+6. **Run tests after changes**: `npm test`
+7. **Commit often with meaningful messages**
 
 ## Example Workflow
 
 User: "Add CSV export feature"
 
-1. Check status: `udd status`
-2. Create journey: `udd new journey export_data`
-3. Edit `product/journeys/export_data.md` with steps
-4. Sync: `udd sync`
-5. Accept proposed scenarios
-6. Run tests (fail): `npm test`
-7. Implement code
-8. Run tests (pass): `npm test`
-9. Verify: `udd status`
+1. **Understand the user need** (SysML-style thinking):
+   - Who needs this? (Data analysts)
+   - Why? (To analyze data in Excel)
+   - What alternatives exist? (Direct Excel, API, CSV)
+   - Which is best for the user? (CSV: simple, universal)
+
+2. Check status: `udd status`
+3. Create journey: `udd new journey export_data`
+4. Edit `product/journeys/export_data.md` with user context
+5. Create rich feature file with:
+   - Comments explaining alternatives considered
+   - Comprehensive scenarios (happy path, errors, edge cases)
+6. Sync: `udd sync`
+7. Run tests (fail): `npm test`
+8. Implement code
+9. Run tests (pass): `npm test`
+10. Verify: `udd status`
+
+**See `docs/sysml-informed-discovery.md` for detailed guidance on using SysML principles to create better feature scenarios.**

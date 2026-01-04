@@ -1,42 +1,29 @@
 # Lean Requirements Model - GitHub Issues Created
 
 **Date:** 2026-01-04  
-**Status:** Updated with grey-box functional analysis  
-**Location:** `/tmp/udd-issues/`  
-**Analysis:** See `specs/research/requirements-model-analysis/README.md`
+**Status:** Updated - Simplified Approach  
+**Location:** `/tmp/udd-issues/`
 
-## ⚠️ Important Update: Grey-Box Functional Analysis
+## ⚠️ Important Clarification: Keep It Simple
 
-**Critical Finding:** The original backlog proposed a "black box only" approach for use cases (~30 lines, external actors only). However, this is **too restrictive** for UDD's goals.
+**Key Insight**: SysML principles should inform how we create feature scenarios, not add separate artifact layers.
 
-### Why This Matters
+### The Right Approach
+- ✅ Use SysML thinking to create **better feature files**
+- ✅ Let agents help with requirements analysis
+- ✅ Keep feature files as single source of truth
+- ✅ Document alternatives as comments in features
 
-UDD must support **grey-box functional analysis** (like SysML) to:
-- Specify functional workflows without mandating implementation architecture
-- Show how functional components work together
-- Bridge user journeys to system-level functional requirements
-- Align with proven systems engineering practices
+### What NOT to Do
+- ❌ Don't add `functional_workflow` layers to use cases
+- ❌ Don't create parallel SysML artifacts to maintain
+- ❌ Don't add complexity without clear value
 
-See detailed analysis in: **`specs/research/requirements-model-analysis/README.md`**
-
-### Key Changes Needed
-
-1. **Issue #02** - Use case schema should support BOTH:
-   - Black-box (simple, external behavior only) 
-   - Grey-box (optional functional workflows)
-
-2. **Issue #04** - Actor model must distinguish:
-   - External actors (users, systems)
-   - Internal functional components (for workflows)
-
-3. **Documentation** - Must explain three levels:
-   - Black box (external view)
-   - Grey box (functional view) ← **This is what SysML functional analysis is**
-   - White box (implementation view)
+See `docs/sysml-informed-discovery.md` for the practical approach.
 
 ## Summary
 
-I have created **12 detailed GitHub issues** (plus README and automation script) for implementing the Lean Requirements Model with JTBD and Agent Query Interface in UDD. These issues have been **analyzed and require updates** to support grey-box functional analysis per SysML principles.
+I have created **12 detailed GitHub issues** (plus README and automation script) for implementing the Lean Requirements Model with JTBD and Agent Query Interface in UDD. These issues should be reviewed with a focus on **simplicity** and avoiding unnecessary artifact layers.
 
 ## What Was Created
 

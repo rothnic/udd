@@ -6,7 +6,6 @@ Research is a structured investigation to resolve uncertainty before committing 
 
 | ID | Status | Question |
 |----|--------|----------|
-| [requirements-model-analysis](./requirements-model-analysis/README.md) | active | How to support grey-box functional analysis (SysML-aligned) |
 | [opencode-orchestration-approach](./opencode-orchestration-approach/README.md) | decided | How to integrate UDD with OpenCode for autonomous iteration |
 | [multi-agent-orchestration](./multi-agent-orchestration/README.md) | active | How to support parallel workers with process enforcement |
 | [traceability-simplification](./traceability-simplification/README.md) | active | Should we simplify use-case/feature linking? |
