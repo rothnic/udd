@@ -1,81 +1,168 @@
-# Lean Requirements Model - GitHub Issues Created
+# UDD Enhancement Issues - Revised for Simplicity
 
 **Date:** 2026-01-04  
-**Status:** Updated - Simplified Approach  
-**Location:** `/tmp/udd-issues/`
+**Status:** ✅ Updated - Simplified SysML-Informed Approach  
+**Location:** `/tmp/udd-issues-updated/`
 
-## ⚠️ Important Clarification: Keep It Simple
+## 🎯 Key Change: Keep It Simple
 
-**Key Insight**: SysML principles should inform how we create feature scenarios, not add separate artifact layers.
+After the SysML principles merge, the original 12-issue plan was **revised down to 5 focused issues** that enhance UDD without adding complexity.
 
-### The Right Approach
+### The Right Approach ✅
 - ✅ Use SysML thinking to create **better feature files**
-- ✅ Let agents help with requirements analysis
+- ✅ Let agents help with requirements discovery
 - ✅ Keep feature files as single source of truth
 - ✅ Document alternatives as comments in features
+- ✅ Add practical tooling (query, discover)
 
-### What NOT to Do
-- ❌ Don't add `functional_workflow` layers to use cases
+### What NOT to Do ❌
+- ❌ Don't add `functional_workflow` layers or separate use case schemas
 - ❌ Don't create parallel SysML artifacts to maintain
 - ❌ Don't add complexity without clear value
+- ❌ Don't over-engineer with 12 separate issues when 5 will do
 
-See `docs/sysml-informed-discovery.md` for the practical approach.
+**See `docs/sysml-informed-discovery.md` for the complete philosophy.**
 
 ## Summary
 
-I have created **12 detailed GitHub issues** (plus README and automation script) for implementing the Lean Requirements Model with JTBD and Agent Query Interface in UDD. These issues should be reviewed with a focus on **simplicity** and avoiding unnecessary artifact layers.
+**Revised approach:** **5 focused issues** (down from 12) that use SysML principles to enhance feature creation without adding artifact layers.
 
-## What Was Created
+## Revised Issues (5 focused, practical enhancements)
 
-### Issue Files (13 files, ~4,500 lines)
+### Issue Files
 
-1. **01-research-lean-requirements-model.md** (4.5K)
-   - Research document capturing problem, alternatives, and decision
-   - **Phase 3** | **Priority: HIGHEST** | Blocks all other work
+1. **01-sysml-informed-feature-scenarios.md** (~9.4K)
+   - Apply SysML thinking to create richer feature files
+   - **Phase 3** | **Priority: HIGH** | Foundation for approach
 
-2. **02-simplify-use-case-schema.md** (5.9K)
-   - New lean YAML format with Zod validation (~30 lines)
-   - **Phase 3** | **Priority: HIGH**
+2. **02-query-commands-for-agents.md** (~7.7K)
+   - `udd query` commands (actors, journeys, features, status)
+   - **Phase 3** | **Priority: HIGH** | Agent tooling
 
-3. **03-implement-query-interface.md** (9.1K)
-   - `udd query` commands (actors, journeys, use-cases, gaps)
-   - **Phase 3** | **Priority: HIGH**
+3. **03-enhance-discovery-workflow.md** (~10.2K)
+   - Interactive `udd discover feature` command
+   - **Phase 3** | **Priority: MEDIUM** | Guided discovery
 
-4. **04-update-actor-model.md** (6.6K)
-   - External actors only, remove internal components
-   - **Phase 3** | **Priority: HIGH**
+4. **04-feature-template.md** (~8.1K)
+   - Feature template with SysML context sections
+   - **Phase 3** | **Priority: MEDIUM** | Consistency
 
-5. **05-enhance-manifest.md** (8.4K)
-   - Add completeness metrics and full traceability
-   - **Phase 3** | **Priority: MEDIUM**
+5. **05-update-documentation.md** (~5.9K)
+   - Update README, CONTRIBUTING.md, getting-started
+   - **Phase 3** | **Priority: LOW** | Documentation
 
-6. **12-enhance-lint-command.md** (7.6K)
-   - Add completeness checks to `udd lint`
-   - **Phase 3** | **Priority: MEDIUM**
+### Supporting Files
+- **README.md** - Complete guide to revised issues
+- **create-issues.sh** - Automated creation script
 
-7. **09-create-core-documentation.md** (15K)
-   - Requirements model, use case spec, discovery guide docs
-   - **Phase 3** | **Priority: MEDIUM**
+## Why 5 Issues Instead of 12?
 
-8. **11-update-existing-docs.md** (9.0K)
-   - Update README, AGENTS.md, CONTRIBUTING.md
-   - **Phase 3** | **Priority: LOW**
+The original plan proposed adding many separate layers and artifacts:
+- ❌ Separate use case schemas (adds layer)
+- ❌ Enhanced manifests (premature optimization)
+- ❌ JTBD templates (too formal)
+- ❌ Multiple analyze/suggest commands (complex)
 
-9. **06-implement-analyze-commands.md** (9.7K)
-   - `udd analyze` for coverage and completeness
-   - **Phase 4** | **Deferred** | Scenarios tagged `@phase:4`
+**The SysML merge showed us the simpler path:**
+- ✅ Use SysML thinking to enhance existing artifacts
+- ✅ Don't add layers or parallel structures
+- ✅ Focus on practical agent assistance
+- ✅ Keep UDD simple and maintainable
 
-10. **07-implement-suggest-commands.md** (12K)
-    - `udd suggest` for AI-assisted discovery
-    - **Phase 4** | **Deferred**
+## Implementation Path
 
-11. **08-add-jtbd-template.md** (12K)
-    - JTBD framework and discovery workflow
-    - **Phase 4** | **Deferred**
+```
+1. SysML-Informed Features (#01) → Foundation
+   ↓
+2. Feature Template (#04) → Makes it easy
+   ↓
+3. Query (#02) + Discovery (#03) → Agent tools (parallel)
+   ↓
+4. Documentation (#05) → Polish
+```
 
-12. **10-create-agent-guide.md** (13K)
-    - Complete guide for AI agents using UDD
-    - **Phase 4** | **Deferred**
+**Estimated effort:** 2-3 weeks (vs 8-10 weeks for original 12)
+
+## How to Create Issues
+
+### Option 1: Automated (Recommended)
+
+```bash
+cd /tmp/udd-issues-updated
+chmod +x create-issues.sh
+./create-issues.sh
+```
+
+### Option 2: GitHub CLI (Manual)
+
+```bash
+cd /tmp/udd-issues-updated
+
+gh issue create \
+  --repo rothnic/udd \
+  --title "Use SysML Principles to Enhance Feature Scenarios" \
+  --body-file 01-sysml-informed-feature-scenarios.md \
+  --label "enhancement,phase-3,documentation,methodology"
+
+# Repeat for issues 02-05
+```
+
+### Option 3: Web UI
+
+1. Go to https://github.com/rothnic/udd/issues/new
+2. Copy title and content from `/tmp/udd-issues-updated/<nn>-*.md`
+3. Add appropriate labels
+4. Submit
+
+## Key Benefits of Simplified Approach
+
+### For Humans
+- 📝 Richer feature documentation with context
+- 🎯 Focused on user needs, not implementation
+- ⚡ Less overhead to maintain (single source of truth)
+- 🎨 No parallel artifacts to sync
+
+### For Agents
+- 🔍 Can query project structure via JSON API
+- 🤖 Can help with discovery workflow
+- ✅ Clear how to assist users
+- 🚀 Practical tools they can actually use
+
+### For UDD
+- 🏆 Maintains core simplicity
+- 💡 Improves requirements quality
+- 🧠 Better thinking process (SysML principles)
+- 🤝 Agent-friendly without complexity
+
+## Files Location
+
+```
+/tmp/udd-issues-updated/
+├── README.md                                    # Complete guide
+├── create-issues.sh                             # Automation script
+├── 01-sysml-informed-feature-scenarios.md       # HIGH
+├── 02-query-commands-for-agents.md              # HIGH
+├── 03-enhance-discovery-workflow.md             # MEDIUM
+├── 04-feature-template.md                       # MEDIUM
+└── 05-update-documentation.md                   # LOW
+```
+
+**Also in repository:**
+- `/home/runner/work/udd/udd/LEAN-REQUIREMENTS-ISSUES.md` - This summary
+
+## Success Criteria
+
+- [ ] 5 issues created in GitHub
+- [ ] Feature template exists
+- [ ] Query commands provide JSON API
+- [ ] Discovery workflow guides users
+- [ ] Documentation updated
+- [ ] All changes maintain UDD simplicity
+- [ ] Agents can effectively assist with discovery
+
+---
+
+**Remember:** Use SysML principles to **think better**, not to **create more artifacts**.
 
 ### Supporting Files
 
