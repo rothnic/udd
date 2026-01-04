@@ -1,12 +1,42 @@
 # Lean Requirements Model - GitHub Issues Created
 
 **Date:** 2026-01-04  
-**Status:** Ready for creation  
-**Location:** `/tmp/udd-issues/`
+**Status:** Updated with grey-box functional analysis  
+**Location:** `/tmp/udd-issues/`  
+**Analysis:** See `specs/research/requirements-model-analysis/README.md`
+
+## ⚠️ Important Update: Grey-Box Functional Analysis
+
+**Critical Finding:** The original backlog proposed a "black box only" approach for use cases (~30 lines, external actors only). However, this is **too restrictive** for UDD's goals.
+
+### Why This Matters
+
+UDD must support **grey-box functional analysis** (like SysML) to:
+- Specify functional workflows without mandating implementation architecture
+- Show how functional components work together
+- Bridge user journeys to system-level functional requirements
+- Align with proven systems engineering practices
+
+See detailed analysis in: **`specs/research/requirements-model-analysis/README.md`**
+
+### Key Changes Needed
+
+1. **Issue #02** - Use case schema should support BOTH:
+   - Black-box (simple, external behavior only) 
+   - Grey-box (optional functional workflows)
+
+2. **Issue #04** - Actor model must distinguish:
+   - External actors (users, systems)
+   - Internal functional components (for workflows)
+
+3. **Documentation** - Must explain three levels:
+   - Black box (external view)
+   - Grey box (functional view) ← **This is what SysML functional analysis is**
+   - White box (implementation view)
 
 ## Summary
 
-I have created **12 detailed GitHub issues** (plus README and automation script) for implementing the Lean Requirements Model with JTBD and Agent Query Interface in UDD. These issues break down the comprehensive analysis from the problem statement into manageable, well-defined implementation tasks.
+I have created **12 detailed GitHub issues** (plus README and automation script) for implementing the Lean Requirements Model with JTBD and Agent Query Interface in UDD. These issues have been **analyzed and require updates** to support grey-box functional analysis per SysML principles.
 
 ## What Was Created
 

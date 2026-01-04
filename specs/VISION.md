@@ -11,6 +11,8 @@ phases:
   5: "Advanced Workflows"
 goals:
   - "Make user-facing scenarios the single source of truth"
+  - "Support grey-box functional analysis (SysML-aligned)"
+  - "Bridge user journeys to system-level functional requirements"
   - "Keep everything simple, discoverable, and deterministic"
   - "Enforce guardrails against spec/test tampering"
   - "Enable autonomous iteration via OpenCode integration"
