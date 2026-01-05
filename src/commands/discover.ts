@@ -25,22 +25,36 @@ discoverCommand
 			// Step 1: Understand the user need
 			console.log(chalk.yellow("📋 Step 1: User Need Analysis\n"));
 
-			const userNeed = await input({
-				message: "What user need does this feature address?",
-				validate: (value) =>
-					value.length > 0 || "Please describe the user need",
-			});
+			// Helper function to sanitize input for Gherkin comments
+			const sanitizeForComment = (text: string): string => {
+				return text
+					.replace(/\n/g, " ") // Replace newlines with spaces
+					.replace(/\r/g, "") // Remove carriage returns
+					.trim();
+			};
 
-			const who = await input({
-				message: "Who are the users/actors? (e.g., Data Analysts, Users)",
-				validate: (value) => value.length > 0 || "Please specify the users",
-			});
+			const userNeed = sanitizeForComment(
+				await input({
+					message: "What user need does this feature address?",
+					validate: (value) =>
+						value.length > 0 || "Please describe the user need",
+				}),
+			);
 
-			const why = await input({
-				message: "Why does this matter? (Business value)",
-				validate: (value) =>
-					value.length > 0 || "Please explain the business value",
-			});
+			const who = sanitizeForComment(
+				await input({
+					message: "Who are the users/actors? (e.g., Data Analysts, Users)",
+					validate: (value) => value.length > 0 || "Please specify the users",
+				}),
+			);
+
+			const why = sanitizeForComment(
+				await input({
+					message: "Why does this matter? (Business value)",
+					validate: (value) =>
+						value.length > 0 || "Please explain the business value",
+				}),
+			);
 
 			// Step 2: Alternatives
 			console.log(chalk.yellow("\n🤔 Step 2: Alternatives Analysis\n"));
@@ -57,15 +71,29 @@ discoverCommand
 
 			let addMore = true;
 			while (addMore) {
-				const altName = await input({
-					message: "Alternative approach name:",
-				});
+				const altName = sanitizeForComment(
+					await input({
+						message: "Alternative approach name:",
+					}),
+				);
 
-				if (!altName) break;
+				if (!altName) {
+					if (alternatives.length === 0) {
+						console.log(
+							chalk.yellow(
+								"\nAt least one alternative should be considered. Please add one.\n",
+							),
+						);
+						continue;
+					}
+					break;
+				}
 
-				const altDescription = await input({
-					message: `Describe "${altName}":`,
-				});
+				const altDescription = sanitizeForComment(
+					await input({
+						message: `Describe "${altName}":`,
+					}),
+				);
 
 				const altDecision = await select({
 					message: `Decision for "${altName}":`,
@@ -76,9 +104,11 @@ discoverCommand
 					],
 				});
 
-				const altReason = await input({
-					message: `Why ${altDecision.toLowerCase()}?`,
-				});
+				const altReason = sanitizeForComment(
+					await input({
+						message: `Why ${altDecision.toLowerCase()}?`,
+					}),
+				);
 
 				alternatives.push({
 					name: altName,
@@ -103,9 +133,11 @@ discoverCommand
 			let addMoreCriteria = true;
 
 			while (addMoreCriteria) {
-				const criterion = await input({
-					message: "Success criterion (leave empty to finish):",
-				});
+				const criterion = sanitizeForComment(
+					await input({
+						message: "Success criterion (leave empty to finish):",
+					}),
+				);
 
 				if (!criterion) break;
 
@@ -129,9 +161,11 @@ discoverCommand
 			let addMoreEdgeCases = true;
 
 			while (addMoreEdgeCases) {
-				const edgeCase = await input({
-					message: "Edge case or error condition (leave empty to finish):",
-				});
+				const edgeCase = sanitizeForComment(
+					await input({
+						message: "Edge case or error condition (leave empty to finish):",
+					}),
+				);
 
 				if (!edgeCase) break;
 
