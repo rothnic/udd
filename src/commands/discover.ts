@@ -10,20 +10,24 @@ export const discoverCommand = new Command("discover").description(
 
 discoverCommand
 	.command("feature")
-	.argument("<path>", "Feature path (e.g., export/csv-export, auth/login)")
+	.argument(
+		"<path>",
+		"Feature path (e.g., export/csv-export, export/tabular/csv, auth/login)",
+	)
 	.description("Guided feature discovery with SysML-style analysis")
 	.action(async (featurePath: string) => {
-		// Parse the path into domain and name
-		const pathParts = featurePath.split("/");
-		if (pathParts.length !== 2 || !pathParts[0] || !pathParts[1]) {
+		// Parse the path into directory parts and feature name
+		const pathParts = featurePath.split("/").filter((part) => part.length > 0);
+		if (pathParts.length < 2) {
 			console.error(
 				chalk.red(
-					"Error: Feature path must be in format <domain>/<name> (e.g., export/csv-export)",
+					"Error: Feature path must be in format <domain>/<name> or <domain>/<subdomain>/<name> (e.g., export/csv-export, export/tabular/csv)",
 				),
 			);
 			process.exit(1);
 		}
-		const [domain, name] = pathParts;
+		const name = pathParts[pathParts.length - 1];
+		const domain = pathParts.slice(0, -1).join("/");
 		console.log(chalk.blue.bold("\n🔍 SysML-Informed Feature Discovery\n"));
 		console.log(
 			chalk.dim(
