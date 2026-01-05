@@ -59,7 +59,20 @@ tests/                            # Agent-generated
 | `udd status` | Show journey → scenario → test coverage |
 | `udd new journey <slug>` | Create new journey file |
 | `udd new scenario <domain> <action>` | Create scenario + test stub |
+| `udd discover feature <domain> <name>` | Interactive feature discovery with SysML principles |
 | `udd lint` | Validate spec structure |
+| `udd validate` | Check feature scenario completeness |
+
+## SysML-Informed Discovery
+
+UDD uses **SysML principles to create richer feature scenarios** without adding complexity:
+
+- 📝 Document user needs and alternatives in feature comments
+- 🎯 Comprehensive scenarios covering edge cases
+- 🤔 Structured thinking about requirements
+- 🤖 Agent-assisted discovery workflow
+
+Use `udd discover feature` for guided requirements analysis or see [docs/sysml-informed-discovery.md](docs/sysml-informed-discovery.md) for examples.
 
 ## Journey Format
 
