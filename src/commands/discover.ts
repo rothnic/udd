@@ -10,10 +10,20 @@ export const discoverCommand = new Command("discover").description(
 
 discoverCommand
 	.command("feature")
-	.argument("<domain>", "Feature domain (e.g., auth, projects)")
-	.argument("<name>", "Feature name (e.g., password_reset)")
+	.argument("<path>", "Feature path (e.g., export/csv-export, auth/login)")
 	.description("Guided feature discovery with SysML-style analysis")
-	.action(async (domain, name) => {
+	.action(async (featurePath: string) => {
+		// Parse the path into domain and name
+		const pathParts = featurePath.split("/");
+		if (pathParts.length !== 2) {
+			console.error(
+				chalk.red(
+					"Error: Feature path must be in format <domain>/<name> (e.g., export/csv-export)",
+				),
+			);
+			process.exit(1);
+		}
+		const [domain, name] = pathParts;
 		console.log(chalk.blue.bold("\n🔍 SysML-Informed Feature Discovery\n"));
 		console.log(
 			chalk.dim(

@@ -37,8 +37,8 @@ describeFeature(feature, ({ Scenario }) => {
 			expect(commandOutput.stdout).toContain("Interactive feature discovery");
 		});
 
-		And('the output should contain "feature <domain> <name>"', () => {
-			expect(commandOutput.stdout).toContain("feature <domain> <name>");
+		And('the output should contain "feature <path>"', () => {
+			expect(commandOutput.stdout).toContain("feature <path>");
 		});
 	});
 
