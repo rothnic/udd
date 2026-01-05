@@ -2,7 +2,6 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
-import yaml from "yaml";
 
 export const newCommand = new Command("new").description("Scaffold new specs");
 
