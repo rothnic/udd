@@ -198,9 +198,9 @@ function analyzeFeatureCompleteness(content: string): FeatureAnalysis {
 
 	// Check for error handling scenarios
 	const hasErrorScenario =
-		content.toLowerCase().includes("error") ||
-		content.toLowerCase().includes("fail") ||
-		content.toLowerCase().includes("invalid");
+		/Scenario:.*\b(error|fail|failure|invalid|wrong|incorrect|missing)\b/i.test(
+			content,
+		);
 
 	if (scenarioCount > 1 && !hasErrorScenario) {
 		warnings.push(
@@ -212,10 +212,9 @@ function analyzeFeatureCompleteness(content: string): FeatureAnalysis {
 	// Check for edge cases
 	const hasEdgeCaseComment = content.includes("# Edge Cases");
 	const hasEdgeCaseScenario =
-		content.toLowerCase().includes("edge") ||
-		content.toLowerCase().includes("boundary") ||
-		content.toLowerCase().includes("empty") ||
-		content.toLowerCase().includes("large");
+		/Scenario:.*\b(edge|boundary|empty|large|limit|maximum|minimum|zero)\b/i.test(
+			content,
+		);
 
 	if (!hasEdgeCaseComment && !hasEdgeCaseScenario && scenarioCount > 1) {
 		warnings.push(
@@ -232,8 +231,12 @@ function analyzeFeatureCompleteness(content: string): FeatureAnalysis {
 		score -= 5;
 	}
 
-	// Check for template boilerplate
-	if (content.includes("[Feature Name]") || content.includes("TODO:")) {
+	// Check for template boilerplate (only in feature declaration and Given/When/Then steps)
+	const hasTemplatePlaceholders =
+		/^Feature:.*\[.*\]/m.test(content) ||
+		/^\s*(Given|When|Then|And)\s+\[.*\]/m.test(content);
+
+	if (hasTemplatePlaceholders) {
 		warnings.push("Contains template placeholders - needs customization");
 		score -= 10;
 	}

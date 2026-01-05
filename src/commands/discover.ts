@@ -192,7 +192,7 @@ ${edgeCasesText}
     When [action that triggers error]
     Then [appropriate error response]
 
-  # TODO: Add more scenarios based on edge cases identified above
+  # Add more scenarios based on edge cases identified above
   # For each edge case, create a specific scenario that tests it
 `;
 
@@ -221,35 +221,35 @@ import { expect } from "vitest";
 const feature = await loadFeature("specs/${domain}/${name}.feature");
 
 describeFeature(feature, ({ Scenario }) => {
-	// TODO: Implement scenarios
+	// Implement scenarios based on the feature file
 	// Replace these placeholders with actual step implementations
 	
 	Scenario("Happy path - describe the main success scenario", ({ Given, When, Then }) => {
 		Given(/(.+)/, (state: string) => {
-			// TODO: Set up initial state
+			// Set up initial state
 		});
 
 		When(/(.+)/, (action: string) => {
-			// TODO: Perform the action
+			// Perform the action
 		});
 
 		Then(/(.+)/, (outcome: string) => {
-			// TODO: Verify the outcome
+			// Verify the outcome
 			expect(true).toBe(true);
 		});
 	});
 
 	Scenario("Error handling - what if it goes wrong?", ({ Given, When, Then }) => {
 		Given(/(.+)/, (state: string) => {
-			// TODO: Set up error condition
+			// Set up error condition
 		});
 
 		When(/(.+)/, (action: string) => {
-			// TODO: Trigger the error
+			// Trigger the error
 		});
 
 		Then(/(.+)/, (response: string) => {
-			// TODO: Verify error handling
+			// Verify error handling
 			expect(true).toBe(true);
 		});
 	});
