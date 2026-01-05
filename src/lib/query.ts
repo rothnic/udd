@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { glob } from "glob";
@@ -50,6 +51,11 @@ export interface QueryStatus {
 		failing_scenarios: string[];
 	};
 	completeness: number;
+}
+
+interface TestResult {
+	name: string;
+	status: string;
 }
 
 /**
@@ -114,7 +120,7 @@ export async function getJourneys(): Promise<Journey[]> {
 
 			const journeyPath = path.join(journeysDir, file);
 			const content = await fs.readFile(journeyPath, "utf-8");
-			const hash = require("node:crypto")
+			const hash = crypto
 				.createHash("sha256")
 				.update(content)
 				.digest("hex")
@@ -191,7 +197,7 @@ export async function getFeatures(): Promise<Feature[]> {
 	const resultsPath = path.join(rootDir, ".udd/results.json");
 	let resultsMtime = 0;
 	let results: {
-		testResults?: { name: string; status: string }[];
+		testResults?: TestResult[];
 	} | null = null;
 	try {
 		const stats = await fs.stat(resultsPath);
@@ -287,7 +293,7 @@ export async function getFeatures(): Promise<Feature[]> {
 						status = "stale";
 					} else {
 						const testResult = results.testResults?.find(
-							(r: { name: string; status: string }) => r.name === absTestPath,
+							(r: TestResult) => r.name === absTestPath,
 						);
 						if (testResult) {
 							status = testResult.status === "passed" ? "passing" : "failing";
