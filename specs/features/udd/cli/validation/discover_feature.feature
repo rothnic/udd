@@ -20,7 +20,7 @@ Feature: Discover Features with SysML Guidance
     When I run "udd discover --help"
     Then the command should succeed
     And the output should contain "Interactive feature discovery"
-    And the output should contain "feature <domain> <name>"
+    And the output should contain "feature <path>"
 
   Scenario: Discover feature command shows help
     When I run "udd discover feature --help"
