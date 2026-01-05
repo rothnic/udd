@@ -15,7 +15,7 @@ discoverCommand
 	.action(async (featurePath: string) => {
 		// Parse the path into domain and name
 		const pathParts = featurePath.split("/");
-		if (pathParts.length !== 2) {
+		if (pathParts.length !== 2 || !pathParts[0] || !pathParts[1]) {
 			console.error(
 				chalk.red(
 					"Error: Feature path must be in format <domain>/<name> (e.g., export/csv-export)",
