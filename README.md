@@ -59,6 +59,7 @@ tests/                            # Agent-generated
 | `udd status` | Show journey → scenario → test coverage |
 | `udd new journey <slug>` | Create new journey file |
 | `udd new scenario <domain> <action>` | Create scenario + test stub |
+| `udd new feature <domain> <feature-name>` | Create feature file from SysML-informed template |
 | `udd discover feature <domain> <name>` | Interactive feature discovery with SysML principles |
 | `udd lint` | Validate spec structure |
 | `udd validate` | Check feature scenario completeness |
@@ -73,6 +74,32 @@ UDD uses **SysML principles to create richer feature scenarios** without adding 
 - 🤖 Agent-assisted discovery workflow
 
 Use `udd discover feature` for guided requirements analysis or see [docs/sysml-informed-discovery.md](docs/sysml-informed-discovery.md) for examples.
+
+## Feature Templates
+
+Create comprehensive feature files using the SysML-informed template:
+
+```bash
+# Create a new feature from template
+udd new feature <domain> <feature-name>
+
+# Example
+udd new feature reporting export_csv
+```
+
+The template includes sections for:
+- **User Need Context** - Who needs this and why
+- **Alternatives Considered** - Document design decisions
+- **Success Criteria** - Measurable outcomes
+- **Comprehensive Scenarios** - Happy path, errors, and edge cases
+
+See [docs/example-features/](docs/example-features/) for complete examples like `export_data.feature` and `password_reset.feature`.
+
+**Manual Usage:**
+```bash
+cp templates/feature-template.feature specs/features/<domain>/<feature-name>/<feature-name>.feature
+# Edit placeholders with your feature details
+```
 
 ## Journey Format
 
