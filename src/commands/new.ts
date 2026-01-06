@@ -115,7 +115,9 @@ newCommand
 		"<feature-name>",
 		"Feature name slug (e.g. export_csv, password_reset)",
 	)
-	.description("Create a new feature file from SysML-informed template")
+	.description(
+		"Create feature file from SysML template (use 'scenario' for simple features, 'discover' for guided creation)",
+	)
 	.action(async (domain, featureName) => {
 		const rootDir = process.cwd();
 		const templatePath = path.join(
@@ -165,6 +167,21 @@ newCommand
 			);
 			console.log(
 				chalk.dim("  4. Run 'udd lint' to validate the feature file"),
+			);
+			console.log(
+				chalk.dim(
+					"\nNote: This creates a rich template with SysML context sections.",
+				),
+			);
+			console.log(
+				chalk.dim(
+					"      For simpler features, use 'udd new scenario' instead.",
+				),
+			);
+			console.log(
+				chalk.dim(
+					"      For guided creation, use 'udd discover feature' instead.",
+				),
 			);
 		} catch (error) {
 			if (

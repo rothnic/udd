@@ -75,19 +75,49 @@ UDD uses **SysML principles to create richer feature scenarios** without adding 
 
 Use `udd discover feature` for guided requirements analysis or see [docs/sysml-informed-discovery.md](docs/sysml-informed-discovery.md) for examples.
 
-## Feature Templates
+## Creating Features: Which Command to Use?
 
-Create comprehensive feature files using the SysML-informed template:
+UDD provides three different ways to create feature files, each optimized for different workflows:
 
+### `udd new scenario` - Quick, Simple Scenarios
+**Use when:** You need a basic feature file and test stub quickly.
 ```bash
-# Create a new feature from template
-udd new feature <domain> <feature-name>
+udd new scenario auth login
+```
+- Creates: `specs/auth/login.feature` (simple scenario)
+- Creates: `tests/auth/login.e2e.test.ts` (test stub)
+- Best for: Simple, single-scenario features or when rapid prototyping
+- Context: Minimal (just basic Given/When/Then)
 
-# Example
+### `udd new feature` - Template-Based Features
+**Use when:** You want a structured starting point with SysML context sections.
+```bash
 udd new feature reporting export_csv
 ```
+- Creates: `specs/features/reporting/export_csv/export_csv.feature` (from template)
+- Includes: User needs, alternatives, success criteria, multiple scenario patterns
+- Best for: Complex features requiring thoughtful design documentation
+- Context: Rich template with comment sections prompting for context
+- **Does NOT create test files** - you write those after defining scenarios
 
-The template includes sections for:
+### `udd discover feature` - Interactive Discovery
+**Use when:** You want guided, interview-style feature creation.
+```bash
+udd discover feature reporting/csv-export
+```
+- Creates: Feature file through interactive prompts
+- Includes: All SysML sections filled in based on your answers
+- Best for: When you need help thinking through requirements systematically
+- Context: Fully guided with questions about users, alternatives, edge cases
+
+**Summary:**
+- **`new scenario`** = Fast & minimal → `specs/<domain>/` (flat structure)
+- **`new feature`** = Template with guidance → `specs/features/<domain>/<name>/` (nested structure)
+- **`discover feature`** = Interactive interview → Wherever specified
+
+## Feature Templates
+
+The `udd new feature` command uses `templates/feature-template.feature` which includes:
 - **User Need Context** - Who needs this and why
 - **Alternatives Considered** - Document design decisions
 - **Success Criteria** - Measurable outcomes
