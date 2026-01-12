@@ -51,6 +51,54 @@ npm test
 udd status
 ```
 
+## Creating Rich Feature Scenarios
+
+UDD uses **SysML principles to create better feature scenarios** without adding complexity.
+
+### Start with User Needs
+
+Before creating features, understand:
+- **Who** needs this? (actors, user roles)
+- **What** are they trying to accomplish? (goals)
+- **Why** does it matter? (value, problem being solved)
+- **What** alternatives exist? (other solutions, trade-offs)
+
+### Three Ways to Create Features
+
+| Command | Best For | Output |
+|---------|----------|--------|
+| `udd new scenario <domain> <action>` | Quick, simple scenarios | Basic feature file + test stub |
+| `udd new feature <domain> <name>` | Template-based features | Rich feature file with context sections |
+| `udd discover feature <domain>/<name>` | Guided discovery | Interactive interview → complete feature |
+
+### Creating a Rich Feature File
+
+Use the template-based or discovery approach to include:
+
+```gherkin
+Feature: Export Project Data
+  # User Need: Data analysts need to analyze project data in Excel
+  # Who: Data Analysts, Project Managers
+  # Why: Create custom reports, pivot tables, presentations
+  # 
+  # Alternatives Considered:
+  #   - Direct Excel integration: Rejected (too complex)
+  #   - REST API access: Deferred (Phase 4)
+  #   - CSV export: CHOSEN (simple, universal)
+  #
+  # Success Criteria:
+  #   - Export completes in < 30s for 1000 records
+  #   - File opens correctly in Excel
+  
+  Scenario: Export current view to CSV
+    Given user is viewing projects list
+    When user clicks "Export to CSV"
+    Then file is downloaded
+    And file contains all projects
+```
+
+**See [docs/sysml-informed-discovery.md](docs/sysml-informed-discovery.md) for detailed guidance and examples.**
+
 ## File Structure
 
 ```
@@ -96,7 +144,10 @@ User has created their first item within 5 minutes.
 | `udd status` | Show coverage |
 | `udd new journey <slug>` | Create journey |
 | `udd new scenario <domain> <action>` | Create scenario + test |
+| `udd new feature <domain> <name>` | Create feature from SysML template |
+| `udd discover feature <domain>/<name>` | Interactive feature discovery |
 | `udd lint` | Validate specs |
+| `udd validate` | Check feature completeness |
 
 ## Feature Evolution
 
