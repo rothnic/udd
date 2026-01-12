@@ -102,7 +102,7 @@ describeFeature(feature, ({ Scenario }) => {
 		"Validate reports missing SysML context",
 		({ Given, When, Then, And }) => {
 			let commandOutput: { stdout: string; stderr: string };
-			let commandError:
+			let _commandError:
 				| { code: number; stdout: string; stderr: string }
 				| undefined;
 
@@ -118,7 +118,7 @@ describeFeature(feature, ({ Scenario }) => {
 							"validate -f specs/features/udd/cli/check_status.feature",
 						);
 					} catch (error) {
-						commandError = error as {
+						_commandError = error as {
 							code: number;
 							stdout: string;
 							stderr: string;
@@ -145,7 +145,7 @@ describeFeature(feature, ({ Scenario }) => {
 		"Validate scores complete features at 100%",
 		({ Given, When, Then, And }) => {
 			let commandOutput: { stdout: string; stderr: string };
-			let commandError:
+			let _commandError:
 				| { code: number; stdout: string; stderr: string }
 				| undefined;
 
@@ -164,7 +164,7 @@ describeFeature(feature, ({ Scenario }) => {
 							"validate -f docs/example-features/export_data.feature",
 						);
 					} catch (error) {
-						commandError = error as {
+						_commandError = error as {
 							code: number;
 							stdout: string;
 							stderr: string;

@@ -18,7 +18,7 @@ export const statusCommand = new Command("status")
 				// V2 Journeys (if product/ exists)
 				if (status.hasProductDir && Object.keys(status.journeys).length > 0) {
 					console.log(chalk.bold("\nUser Journeys:"));
-					for (const [key, journey] of Object.entries(status.journeys)) {
+					for (const [_key, journey] of Object.entries(status.journeys)) {
 						const staleMarker = journey.isStale
 							? chalk.yellow(" (needs sync)")
 							: "";

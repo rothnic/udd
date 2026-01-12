@@ -2,7 +2,6 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
-import yaml from "yaml";
 
 export const newCommand = new Command("new").description("Scaffold new specs");
 
@@ -105,6 +104,103 @@ describeFeature(feature, ({ Scenario }) => {
 			console.log(chalk.green(`Created test: ${testFilePath}`));
 		} catch (error) {
 			console.error(chalk.red("Error creating scenario:"), error);
+			process.exit(1);
+		}
+	});
+
+newCommand
+	.command("feature")
+	.argument("<domain>", "Domain (e.g. auth, user, reporting)")
+	.argument(
+		"<feature-name>",
+		"Feature name slug (e.g. export_csv, password_reset)",
+	)
+	.description(
+		"Create feature file from SysML template (use 'scenario' for simple features, 'discover' for guided creation)",
+	)
+	.action(async (domain, featureName) => {
+		const rootDir = process.cwd();
+		const templatePath = path.join(
+			rootDir,
+			"templates",
+			"feature-template.feature",
+		);
+
+		// Create feature directory structure: specs/features/<domain>/<feature-name>/
+		const featureDir = path.join(
+			rootDir,
+			"specs",
+			"features",
+			domain,
+			featureName,
+		);
+		const featureFilePath = path.join(featureDir, `${featureName}.feature`);
+
+		// Convert feature name to title case for display
+		const featureTitle = featureName
+			.split("_")
+			.map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+			.join(" ");
+
+		try {
+			// Read template
+			const templateContent = await fs.readFile(templatePath, "utf-8");
+
+			// Replace [Feature Name] placeholder with actual feature name
+			const content = templateContent.replace(
+				/\[Feature Name\]/g,
+				featureTitle,
+			);
+
+			// Create feature directory and file
+			await fs.mkdir(featureDir, { recursive: true });
+			await fs.writeFile(featureFilePath, content);
+
+			console.log(chalk.green(`✓ Created feature: ${featureFilePath}`));
+			console.log(chalk.dim("\nNext steps:"));
+			console.log(
+				chalk.dim("  1. Edit the feature file to fill in context sections"),
+			);
+			console.log(chalk.dim("  2. Replace placeholders with actual scenarios"));
+			console.log(
+				chalk.dim("  3. See docs/example-features/ for reference examples"),
+			);
+			console.log(
+				chalk.dim("  4. Run 'udd lint' to validate the feature file"),
+			);
+			console.log(
+				chalk.dim(
+					"\nNote: This creates a rich template with SysML context sections.",
+				),
+			);
+			console.log(
+				chalk.dim(
+					"      For simpler features, use 'udd new scenario' instead.",
+				),
+			);
+			console.log(
+				chalk.dim(
+					"      For guided creation, use 'udd discover feature' instead.",
+				),
+			);
+		} catch (error) {
+			if (
+				(error as NodeJS.ErrnoException).code === "ENOENT" &&
+				(error as NodeJS.ErrnoException).path?.includes("template")
+			) {
+				console.error(
+					chalk.red(
+						"Error: Template file not found at templates/feature-template.feature",
+					),
+				);
+				console.error(
+					chalk.dim(
+						"Make sure you're running this command from the project root",
+					),
+				);
+			} else {
+				console.error(chalk.red("Error creating feature:"), error);
+			}
 			process.exit(1);
 		}
 	});

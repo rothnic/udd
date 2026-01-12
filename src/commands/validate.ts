@@ -146,7 +146,7 @@ function analyzeFeatureCompleteness(content: string): FeatureAnalysis {
 	const warnings: string[] = [];
 	let score = 100;
 
-	const lines = content.split("\n");
+	const _lines = content.split("\n");
 
 	// Check for Feature declaration
 	if (!content.match(/^Feature:/m)) {
