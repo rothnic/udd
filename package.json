@@ -36,8 +36,8 @@
 		"status": "tsx bin/udd.ts status",
 		"check": "biome check .",
 		"check:fix": "biome check --write .",
-		"postinstall": "tsx scripts/patch-vitest-cucumber.ts",
-		"prepare": "husky"
+		"prepare": "husky",
+		"postinstall": "tsx scripts/patch-vitest-cucumber.ts"
 	},
 	"lint-staged": {
 		"**/*.ts": [
