@@ -111,11 +111,25 @@ function patchFile(filePath: string) {
 		const buggySpecLine =
 			"const specFilePath = featureFilePath.replace('.feature', '.spec.ts');";
 		const fixedSpecLine =
-			"const specFilePath = path.join(options.specFilesDir, filename).replace('.feature', '.spec.ts');";
+			"const specFilePath = path.join(options.specFilesDir, filename).replace('.feature', '.spec.ts'); fs.mkdirSync(path.dirname(specFilePath), { recursive: true });";
 		if (content.includes(buggySpecLine)) {
 			content = content.replace(buggySpecLine, fixedSpecLine);
 			changed = true;
 			console.log("Fixed specFilePath calculation in plugin/index.js");
+		} else if (
+			content.includes(
+				"const specFilePath = path.join(options.specFilesDir, filename).replace('.feature', '.spec.ts');",
+			) &&
+			!content.includes("fs.mkdirSync(path.dirname(specFilePath)")
+		) {
+			content = content.replace(
+				"const specFilePath = path.join(options.specFilesDir, filename).replace('.feature', '.spec.ts');",
+				fixedSpecLine,
+			);
+			changed = true;
+			console.log(
+				"Updated specFilePath calculation in plugin/index.js (missing mkdirSync)",
+			);
 		}
 	}
 
