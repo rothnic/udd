@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text } from 'ink';
 import { getActors, Actor } from '../../lib/actors.js';
+import { theme } from '../theme.js';
 
 export const Actors = () => {
 	const [actors, setActors] = useState<Actor[]>([]);
@@ -19,23 +20,25 @@ export const Actors = () => {
 
 	if (actors.length === 0) {
 		return (
-			<Box borderStyle="single" borderColor="yellow" padding={1}>
-				<Text color="yellow">No actors found in product/actors.md</Text>
+			<Box borderStyle="single" borderColor={theme.colors.warning} padding={1}>
+				<Text color={theme.colors.warning}>No actors found in product/actors.md</Text>
 			</Box>
 		);
 	}
 
 	return (
-		<Box flexDirection="column" borderStyle="round" borderColor="magenta" padding={1}>
+		<Box flexDirection="column" borderStyle="round" borderColor={theme.colors.secondary} padding={1}>
 			<Box marginBottom={1}>
-				<Text bold underline color="magenta">System Actors (Personas)</Text>
+				<Text bold color={theme.colors.secondary}> SYSTEM ACTORS </Text>
 			</Box>
 
 			<Box flexDirection="row" flexWrap="wrap" gap={2}>
 				{actors.map((actor, i) => (
-					<Box key={i} borderStyle="double" borderColor="cyan" padding={1} flexDirection="column" width={30}>
-						<Text bold color="cyan">{actor.name}</Text>
-						<Text>{actor.description}</Text>
+					<Box key={i} borderStyle="double" borderColor={theme.colors.primary} padding={1} flexDirection="column" width={34}>
+						<Text bold color={theme.colors.primary} underline>{actor.name}</Text>
+                        <Box marginTop={1}>
+						    <Text color={theme.colors.text}>{actor.description}</Text>
+                        </Box>
 					</Box>
 				))}
 			</Box>

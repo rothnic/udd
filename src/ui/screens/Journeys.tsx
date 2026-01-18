@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text } from 'ink';
 import { getProjectStatus, ProjectStatus } from '../../lib/status.js';
+import { theme, symbols } from '../theme.js';
+import { ProgressBar } from '../components/ProgressBar.js';
 
 export const Journeys = () => {
 	const [status, setStatus] = useState<ProjectStatus | null>(null);
@@ -19,33 +21,39 @@ export const Journeys = () => {
 
     if (journeys.length === 0) {
         return (
-            <Box borderStyle="single" borderColor="yellow" padding={1}>
-                <Text color="yellow">No journeys found.</Text>
+            <Box borderStyle="single" borderColor={theme.colors.warning} padding={1}>
+                <Text color={theme.colors.warning}>{symbols.warning} No journeys found.</Text>
             </Box>
         )
     }
 
 	return (
-		<Box flexDirection="column" borderStyle="round" borderColor="blue" padding={1}>
+		<Box flexDirection="column" borderStyle="round" borderColor={theme.colors.highlight} padding={1}>
 			<Box marginBottom={1}>
-				<Text bold underline color="blue">User Journeys</Text>
+				<Text bold color={theme.colors.highlight}> USER JOURNEYS </Text>
 			</Box>
 
-			{journeys.map((j, i) => (
-				<Box key={i} flexDirection="column" marginBottom={1} borderStyle="single" borderColor="gray" paddingX={1}>
-					<Box flexDirection="row" justifyContent="space-between">
-						<Text bold>{j.name}</Text>
-						<Text>
-                            <Text color="green">✓ {j.scenariosPassing}</Text> |
-                            <Text color="red"> ✗ {j.scenariosFailing}</Text> |
-                            <Text color="yellow"> ? {j.scenariosMissing}</Text>
-                        </Text>
-					</Box>
-                    <Box marginLeft={2}>
-                        <Text italic dimColor>Goal: {j.goal}</Text>
+			{journeys.map((j, i) => {
+                const total = j.scenarioCount;
+                const percent = total > 0 ? (j.scenariosPassing / total) * 100 : 0;
+
+                return (
+                    <Box key={i} flexDirection="column" marginBottom={1} borderStyle="single" borderColor={theme.colors.dim} paddingX={1}>
+                        <Box flexDirection="row" justifyContent="space-between">
+                            <Text bold color={theme.colors.text}>{j.name}</Text>
+                            <Box>
+                                <Text color={theme.colors.success}>{symbols.check} {j.scenariosPassing} </Text>
+                                <Text color={theme.colors.error}>{symbols.cross} {j.scenariosFailing} </Text>
+                                <Text color={theme.colors.warning}>? {j.scenariosMissing}</Text>
+                            </Box>
+                        </Box>
+                        <Box flexDirection="row" justifyContent="space-between" marginTop={0}>
+                             <Text italic color={theme.colors.dim} wrap="truncate" maxWidth={50}>{j.goal}</Text>
+                             <ProgressBar percent={percent} width={15} />
+                        </Box>
                     </Box>
-				</Box>
-			))}
+                );
+            })}
 		</Box>
 	);
 };

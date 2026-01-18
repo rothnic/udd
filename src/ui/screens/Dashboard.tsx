@@ -1,7 +1,9 @@
-import { Box, Text } from "ink";
-import Spinner from "ink-spinner";
-import React, { useEffect, useState } from "react";
-import { getProjectStatus, type ProjectStatus } from "../../lib/status.js";
+import React, { useState, useEffect } from 'react';
+import { Box, Text } from 'ink';
+import { getProjectStatus, ProjectStatus } from '../../lib/status.js';
+import Spinner from 'ink-spinner';
+import { theme } from '../theme.js';
+import { ProgressBar } from '../components/ProgressBar.js';
 
 export const Dashboard = () => {
 	const [status, setStatus] = useState<ProjectStatus | null>(null);
@@ -24,7 +26,7 @@ export const Dashboard = () => {
 	if (loading) {
 		return (
 			<Box>
-				<Text color="green">
+				<Text color={theme.colors.success}>
 					<Spinner type="dots" /> Loading project status...
 				</Text>
 			</Box>
@@ -32,111 +34,64 @@ export const Dashboard = () => {
 	}
 
 	if (!status) {
-		return <Text color="red">Failed to load status.</Text>;
+		return <Text color={theme.colors.error}>Failed to load status.</Text>;
 	}
 
+    // Calculations
 	const journeyCount = Object.keys(status.journeys).length;
-	const featureCount = Object.keys(status.features).length;
-	const useCaseCount = Object.keys(status.use_cases).length;
-
-	// Calculate total scenarios and tests
 	let totalScenarios = 0;
 	let passingScenarios = 0;
-	let failingScenarios = 0;
-	let missingTests = 0;
 
 	for (const journey of Object.values(status.journeys)) {
 		totalScenarios += journey.scenarioCount;
 		passingScenarios += journey.scenariosPassing;
-		failingScenarios += journey.scenariosFailing;
-		missingTests += journey.scenariosMissing;
 	}
 
+    const passRate = totalScenarios > 0 ? Math.round((passingScenarios / totalScenarios) * 100) : 0;
+
 	return (
-		<Box
-			flexDirection="column"
-			borderStyle="round"
-			borderColor="cyan"
-			padding={1}
-		>
+		<Box flexDirection="column" borderStyle="round" borderColor={theme.colors.primary} padding={1}>
 			<Box marginBottom={1}>
-				<Text bold underline>
-					Project Dashboard
-				</Text>
+				<Text bold color={theme.colors.primary}> SYSTEM STATUS </Text>
 			</Box>
 
 			<Box flexDirection="row" gap={4}>
-				<Box flexDirection="column">
-					<Text>
-						Journeys:{" "}
-						<Text color="blue" bold>
-							{journeyCount}
-						</Text>
-					</Text>
-					<Text>
-						Use Cases:{" "}
-						<Text color="blue" bold>
-							{useCaseCount}
-						</Text>
-					</Text>
-					<Text>
-						Features:{" "}
-						<Text color="blue" bold>
-							{featureCount}
-						</Text>
-					</Text>
+                {/* Metrics Column */}
+				<Box flexDirection="column" borderStyle="single" borderColor={theme.colors.dim} padding={1} minWidth={30}>
+                    <Text underline color={theme.colors.secondary}>Metrics</Text>
+					<Box justifyContent="space-between">
+                        <Text>Journeys:</Text>
+                        <Text bold color={theme.colors.highlight}>{journeyCount}</Text>
+                    </Box>
+                    <Box justifyContent="space-between">
+                        <Text>Features:</Text>
+                        <Text bold color={theme.colors.highlight}>{Object.keys(status.features).length}</Text>
+                    </Box>
+                    <Box justifyContent="space-between">
+                        <Text>Scenarios:</Text>
+                        <Text bold color={theme.colors.highlight}>{totalScenarios}</Text>
+                    </Box>
 				</Box>
 
-				<Box flexDirection="column">
-					<Text>
-						Scenarios:{" "}
-						<Text color="white" bold>
-							{totalScenarios}
-						</Text>
-					</Text>
-					<Text>
-						Passing:{" "}
-						<Text color="green" bold>
-							{passingScenarios}
-						</Text>
-					</Text>
-					<Text>
-						Failing:{" "}
-						<Text color="red" bold>
-							{failingScenarios}
-						</Text>
-					</Text>
-					<Text>
-						Missing:{" "}
-						<Text color="yellow" bold>
-							{missingTests}
-						</Text>
-					</Text>
-				</Box>
-
-				<Box flexDirection="column">
-					<Text>
-						Git Branch: <Text color="magenta">{status.git.branch}</Text>
-					</Text>
-					<Text>
-						Phase: <Text color="magenta">{status.current_phase}</Text>
-					</Text>
-					<Text>
-						Dirty:{" "}
-						<Text color={status.git.clean ? "green" : "red"}>
-							{status.git.clean ? "No" : "Yes"}
-						</Text>
-					</Text>
+                {/* Health Column */}
+				<Box flexDirection="column" borderStyle="single" borderColor={theme.colors.dim} padding={1} minWidth={40}>
+                     <Text underline color={theme.colors.success}>System Health</Text>
+                     <Box marginTop={1}>
+                        <Text>Test Coverage: {passRate}%</Text>
+                     </Box>
+                     <ProgressBar percent={passRate} width={30} />
+                     <Box marginTop={1}>
+                        <Text dimColor>Phase: {status.current_phase}</Text>
+                        <Text dimColor>Branch: {status.git.branch}</Text>
+                     </Box>
 				</Box>
 			</Box>
 
-			{status.hasProductDir && (
-				<Box marginTop={1}>
-					<Text italic color="gray">
-						Product directory detected (V2 model)
-					</Text>
-				</Box>
-			)}
+            {status.hasProductDir && (
+                <Box marginTop={1}>
+                    <Text italic color={theme.colors.dim}>[V2 Model Active]</Text>
+                </Box>
+            )}
 		</Box>
 	);
 };
