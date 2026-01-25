@@ -16,3 +16,8 @@ items:
     description: "Decide where non-functional requirements belong (separate files vs tech specs)"
     research: technical-requirements-strategy
     created: 2025-11-25
+
+  - id: tui-interactive-features
+    title: "Feature: Interactive TUI Journey Creation"
+    description: "Expand the TUI to allow interactive creation and editing of Journeys and Actors."
+    created: 2025-11-25

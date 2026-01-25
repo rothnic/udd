@@ -9,6 +9,7 @@ import { queryCommand } from "../src/commands/query.js";
 import { statusCommand } from "../src/commands/status.js";
 import { syncCommand } from "../src/commands/sync.js";
 import { testCommand } from "../src/commands/test.js";
+import { tuiCommand } from "../src/commands/tui.js";
 import { validateCommand } from "../src/commands/validate.js";
 
 const program = new Command();
@@ -23,6 +24,7 @@ program.addCommand(newCommand);
 program.addCommand(discoverCommand);
 program.addCommand(validateCommand);
 program.addCommand(testCommand);
+program.addCommand(tuiCommand);
 program.addCommand(inboxCommand);
 program.addCommand(queryCommand);
 
