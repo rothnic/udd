@@ -1,0 +1,35 @@
+import { useEffect, useState } from "react";
+import { getProjectStatus, type ProjectStatus } from "../../lib/status.js";
+
+export const useProjectStatus = () => {
+	const [status, setStatus] = useState<ProjectStatus | null>(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<Error | null>(null);
+
+	useEffect(() => {
+		let mounted = true;
+
+		const fetchStatus = async () => {
+			try {
+				const data = await getProjectStatus();
+				if (mounted) {
+					setStatus(data);
+					setLoading(false);
+				}
+			} catch (err) {
+				if (mounted) {
+					setError(err as Error);
+					setLoading(false);
+				}
+			}
+		};
+
+		fetchStatus();
+
+		return () => {
+			mounted = false;
+		};
+	}, []);
+
+	return { status, loading, error };
+};
