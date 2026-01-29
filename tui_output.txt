@@ -1,0 +1,59 @@
+
+ ╭────────────────────────────────────────────────────────────────────────────╮
+ │  1. Dashboard   2. Journeys   3. Inbox   4. Help                q to quit  │
+ ╰────────────────────────────────────────────────────────────────────────────╯
+
+
+
+
+
+                          ⠋ Loading Project Status...
+
+
+
+
+
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[GEncountered two children with the same key, `    at recursivelyTraversePassiveMountEffects (/app/node_modules/react-reconciler/cjs/react-reconciler.development.js:12934:11)`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+
+ ╭────────────────────────────────────────────────────────────────────────────╮
+ │  1. Dashboard   2. Journeys   3. Inbox   4. Help                q to quit  │
+ ╰────────────────────────────────────────────────────────────────────────────╯
+
+
+
+
+
+                          ⠋ Loading Project Status...
+
+
+
+
+
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+  ERROR Raw mode is not supported on the current process.stdin, which Ink uses
+       as input stream by default.
+       Read about how to prevent this error on
+       https://github.com/vadimdemedes/ink/#israwmodesupported
+
+ - Read about how to prevent this error on
+   https://github.com/vadimdemedes/ink/#israwmodesupported\t
+ - handleSetRawMode (node_modules/ink/build/components/App.js:108:23)
+ -  (node_modules/ink/build/hooks/use-input.js:33:9)
+ -Object.react_stack_bot (node_modules/react-reconciler/cjs/react-reconciler.de
+  om_frame              velopment.js:17681:20)
+ -runWithFiberIn (node_modules/react-reconciler/cjs/react-reconciler.developmen
+  EV            t.js:2505:30)
+ -commitHookEffectLis (node_modules/react-reconciler/cjs/react-reconciler.devel
+  Mount              opment.js:10861:29)
+ -commitHookPassiveMoun (node_modules/react-reconciler/cjs/react-reconciler.dev
+  Effects              elopment.js:10948:11)
+ -commitPassiveMountO (node_modules/react-reconciler/cjs/react-reconciler.devel
+  Fiber              opment.js:12979:13)
+ -recursivelyTraversePassiv (node_modules/react-reconciler/cjs/react-reconciler
+  MountEffects             .development.js:12934:11)
+ -commitPassiveMountO (node_modules/react-reconciler/cjs/react-reconciler.devel
+  Fiber              opment.js:12971:11)
+ -recursivelyTraversePassiv (node_modules/react-reconciler/cjs/react-reconciler
+  MountEffects             .development.js:12934:11)

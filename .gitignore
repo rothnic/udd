@@ -7,4 +7,4 @@ tests/**/*.spec.ts
 tests/e2e/my_area/
 
 # Test feature files
-specs/features/test_domain/
+specs/features/test_domain/dist/
