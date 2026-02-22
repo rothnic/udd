@@ -3,7 +3,6 @@
 	"version": "2.0.0",
 	"description": "User Driven Development - spec-first CLI where journeys are requirements and BDD scenarios are tests",
 	"type": "module",
-	"main": "index.js",
 	"bin": {
 		"udd": "bin/udd"
 	},

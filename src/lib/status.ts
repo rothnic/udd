@@ -1,4 +1,5 @@
 import { exec } from "node:child_process";
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -170,7 +171,7 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 
 				const journeyPath = path.join(journeysDir, file);
 				const content = await fs.readFile(journeyPath, "utf-8");
-				const hash = require("node:crypto")
+				const hash = crypto
 					.createHash("sha256")
 					.update(content)
 					.digest("hex")
