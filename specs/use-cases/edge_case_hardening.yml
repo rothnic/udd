@@ -1,0 +1,16 @@
+id: edge_case_hardening
+name: Edge Case Hardening
+summary: "Link edge-case CLI and agent scenarios created during the edge-case-hardening plan"
+actors:
+  - developer
+  - agent
+outcomes:
+  - description: "Edge-case CLI and agent scenarios are discoverable and linked to a use case"
+    scenarios:
+      - "udd/cli/sync_edge_cases"
+      - "udd/cli/status_edge_cases"
+      - "udd/cli/scaffold_feature"
+      - "udd/cli/orphan_detection"
+      - "udd/cli/manifest_recovery"
+      - "udd/cli/init_edge_cases"
+      - "udd/agent/query_commands"

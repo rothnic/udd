@@ -45,6 +45,8 @@ export async function validateSpecs(): Promise<ValidationResult> {
 	// 2. Validate Use Cases
 	const useCaseFiles = await glob("specs/use-cases/*.yml", { cwd: rootDir });
 	const useCaseIds = new Set<string>();
+	// Track scenarios referenced by use cases and requirements so we can detect orphans
+	const referencedScenarios = new Set<string>();
 	for (const file of useCaseFiles) {
 		try {
 			const content = await fs.readFile(path.join(rootDir, file), "utf-8");
@@ -59,6 +61,8 @@ export async function validateSpecs(): Promise<ValidationResult> {
 					for (const outcome of result.data.outcomes) {
 						if (outcome.scenarios) {
 							for (const scenarioPath of outcome.scenarios) {
+								// Mark as referenced (format: area/feature/slug)
+								referencedScenarios.add(scenarioPath);
 								const featurePath = path.join(
 									specsDir,
 									"features",
@@ -130,6 +134,8 @@ export async function validateSpecs(): Promise<ValidationResult> {
 					);
 					try {
 						await fs.access(featurePath);
+						// Mark as referenced using feature/slug
+						referencedScenarios.add(`${result.data.feature}/${slug}`);
 					} catch {
 						errors.push(
 							`${file}: References missing scenario ${slug} in feature ${result.data.feature}`,
