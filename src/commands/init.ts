@@ -3,6 +3,7 @@ import path from "node:path";
 import { confirm, input } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
+import { userWarn } from "../lib/cli-error.js";
 
 export const initCommand = new Command("init")
 	.description("Initialize UDD in a project")
@@ -12,24 +13,69 @@ export const initCommand = new Command("init")
 		const productDir = path.join(rootDir, "product");
 		const specsDir = path.join(rootDir, "specs");
 
-		// Check if already initialized
+		// Check initialization state and handle partial/corrupted states
+		const specsUddDir = path.join(specsDir, ".udd");
+		let productExists = false;
+		let specsUddExists = false;
+
+		// Check what exists
 		try {
 			await fs.access(productDir);
+			productExists = true;
+		} catch {
+			// product/ doesn't exist
+		}
+
+		try {
+			await fs.access(specsUddDir);
+			specsUddExists = true;
+		} catch {
+			// specs/.udd doesn't exist
+		}
+
+		// Handle based on state
+		if (productExists && specsUddExists) {
+			// Normal already-initialized case
 			console.log(
 				chalk.yellow("UDD already initialized (product/ directory exists)"),
 			);
-			const overwrite = options.yes
-				? false
-				: await confirm({
-						message: "Reinitialize? This will overwrite existing files.",
-						default: false,
-					});
+			if (options.yes) {
+				// With --yes and already initialized, exit cleanly without overwriting
+				process.exit(0);
+			}
+			const overwrite = await confirm({
+				message: "Reinitialize? This will overwrite existing files.",
+				default: false,
+			});
 			if (!overwrite) {
 				process.exit(0);
 			}
-		} catch {
-			// Directory doesn't exist, continue
+		} else if (productExists && !specsUddExists) {
+			// Partial state: product/ exists but specs/.udd is missing
+			console.log(
+				chalk.yellow(
+					"Partial UDD state detected: product/ exists but specs/.udd is missing.",
+				),
+			);
+			if (options.yes) {
+				userWarn("Running with --yes: will create specs/.udd structure.");
+			} else {
+				const recover = await confirm({
+					message: "Recover by creating specs/.udd?",
+					default: true,
+				});
+				if (!recover) {
+					process.exit(0);
+				}
+			}
+		} else if (!productExists && specsUddExists) {
+			// Partial state: specs/.udd exists but product/ is missing
+			userWarn(
+				"Partial UDD state detected: specs/.udd exists but product/ is missing.",
+			);
+			console.log(chalk.dim("  Recovering by creating product/ structure..."));
 		}
+		// else: neither exists - fresh init, continue normally
 
 		console.log(chalk.cyan("\n🚀 Let's define your product!\n"));
 

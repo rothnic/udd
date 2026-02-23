@@ -1,13 +1,208 @@
+import fs from "node:fs/promises";
+import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
+import yaml from "yaml";
 import { getProjectStatus } from "../lib/status.js";
 
 export const statusCommand = new Command("status")
 	.description("Summarize current test-based status")
 	.option("--json", "Output status as JSON")
+	.option("--doctor", "Run diagnostics and provide recommendations")
 	.action(async (options) => {
 		try {
 			const status = await getProjectStatus();
+
+			// Doctor mode: focused diagnostics with actionable recommendations
+			if (options.doctor) {
+				console.log(chalk.bold("🔍 Running diagnostics..."));
+				console.log(chalk.dim("=============="));
+
+				const issues: string[] = [];
+				const recommendations: string[] = [];
+
+				// Check 1: Manifest health
+				const manifestPath = path.join(
+					process.cwd(),
+					"specs/.udd/manifest.yml",
+				);
+				try {
+					await fs.access(manifestPath);
+
+					// Attempt to read and parse manifest to detect malformed YAML
+					try {
+						const manifestContent = await fs.readFile(manifestPath, "utf-8");
+						try {
+							const parsed = yaml.parse(manifestContent);
+							if (!parsed || typeof parsed !== "object") {
+								issues.push(
+									"Manifest file invalid (specs/.udd/manifest.yml) - unexpected structure",
+								);
+								recommendations.push(
+									"Run 'udd sync' to regenerate the manifest",
+								);
+							}
+						} catch (_err) {
+							issues.push(
+								"Manifest YAML malformed or unreadable (specs/.udd/manifest.yml)",
+							);
+							recommendations.push("Run 'udd sync' to regenerate the manifest");
+						}
+					} catch (_err) {
+						issues.push(
+							"Manifest file exists but cannot be read (specs/.udd/manifest.yml)",
+						);
+						recommendations.push("Check file permissions or restore from VCS");
+					}
+				} catch {
+					issues.push("Manifest file missing (specs/.udd/manifest.yml)");
+					recommendations.push("Run 'udd sync' to generate the manifest");
+				}
+
+				// Check 2: Product directory exists
+				if (!status.hasProductDir) {
+					issues.push("No product/ directory found");
+					recommendations.push(
+						"Run 'udd init' to initialize the project structure",
+					);
+				}
+
+				// Check 3: Stale journeys
+				const staleJourneys = Object.values(status.journeys).filter(
+					(j) => j.isStale,
+				);
+				if (staleJourneys.length > 0) {
+					issues.push(
+						`${staleJourneys.length} journey(s) need syncing (hash mismatch)`,
+					);
+					recommendations.push(
+						"Run 'udd sync' to update scenarios from journey changes",
+					);
+				}
+
+				// Check 4: Missing scenarios from journeys
+				const totalMissing = Object.values(status.journeys).reduce(
+					(acc, j) => acc + j.scenariosMissing,
+					0,
+				);
+				if (totalMissing > 0) {
+					issues.push(
+						`${totalMissing} scenario file(s) referenced in journeys not found`,
+					);
+					recommendations.push(
+						"Check journey step references, create missing scenario files",
+					);
+				}
+
+				// Check 5: Orphaned scenarios
+				if (status.orphaned_scenarios.length > 0) {
+					issues.push(
+						`${status.orphaned_scenarios.length} orphaned scenario(s) not linked to use cases`,
+					);
+					recommendations.push(
+						"Link scenarios to use case outcomes or remove unused scenarios",
+					);
+				}
+
+				// Check 6: Failing tests
+				let failingCount = 0;
+				for (const feature of Object.values(status.features)) {
+					for (const scenario of Object.values(feature.scenarios)) {
+						if (scenario.e2e === "failing") failingCount++;
+					}
+				}
+				if (failingCount > 0) {
+					issues.push(`${failingCount} scenario test(s) failing`);
+					recommendations.push(
+						"Run 'npm test' to see failures and fix implementation",
+					);
+				}
+
+				// Check 7: Missing tests
+				let missingCount = 0;
+				for (const feature of Object.values(status.features)) {
+					for (const scenario of Object.values(feature.scenarios)) {
+						if (scenario.e2e === "missing") missingCount++;
+					}
+				}
+				if (missingCount > 0) {
+					issues.push(`${missingCount} scenario(s) missing E2E tests`);
+					recommendations.push(
+						"Create test stubs with 'udd new scenario' or implement tests",
+					);
+				}
+
+				// Check 8: Validation errors in use cases
+				let hasValidationErrors = false;
+				for (const useCase of Object.values(status.use_cases)) {
+					if (useCase.validation_errors.length > 0) {
+						hasValidationErrors = true;
+						break;
+					}
+				}
+				if (hasValidationErrors) {
+					issues.push("Use cases have validation errors");
+					recommendations.push(
+						"Fix use case YAML format - outcomes should be objects with 'description' and 'scenarios'",
+					);
+				}
+
+				// Explicit doctor-mode journey file readability check (independent of status.journeys)
+				if (status.hasProductDir) {
+					try {
+						const journeysDir = path.join(process.cwd(), "product/journeys");
+						const files = await fs.readdir(journeysDir);
+						for (const f of files) {
+							if (!f.endsWith(".md") || f.startsWith("_")) continue;
+							const p = path.join(journeysDir, f);
+							try {
+								await fs.readFile(p, "utf-8");
+							} catch (_err) {
+								issues.push(
+									`Unreadable journey file: ${path.join("product/journeys", f)}`,
+								);
+								recommendations.push(
+									"Check file permissions or restore journey file from VCS/backup",
+								);
+							}
+						}
+					} catch {
+						// ignore - product/journeys may not exist
+					}
+				}
+
+				// Output results
+				console.log();
+				if (issues.length === 0) {
+					console.log(chalk.green("✓ No issues found - project is healthy!"));
+					console.log(
+						chalk.dim(
+							"\
+Tip: Run 'udd status' for detailed status view",
+						),
+					);
+					process.exitCode = 0;
+				} else {
+					console.log(chalk.red(`Found ${issues.length} issue(s):`));
+					issues.forEach((issue, i) => {
+						console.log(chalk.red(`  ${i + 1}. ${issue}`));
+					});
+
+					console.log(
+						chalk.bold(
+							"\
+Recommendations:",
+						),
+					);
+					recommendations.forEach((rec, i) => {
+						console.log(chalk.cyan(`  ${i + 1}. ${rec}`));
+					});
+
+					process.exitCode = 1;
+				}
+
+				return;
+			}
 
 			if (options.json) {
 				console.log(JSON.stringify(status, null, 2));
@@ -229,6 +424,18 @@ export const statusCommand = new Command("status")
 					status.orphaned_scenarios.forEach((s) => {
 						console.log(chalk.red(`- ${s}`));
 					});
+					console.log(chalk.dim("\n  Suggestions:"));
+					if (status.hasProductDir) {
+						console.log(
+							chalk.dim("    - Run 'udd sync' to link scenarios to journeys"),
+						);
+					}
+					console.log(
+						chalk.dim(
+							"    - Add scenario reference to a use case in specs/use-cases/",
+						),
+					);
+					console.log(chalk.dim("    - Remove scenario if no longer needed"));
 				}
 
 				console.log(chalk.bold("\nActive Features:"));

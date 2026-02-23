@@ -5,6 +5,7 @@ import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import yaml from "yaml";
+import { userWarn } from "../lib/cli-error.js";
 
 interface JourneyStep {
 	description: string;
@@ -93,18 +94,114 @@ async function parseJourneyFile(filePath: string): Promise<Journey | null> {
 	}
 }
 
-async function loadManifest(specsDir: string): Promise<Manifest> {
+async function loadManifest(
+	specsDir: string,
+): Promise<{ manifest: Manifest; wasCorrupted: boolean }> {
 	const manifestPath = path.join(specsDir, ".udd", "manifest.yml");
 	try {
 		const content = await fs.readFile(manifestPath, "utf-8");
 		const parsed = yaml.parse(content);
+		const validation = validateManifest(parsed);
+		if (!validation.valid) {
+			userWarn(`Invalid manifest: ${validation.reason}`);
+			return { manifest: { journeys: {}, scenarios: {} }, wasCorrupted: true };
+		}
 		return {
-			journeys: parsed?.journeys || {},
-			scenarios: parsed?.scenarios || {},
+			manifest: {
+				journeys: parsed.journeys || {},
+				scenarios: parsed.scenarios || {},
+			},
+			wasCorrupted: false,
 		};
-	} catch {
-		return { journeys: {}, scenarios: {} };
+	} catch (err) {
+		// Distinguish malformed YAML (parse errors) vs missing file
+		try {
+			await fs.access(manifestPath);
+			// File exists but couldn't be read/parsed - provide context
+			userWarn(
+				`Could not parse manifest: ${String((err && (err as Error).message) || err)} (manifest path: ${manifestPath})`,
+			);
+		} catch {
+			// File doesn't exist - first run, no warning
+		}
+		return { manifest: { journeys: {}, scenarios: {} }, wasCorrupted: true };
 	}
+}
+
+function validateManifest(obj: unknown): { valid: boolean; reason?: string } {
+	if (!obj || typeof obj !== "object") {
+		return { valid: false, reason: "manifest is not a mapping/object" };
+	}
+
+	function isRecord(x: unknown): x is Record<string, unknown> {
+		return x !== null && typeof x === "object" && !Array.isArray(x);
+	}
+
+	if (
+		!("journeys" in obj) ||
+		!isRecord((obj as Record<string, unknown>).journeys)
+	) {
+		return { valid: false, reason: "missing or invalid 'journeys' key" };
+	}
+
+	const journeys = (obj as Record<string, unknown>).journeys as Record<
+		string,
+		unknown
+	>;
+
+	// scenarios can be missing; that's acceptable
+	const scenariosVal = (obj as Record<string, unknown>).scenarios as unknown;
+	if (scenariosVal !== undefined && !isRecord(scenariosVal)) {
+		// present but invalid
+		return { valid: false, reason: "invalid 'scenarios' key" };
+	}
+
+	// Basic shape checks for journey entries
+	for (const [k, v] of Object.entries(journeys) as [string, unknown][]) {
+		if (!isRecord(v)) {
+			return { valid: false, reason: `journey entry '${k}' is not an object` };
+		}
+		const pathVal = v.path;
+		const hashVal = v.hash;
+		const scenariosProp = v.scenarios;
+		if (typeof pathVal !== "string") {
+			return { valid: false, reason: `journey '${k}' missing 'path' string` };
+		}
+		if (typeof hashVal !== "string") {
+			return { valid: false, reason: `journey '${k}' missing 'hash' string` };
+		}
+		if (!Array.isArray(scenariosProp)) {
+			return { valid: false, reason: `journey '${k}' has invalid 'scenarios'` };
+		}
+	}
+
+	// Basic shape checks for scenarios
+	if (isRecord(scenariosVal)) {
+		for (const [k, v] of Object.entries(scenariosVal)) {
+			if (!isRecord(v)) {
+				return {
+					valid: false,
+					reason: `scenario entry '${k}' is not an object`,
+				};
+			}
+			const hashVal = v.hash;
+			const testVal = v.test;
+			if (typeof hashVal !== "string") {
+				return {
+					valid: false,
+					reason: `scenario '${k}' missing 'hash' string`,
+				};
+			}
+			if (typeof testVal !== "string") {
+				return {
+					valid: false,
+					reason: `scenario '${k}' missing 'test' string`,
+				};
+			}
+		}
+	}
+
+	return { valid: true };
 }
 
 async function saveManifest(
@@ -190,7 +287,43 @@ export const syncCommand = new Command("sync")
 		}
 
 		// Load manifest
-		const manifest = await loadManifest(specsDir);
+		const { manifest } = await loadManifest(specsDir);
+
+		// Check for stale journey references in manifest (journeys that no longer exist on disk)
+		for (const journeyKey of Object.keys(manifest.journeys)) {
+			const journeyPath = path.join(journeysDir, `${journeyKey}.md`);
+			try {
+				await fs.access(journeyPath);
+			} catch {
+				// Journey file no longer exists - stale reference
+				userWarn(`manifest references missing journey: ${journeyKey}`);
+				console.log(chalk.dim(`  Run 'udd sync' to refresh manifest`));
+			}
+		}
+
+		// Check manifest scenarios for missing files and hash mismatches
+		for (const scenarioPath of Object.keys(manifest.scenarios || {})) {
+			const entry = manifest.scenarios[scenarioPath];
+			const fullPath = path.join(rootDir, scenarioPath);
+			try {
+				const content = await fs.readFile(fullPath, "utf-8");
+				const currentHash = hashContent(content);
+				if (entry?.hash && entry.hash !== currentHash) {
+					userWarn(`hash mismatch for ${scenarioPath}`);
+					console.log(
+						chalk.dim(`  manifest: ${entry.hash}  current: ${currentHash}`),
+					);
+				}
+			} catch {
+				// File missing
+				userWarn(`manifest references missing scenario: ${scenarioPath}`);
+				console.log(
+					chalk.dim(
+						`  The scenario will be recreated during 'udd sync' if linked from a journey.`,
+					),
+				);
+			}
+		}
 
 		// Find journey files
 		const journeyFiles = await fs.readdir(journeysDir);
@@ -214,7 +347,7 @@ export const syncCommand = new Command("sync")
 			const journey = await parseJourneyFile(journeyPath);
 
 			if (!journey) {
-				console.log(chalk.yellow(`⚠ Could not parse: ${file}`));
+				userWarn(`Could not parse journey file: ${file}`);
 				continue;
 			}
 
