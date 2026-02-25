@@ -103,7 +103,7 @@ Feature: Export Project Data
 - `README.md` - Add SysML-informed discovery reference
 - `templates/feature-template.feature` - New template with context
 - `src/commands/discover.ts` - Add `discover feature` subcommand
-- `docs/example-features/` - Add example rich feature files
+  - `examples/feature-features/` - Add example rich feature files
 
 ## Benefits
 

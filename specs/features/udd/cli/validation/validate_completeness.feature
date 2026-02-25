@@ -24,8 +24,8 @@ Feature: Validate Feature Completeness
     And the output should show an average completeness score
 
   Scenario: Validate specific feature file
-    Given I have a feature file "docs/example-features/export_data.feature"
-    When I run "udd validate -f docs/example-features/export_data.feature"
+    Given I have a feature file "examples/feature-features/export_data.feature"
+    When I run "udd validate -f examples/feature-features/export_data.feature"
     Then the command should succeed
     And the output should show the completeness score for that feature
 
@@ -37,7 +37,7 @@ Feature: Validate Feature Completeness
     And the output should warn about missing success criteria
 
   Scenario: Validate scores complete features at 100%
-    Given I have a complete feature file "docs/example-features/export_data.feature"
-    When I run "udd validate -f docs/example-features/export_data.feature"
+    Given I have a complete feature file "examples/feature-features/export_data.feature"
+    When I run "udd validate -f examples/feature-features/export_data.feature"
     Then the completeness score should be 100%
     And the output should show "Complete"

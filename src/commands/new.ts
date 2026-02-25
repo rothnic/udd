@@ -163,7 +163,7 @@ newCommand
 			);
 			console.log(chalk.dim("  2. Replace placeholders with actual scenarios"));
 			console.log(
-				chalk.dim("  3. See docs/example-features/ for reference examples"),
+				chalk.dim("  3. See examples/feature-features/ for reference examples"),
 			);
 			console.log(
 				chalk.dim("  4. Run 'udd lint' to validate the feature file"),

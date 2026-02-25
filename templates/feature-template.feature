@@ -86,4 +86,4 @@ Feature: [Feature Name]
 #    - Use Background for common setup
 #
 # 6. Examples of Complete Features:
-#    - See docs/example-features/ for real-world examples
+#    - See examples/feature-features/ for real-world examples

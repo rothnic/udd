@@ -123,7 +123,7 @@ The `udd new feature` command uses `templates/feature-template.feature` which in
 - **Success Criteria** - Measurable outcomes
 - **Comprehensive Scenarios** - Happy path, errors, and edge cases
 
-See [docs/example-features/](docs/example-features/) for complete examples like `export_data.feature` and `password_reset.feature`.
+See [examples/feature-features/](examples/feature-features/) for complete examples like `export_data.feature` and `password_reset.feature`.
 
 **Manual Usage:**
 ```bash

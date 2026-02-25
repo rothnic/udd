@@ -73,7 +73,7 @@ udd new feature <domain> <feature-name>
 
 Create examples showing good usage:
 
-**File:** `docs/example-features/export-csv.feature`
+**File:** `examples/feature-features/export-csv.feature`
 
 ## Acceptance Criteria
 
