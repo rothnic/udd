@@ -1,0 +1,129 @@
+---
+# Example journey manifest demonstrating linking pattern
+# Based on specs/traceability-contract.yml
+
+id: example_journey
+title: Example journey manifest
+actor: user.persona.example
+goal: Demonstrate forward and reverse traceability links from journey to tests
+summary: |
+  Small example manifest showing how to link journey -> use_cases -> scenarios -> e2e_tests
+  and provide reverse links and an ownership matrix.
+tags:
+  - example
+  - traceability
+
+use_cases:
+  - id: uc.example.onboard
+    name: Onboard new user
+    actors:
+      - user.persona.example
+    outcomes:
+      scenarios:
+        - sc.auth.signup
+        - sc.auth.verify_email
+
+  - id: uc.example.create_item
+    name: Create first item
+    actors:
+      - user.persona.example
+    outcomes:
+      scenarios:
+        - sc.items.create_first
+
+# Forward links (authoritative pointers)
+forward_links:
+  journey_to_use_cases:
+    - uc.example.onboard
+    - uc.example.create_item
+
+  use_case_to_scenarios:
+    uc.example.onboard:
+      - sc.auth.signup
+      - sc.auth.verify_email
+    uc.example.create_item:
+      - sc.items.create_first
+
+  scenario_to_e2e_tests:
+    sc.auth.signup:
+      - id: e2e.auth.signup.test
+        path: tests/auth/signup.e2e.test.ts
+        status: unknown
+    sc.auth.verify_email:
+      - id: e2e.auth.verify_email.test
+        path: tests/auth/verify_email.e2e.test.ts
+        status: unknown
+    sc.items.create_first:
+      - id: e2e.items.create_first.test
+        path: tests/items/create_first.e2e.test.ts
+        status: unknown
+
+# Reverse links (computed / explicit reverse mapping to help tools)
+reverse_links:
+  tests_to_scenarios:
+    tests/auth/signup.e2e.test.ts: sc.auth.signup
+    tests/auth/verify_email.e2e.test.ts: sc.auth.verify_email
+    tests/items/create_first.e2e.test.ts: sc.items.create_first
+
+  scenarios_to_use_cases:
+    sc.auth.signup: uc.example.onboard
+    sc.auth.verify_email: uc.example.onboard
+    sc.items.create_first: uc.example.create_item
+
+  use_cases_to_journeys:
+    uc.example.onboard: example_journey
+    uc.example.create_item: example_journey
+
+# Ownership matrix: human | agent | generated
+ownership:
+  journey:
+    human: product_manager@example.com
+    agent: sre-agent
+    generated: false
+
+  use_cases:
+    uc.example.onboard:
+      human: pm@example.com
+      agent: spec-generator
+      generated: true
+    uc.example.create_item:
+      human: pm@example.com
+      agent: spec-generator
+      generated: true
+
+  scenarios:
+    sc.auth.signup:
+      human: qa_lead@example.com
+      agent: udd-sync
+      generated: true
+    sc.auth.verify_email:
+      human: qa_lead@example.com
+      agent: udd-sync
+      generated: true
+    sc.items.create_first:
+      human: product_owner@example.com
+      agent: udd-sync
+      generated: true
+
+  e2e_tests:
+    e2e.auth.signup.test:
+      human: qa_eng@example.com
+      agent: test-gen
+      generated: true
+    e2e.auth.verify_email.test:
+      human: qa_eng@example.com
+      agent: test-gen
+      generated: true
+    e2e.items.create_first.test:
+      human: qa_eng@example.com
+      agent: test-gen
+      generated: true
+
+references:
+  traceability_contract: specs/traceability-contract.yml
+
+evidence:
+  - .sisyphus/evidence/phase2/task-8-traversal.md
+  - .sisyphus/evidence/phase2/task-8-stale.md
+
+---

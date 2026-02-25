@@ -1,0 +1,53 @@
+# System boundary definition for UDD Phase 2
+# Boundary subject must match decisions: 'udd-core'
+boundary_subject: udd-core
+
+# What is considered in scope for udd-core (traceability artifacts only)
+in_scope:
+  - specs/features
+  - tests
+  - specs/.udd/manifest.yml
+  - product/journeys
+  - docs/architecture/udd-concept-model.md
+
+# Explicitly excluded from udd-core to avoid scope creep
+out_of_scope:
+  - implementation_code
+  - deployment_infra
+  - runtime_services
+
+# External actors and systems that interact with udd-core
+external_actors:
+  - name: Reviewer
+    type: human
+    description: "Human reviewer who validates traceability and spec-to-test mapping"
+
+external_systems:
+  - id: CI_System
+    type: external_system
+    description: "Continuous Integration system that runs tests and checks (eg. GitHub Actions, Jenkins)"
+  - id: Hosted_DB
+    type: external_system
+    description: "Hosted database used by implementation environments (treated as external to udd-core)"
+
+# Validation rules used by udd lint / udd check
+validation:
+  - id: boundary_subject_exists
+    description: "specs/system-boundary.yml must declare boundary_subject 'udd-core'"
+    rule: "boundary_subject == 'udd-core'"
+  - id: in_scope_enumerates_artifacts
+    description: "in_scope must include spec artifacts: specs/features, tests, specs/.udd/manifest.yml"
+    rule: "contains(in_scope, 'specs/features') and contains(in_scope, 'tests') and contains(in_scope, 'specs/.udd/manifest.yml')"
+  - id: external_systems_minimum
+    description: "There must be at least two external_system entries (CI_System, Hosted_DB recommended)"
+    rule: "length(external_systems) >= 2"
+  - id: no_external_as_in_scope
+    description: "Detect misclassification where known external systems are placed in in_scope"
+    rule: "not any(in_scope contains item where item in ['Hosted_DB','CI_System'])"
+
+# Notes and references
+notes:
+  - source_evidence:
+    - .sisyphus/evidence/phase2/task-2-boundary.md
+    - .sisyphus/evidence/phase2/task-2-leak.md
+    - .sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md

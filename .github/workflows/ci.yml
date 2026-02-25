@@ -1,0 +1,175 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint and format check
+        run: npm run check
+
+      - name: UDD traceability lint
+        run: npx tsx bin/udd.ts lint
+
+      - name: UDD strict validation
+        run: npx tsx bin/udd.ts validate --strict
+
+      - name: Run tests
+        run: npm test -- --run
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: .udd/results.json
+
+  traceability:
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check journey manifests
+        run: |
+          if [ -d "product/journeys" ]; then
+            for manifest in product/journeys/*.manifest.yml; do
+              if [ -f "$manifest" ]; then
+                echo "Validating: $manifest"
+                # Add manifest validation when available
+              fi
+            done
+          fi
+
+      - name: Verify trace links
+        run: |
+          echo "Checking traceability..."
+          npx tsx bin/udd.ts status --json > traceability-status.json
+          
+          # Check for orphaned scenarios
+          orphaned=$(cat traceability-status.json | jq '.orphaned_scenarios | length')
+          if [ "$orphaned" -gt 0 ]; then
+            echo "Error: $orphaned orphaned scenarios found"
+            exit 1
+          fi
+          
+          # Check for stale artifacts
+          stale=$(cat traceability-status.json | jq '.stale_artifacts | length')
+          if [ "$stale" -gt 0 ]; then
+            echo "Warning: $stale stale artifacts detected"
+            cat traceability-status.json | jq '.stale_artifacts'
+          fi
+
+      - name: Upload traceability report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: traceability-report
+          path: traceability-status.json
+
+  documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check documentation completeness
+        run: |
+          # Required documentation files
+          required_docs=(
+            "docs/architecture/udd-concept-model.md"
+            "docs/architecture/canonical-derivation-model.md"
+            "docs/architecture/glossary-naming-policy.md"
+            "docs/process/udd-user-playbook.md"
+            "specs/traceability-contract.yml"
+          )
+          
+          missing=0
+          for doc in "${required_docs[@]}"; do
+            if [ ! -f "$doc" ]; then
+              echo "Missing required documentation: $doc"
+              missing=$((missing + 1))
+            fi
+          done
+          
+          if [ $missing -gt 0 ]; then
+            echo "Error: $missing required documentation files missing"
+            exit 1
+          fi
+          
+          echo "All required documentation present"
+
+      - name: Check evidence files
+        run: |
+          # Check that evidence exists for completed tasks
+          if [ ! -d ".sisyphus/evidence/phase2" ]; then
+            echo "Error: Phase 2 evidence directory missing"
+            exit 1
+          fi
+          
+          evidence_count=$(ls .sisyphus/evidence/phase2/*.md 2>/dev/null | wc -l)
+          if [ "$evidence_count" -lt 10 ]; then
+            echo "Warning: Only $evidence_count evidence files found (expected 14+)"
+          fi
+          
+          echo "Evidence files: $evidence_count"
+
+  naming-convention:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check naming conventions
+        run: |
+          # Check for disallowed terms
+          disallowed_terms=("Story" "Epic" "Ticket")
+          violations=0
+          
+          for term in "${disallowed_terms[@]}"; do
+            count=$(grep -r "$term" --include="*.md" --include="*.yml" product/ specs/ docs/ 2>/dev/null | wc -l)
+            if [ "$count" -gt 0 ]; then
+              echo "Warning: Found '$term' in $count places (should use approved terms)"
+              violations=$((violations + count))
+            fi
+          done
+          
+          # Check kebab-case for IDs
+          invalid_ids=$(grep -r "id: .*_" --include="*.yml" specs/ product/ 2>/dev/null | grep -v "^#" || true)
+          if [ -n "$invalid_ids" ]; then
+            echo "Warning: IDs using underscore instead of kebab-case:"
+            echo "$invalid_ids"
+          fi
+          
+          echo "Naming convention check complete"

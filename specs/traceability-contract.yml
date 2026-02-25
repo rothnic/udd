@@ -1,0 +1,128 @@
+# Traceability contract for UDD
+# Defines artifact schemas, forward/reverse trace queries, and invalidation rules
+
+artifacts:
+  persona:
+    required_fields: [id, name]
+    optional_fields: [description, goals, contact]
+    description: |
+      Human actor definitions used by journeys and use_cases. "id" is canonical key.
+
+  journey:
+    required_fields: [id, actor, goal, steps]
+    optional_fields: [summary, tags]
+    description: |
+      High-level user journeys. "actor" must reference persona.id. "steps" list use_case ids or human steps.
+
+  use_case:
+    required_fields: [id, name, actors, outcomes]
+    optional_fields: [summary, tags]
+    description: |
+      Use cases connect journeys to scenarios. "actors" list persona ids. "outcomes" must include scenarios array.
+
+  scenario:
+    required_fields: [id, title, feature_path]
+    optional_fields: [tags, description]
+    description: |
+      Scenario metadata representing a Gherkin scenario. "feature_path" points to the authoritative .feature file.
+
+  e2e_test:
+    required_fields: [id, scenario_path, status]
+    optional_fields: [last_run, runner]
+    description: |
+      Test harness mapping to a scenario. "scenario_path" must match scenario.feature_path or contain scenario id in path.
+
+  test_review:
+    required_fields: [id, test_id, scenario_path, checks]
+    optional_fields: [reviewer, created_at]
+    description: |
+      Review artifacts validating test fidelity against scenario. Must reference test_id and scenario_path.
+
+  requirement:
+    required_fields: [id, type, feature, description, scenarios]
+    optional_fields: [priority, owner]
+    description: |
+      Requirements linked to scenarios. "scenarios" lists scenario ids covered by this requirement.
+
+trace_queries:
+  forward:
+    - name: persona_to_journeys
+      description: Find journeys for a persona
+      query: "Find journey where journey.actor = <persona.id>"
+
+    - name: journey_to_use_cases
+      description: Resolve use_cases from journey.steps
+      query: "For journey.id = <id>, map journey.steps -> use_case.id"
+
+    - name: use_case_to_scenarios
+      description: Find scenarios declared in a use_case outcome
+      query: "Find scenario.id in use_case.outcomes[].scenarios where use_case.id = <id>"
+
+    - name: scenario_to_tests
+      description: Find tests that target a scenario
+      query: "Find e2e_test where e2e_test.scenario_path contains <scenario.id> or equals <scenario.feature_path>"
+
+    - name: requirement_impact
+      description: From a requirement, find impacted scenarios, tests, journeys, personas
+      query: "Find all e2e_test where requirement.scenarios contains matching scenario.id"
+
+  reverse:
+    - name: test_to_scenario
+      description: Find scenario related to a test
+      query: "Find scenario where scenario.feature_path = <e2e_test.scenario_path> or <e2e_test.scenario_path> contains scenario.id"
+
+    - name: scenario_to_use_case
+      description: Find use_cases that reference a scenario
+      query: "Find use_case where use_case.outcomes[].scenarios contains <scenario.id>"
+
+    - name: use_case_to_journeys
+      description: Find journeys that include a use_case
+      query: "Find journey where journey.steps references <use_case.id>"
+
+    - name: journey_to_persona
+      description: Find persona for a journey
+      query: "Find persona where persona.id = <journey.actor>"
+
+    - name: failing_tests_to_requirements
+      description: From failing tests, find linked requirements
+      query: "Find requirement where requirement.scenarios intersects (tests -> scenario ids)"
+
+invalidation_rules:
+  # Each rule declares which missing field(s) cause ERROR vs WARN and short explanation
+  - artifact: persona
+    missing:
+      id: {level: ERROR, message: "Cannot reference persona in journey.actor; forward trace breaks"}
+      name: {level: WARN, message: "Display name unavailable for journey documentation"}
+
+  - artifact: journey
+    missing:
+      actor: {level: ERROR, message: "Cannot trace to persona; reverse trace from journey fails"}
+      steps: {level: ERROR, message: "Journey has no actionable steps; cannot map to use_cases"}
+
+  - artifact: use_case
+    missing:
+      id: {level: ERROR, message: "Cannot reference use_case in journey.steps; forward trace breaks"}
+      actors: {level: ERROR, message: "Cannot trace to persona; requirement-to-persona trace fails"}
+      outcomes: {level: ERROR, message: "No scenario references; use_case not connected to graph"}
+
+  - artifact: scenario
+    missing:
+      id: {level: ERROR, message: "Cannot reference scenario in use_case.outcomes; graph edge missing"}
+      feature_path: {level: ERROR, message: "Cannot locate scenario file for test mapping"}
+
+  - artifact: e2e_test
+    missing:
+      scenario_path: {level: ERROR, message: "Test not linked to scenario; traceability broken"}
+      status: {level: ERROR, message: "Cannot determine if test is passing for reverse trace"}
+
+  - artifact: test_review
+    missing:
+      test_id: {level: ERROR, message: "Review not linked to test; quality gate ineffective"}
+      scenario_path: {level: ERROR, message: "Cannot verify scenario fidelity; mapping unconfirmed"}
+
+  - artifact: requirement
+    missing:
+      feature: {level: ERROR, message: "Cannot group requirements; impact analysis incomplete"}
+      description: {level: ERROR, message: "No specification available; implementation guidance missing"}
+
+rules_version: 1

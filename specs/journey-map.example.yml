@@ -1,0 +1,65 @@
+# Journey Structured Map Example
+# Conforming example demonstrating valid journey-to-use-case mapping.
+
+journey_map:
+  id: new-user-onboarding
+  title: New User Quick Start
+  actor: team-member
+  goal: Sign up and start using the app
+
+  trigger_conditions:
+    - type: event
+      description: User visits app for first time
+
+  steps:
+    - sequence: 1
+      name: User signs up
+      use_case_ref: user-signup
+      entry_conditions:
+        - type: state
+          description: User is unauthenticated
+      exit_conditions:
+        - type: event
+          description: Account created and verified
+      success_metrics:
+        - id: signup-completion
+          description: User completes signup flow
+          target: ">80%"
+          metric_reference: analytics.signup_completed
+
+    - sequence: 2
+      name: User creates first item
+      use_case_ref: create-first-item
+      entry_conditions:
+        - type: state
+          description: User is authenticated with verified account
+      exit_conditions:
+        - type: event
+          description: Item appears in inbox
+      success_metrics:
+        - id: first-item-creation
+          description: User creates first item within 5 minutes
+          target: ">50%"
+          metric_reference: analytics.first_item_created
+
+    - sequence: 3
+      name: User organizes items
+      use_case_ref: organize-items
+      entry_conditions:
+        - type: state
+          description: User has at least one item in inbox
+      exit_conditions:
+        - type: event
+          description: Items are tagged or prioritized
+      success_metrics:
+        - id: organization-rate
+          description: Users who organize at least one item
+          target: ">30%"
+
+  success_metrics:
+    - id: onboarding-completion
+      description: Users who complete onboarding within 10 minutes
+      target: ">60%"
+      metric_reference: analytics.onboarding_completed
+
+validation_rules: []
