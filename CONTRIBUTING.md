@@ -175,3 +175,75 @@ Follow conventional commits:
 - `docs:` - Documentation
 - `refactor:` - Code change (no behavior change)
 - `test:` - Test changes
+
+## Adding UDD Features
+
+Since UDD uses itself to manage development, adding features requires updating UDD's own product artifacts:
+
+1. **Define the Journey**
+   ```bash
+   udd new journey <feature-name>
+   ```
+   Edit `product/journeys/<feature-name>.md` to describe:
+   - Who needs this feature (actor)
+   - What they're trying to accomplish
+   - Steps to complete the journey
+
+2. **Create BDD Scenarios**
+   ```bash
+   udd new scenario udd/<domain> <action>
+   ```
+   Or use the feature template:
+   ```bash
+   udd new feature udd/<domain> <feature-name>
+   ```
+   Place scenarios in `specs/udd/<domain>/`
+
+3. **Write E2E Tests**
+   Create test file in `tests/e2e/udd/<domain>/`
+   Use vitest-cucumber to load and test the feature
+
+4. **Implement the Code**
+   Add implementation in `src/`
+
+5. **Validate**
+   ```bash
+   udd validate --strict
+   udd status
+   ```
+
+## Adding Examples
+
+Examples help users learn UDD patterns:
+
+1. **Create Example Directory**
+   ```bash
+   mkdir -p examples/<name>/{product/journeys,specs,tests}
+   ```
+
+2. **Add Product Structure**
+   - `examples/<name>/product/actors.md`
+   - `examples/<name>/product/constraints.md`
+   - `examples/<name>/product/journeys/*.md`
+
+3. **Create Scenarios and Tests**
+   Add feature files and E2E tests
+
+4. **Register in Config**
+   Add to `.udd/config.yml`:
+   ```yaml
+   examples:
+     <name>:
+       path: "examples/<name>"
+       description: "Description of example"
+   ```
+
+5. **Update Documentation**
+   - Add to `examples/README.md`
+   - Create `examples/<name>/README.md`
+
+6. **Test**
+   ```bash
+   udd status --example <name>
+   udd validate --example <name>
+   ```

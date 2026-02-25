@@ -49,6 +49,52 @@ tests/                            # Agent-generated
     ├── signup.e2e.test.ts
     └── login.e2e.test.ts
 ```
+ 
+## Repository Structure
+
+UDD uses a three-tier architecture that separates concerns:
+
+```
+product/          # UDD's own requirements (dogfooding)
+├── journeys/     # User journeys for UDD features
+├── actors.md     # UDD actors (developer, agent, PM)
+└── constraints.md # UDD NFRs
+
+specs/            # UDD's own specs
+└── udd/          # Features organized by domain
+    ├── cli/
+    ├── agent/
+    └── dev-experience/
+
+examples/         # Learn by example
+├── todo-app/     # Complete project example
+└── feature-examples/  # Feature-level examples
+
+docs/             # Documentation
+├── architecture/ # Design docs
+├── process/      # Playbooks
+└── getting-started.md
+```
+
+## Dogfooding
+
+UDD uses its own system to manage development. You can inspect UDD's own requirements:
+
+```bash
+# Check UDD's traceability
+udd status
+
+# Validate UDD's requirements
+udd validate --strict
+
+# Check an example project
+udd status --example todo-app
+```
+
+This repository demonstrates the full UDD workflow:
+- **product/** - UDD managing itself
+- **examples/** - Standalone projects users can copy
+- **docs/** - Reference documentation
 
 ## Commands
 
