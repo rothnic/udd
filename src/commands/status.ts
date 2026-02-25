@@ -3,14 +3,58 @@ import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
 import yaml from "yaml";
+import { listExamples, resolvePaths } from "../lib/paths.js";
 import { getProjectStatus } from "../lib/status.js";
 
 export const statusCommand = new Command("status")
 	.description("Summarize current test-based status")
 	.option("--json", "Output status as JSON")
 	.option("--doctor", "Run diagnostics and provide recommendations")
+	.option("--example <name>", "Show status for a specific example")
+	.option("--all", "Show status for all projects (product + examples)")
 	.action(async (options) => {
 		try {
+			// New multi-project handling: --all and --example
+			if (options.all) {
+				console.log(chalk.bold("Product Status:\n"));
+				// Show minimal product status for now
+				const productStatus = await getProjectStatus();
+				console.log(
+					chalk.dim(
+						`  Product detected: ${productStatus.hasProductDir ? "yes" : "no"}`,
+					),
+				);
+				// List examples
+				let examples: any[] = [];
+				try {
+					examples = await listExamples();
+				} catch (err) {
+					console.log(chalk.dim("  (Could not list examples)"));
+				}
+				for (const ex of examples) {
+					console.log(chalk.bold(`\n${ex.name} Status:\n`));
+					console.log(chalk.dim(`  Example path: ${ex.path}`));
+				}
+				return;
+			}
+
+			if (options.example) {
+				const exampleName = options.example;
+				let paths: any = {};
+				try {
+					paths = resolvePaths(exampleName);
+				} catch (err) {
+					console.log(
+						chalk.red(`Unable to resolve paths for example '${exampleName}'`),
+					);
+					return;
+				}
+				console.log(chalk.bold(`Status for ${exampleName}:\n`));
+				console.log(chalk.dim(`  Product: ${paths.product}`));
+				console.log(chalk.dim(`  Specs: ${paths.specs}`));
+				console.log(chalk.dim(`  Tests: ${paths.tests}`));
+				return;
+			}
 			const status = await getProjectStatus();
 
 			// Doctor mode: focused diagnostics with actionable recommendations

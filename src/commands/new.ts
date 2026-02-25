@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
+import { resolvePaths } from "../lib/paths.js";
 
 export const newCommand = new Command("new").description("Scaffold new specs");
 
@@ -9,9 +10,13 @@ newCommand
 	.command("journey")
 	.argument("<slug>", "Journey slug (e.g. new_user_onboarding)")
 	.description("Create a new user journey")
-	.action(async (slug) => {
-		const rootDir = process.cwd();
-		const journeysDir = path.join(rootDir, "product/journeys");
+	.option("--example <name>", "Create journey in an example project")
+	.action(async (slug, options) => {
+		// Resolve paths based on context (product or example)
+		const paths = options?.example
+			? resolvePaths(options.example)
+			: resolvePaths("product");
+		const journeysDir = path.join(paths.product, "journeys");
 		const filePath = path.join(journeysDir, `${slug}.md`);
 
 		const journeyName = slug

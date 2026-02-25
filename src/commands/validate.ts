@@ -3,6 +3,7 @@ import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
 import { glob } from "glob";
+import { isStrictMode, resolvePaths } from "../lib/paths.js";
 
 export const validateCommand = new Command("validate")
 	.description("Check feature scenario completeness")
@@ -11,15 +12,37 @@ export const validateCommand = new Command("validate")
 		"Validate specific feature file (default: all in specs/)",
 	)
 	.option("--strict", "Require all completeness checks to pass", false)
+	.option("--example <name>", "Validate a specific example project")
 	.action(async (options) => {
 		const rootDir = process.cwd();
+		// Determine validation mode based on flags and config
+		const useStrict = options.strict || (!options.example && isStrictMode());
+		const context = options.example || "product";
+
+		if (options.example) {
+			try {
+				const paths = resolvePaths(options.example);
+				console.log(chalk.blue(`Validating example: ${options.example}`));
+				console.log(chalk.dim(`  Specs: ${paths.specs}`));
+				// adjust rootDir for example
+			} catch (err) {
+				console.log(chalk.red(String(err)));
+				process.exit(1);
+			}
+		} else if (useStrict) {
+			console.log(chalk.blue("Using strict validation mode"));
+		}
 		let featureFiles: string[] = [];
 
 		if (options.feature) {
 			featureFiles = [path.resolve(rootDir, options.feature)];
 		} else {
 			// Find all feature files
-			const specsDir = path.join(rootDir, "specs");
+			let specsDir = path.join(rootDir, "specs");
+			if (options.example) {
+				const paths = resolvePaths(options.example);
+				specsDir = paths.specs;
+			}
 			const pattern = path.join(specsDir, "**/*.feature");
 			featureFiles = await glob(pattern);
 		}
