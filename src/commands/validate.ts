@@ -117,7 +117,7 @@ export const validateCommand = new Command("validate")
 			);
 			console.log(
 				chalk.dim(
-					"  • See docs/example-features/ for examples of complete features",
+					"  • See examples/feature-features/ for examples of complete features",
 				),
 			);
 			console.log(

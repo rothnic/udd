@@ -333,7 +333,7 @@ describeFeature(feature, ({ Scenario }) => {
 			console.log(chalk.dim("5. Implement the feature to make tests pass"));
 			console.log(
 				chalk.dim(
-					"\nSee docs/example-features/ for examples of complete feature files.",
+					"\nSee examples/feature-features/ for examples of complete feature files.",
 				),
 			);
 		} catch (error) {
