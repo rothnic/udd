@@ -56,18 +56,18 @@ describeFeature(feature, ({ Scenario }) => {
 			| undefined;
 
 		Given(
-			'I have a feature file "docs/example-features/export_data.feature"',
+			'I have a feature file "examples/feature-examples/export_data.feature"',
 			() => {
 				// Already exists in the project
 			},
 		);
 
 		When(
-			'I run "udd validate -f docs/example-features/export_data.feature"',
+			'I run "udd validate -f examples/feature-examples/export_data.feature"',
 			async () => {
 				try {
 					commandOutput = await runUdd(
-						"validate -f docs/example-features/export_data.feature",
+						"validate -f examples/feature-examples/export_data.feature",
 					);
 				} catch (error) {
 					commandError = error as {
@@ -91,7 +91,7 @@ describeFeature(feature, ({ Scenario }) => {
 			"the output should show the completeness score for that feature",
 			() => {
 				expect(commandOutput.stdout).toContain(
-					"docs/example-features/export_data.feature",
+					"examples/feature-examples/export_data.feature",
 				);
 				expect(commandOutput.stdout).toMatch(/\[\d+%\]/);
 			},
@@ -150,18 +150,18 @@ describeFeature(feature, ({ Scenario }) => {
 				| undefined;
 
 			Given(
-				'I have a complete feature file "docs/example-features/export_data.feature"',
+				'I have a complete feature file "examples/feature-examples/export_data.feature"',
 				() => {
 					// Already exists and is complete
 				},
 			);
 
 			When(
-				'I run "udd validate -f docs/example-features/export_data.feature"',
+				'I run "udd validate -f examples/feature-examples/export_data.feature"',
 				async () => {
 					try {
 						commandOutput = await runUdd(
-							"validate -f docs/example-features/export_data.feature",
+							"validate -f examples/feature-examples/export_data.feature",
 						);
 					} catch (error) {
 						_commandError = error as {
