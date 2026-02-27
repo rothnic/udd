@@ -412,7 +412,8 @@ Recommendations:",
 					let testReviews: TestReviewRecord[] = [];
 					try {
 						const content = await fs.readFile(testReviewsPath, "utf-8");
-						testReviews = yaml.parse(content) || [];
+						const parsed = yaml.parse(content);
+						testReviews = parsed?.tests || [];
 					} catch {
 						// File doesn't exist
 					}
