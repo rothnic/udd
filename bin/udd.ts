@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import { discoverCommand } from "../src/commands/discover.js";
+import { hooksCommand } from "../src/commands/hooks.js";
 import { examplesCommand } from "../src/commands/examples.js";
 import { inboxCommand } from "../src/commands/inbox.js";
 import { initCommand } from "../src/commands/init.js";
@@ -26,6 +27,7 @@ program.addCommand(validateCommand);
 program.addCommand(testCommand);
 program.addCommand(inboxCommand);
 program.addCommand(queryCommand);
+program.addCommand(hooksCommand);
 program.addCommand(examplesCommand);
 
 program.parse(process.argv);

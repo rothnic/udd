@@ -12,7 +12,7 @@ covers installation and initial configuration.
 
 1. Developer runs `npm install` to install dependencies
 2. Runs `npm link` to make CLI available globally
-3. Verifies installation with `udd --help`
+3. Verifies installation with `udd --help` → `specs/features/udd/cli/setup.feature`
 4. Project is ready for development
 
 ## Success Criteria
@@ -20,10 +20,6 @@ covers installation and initial configuration.
 - Dependencies are installed correctly
 - CLI tool is linked and available globally
 - Setup can be completed by agent or developer
-
-## Scenarios
-
-- `specs/features/udd/cli/setup.feature` - Project setup
 
 ## Use Cases
 

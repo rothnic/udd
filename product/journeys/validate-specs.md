@@ -10,8 +10,8 @@ This journey provides validation tools.
 
 ## Steps
 
-1. Developer writes or updates specs
-2. Runs `udd lint` to validate structure
+1. Developer writes or updates specs → `specs/features/udd/cli/lint_valid_specs.feature`
+2. Runs `udd lint` to validate structure → `specs/features/udd/cli/lint_invalid_specs.feature`
 3. Gets feedback on any issues
 4. Fixes issues until validation passes
 
@@ -20,11 +20,6 @@ This journey provides validation tools.
 - Valid specs pass linting without errors
 - Invalid specs report clear, actionable errors
 - Validation is fast (< 1 second)
-
-## Scenarios
-
-- `specs/features/udd/cli/lint_valid_specs.feature` - Valid specs pass
-- `specs/features/udd/cli/lint_invalid_specs.feature` - Invalid specs report errors
 
 ## Use Cases
 

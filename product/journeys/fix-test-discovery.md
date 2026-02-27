@@ -11,8 +11,8 @@ ensures Vitest extension properly discovers and displays all scenarios.
 ## Steps
 
 1. Developer opens VS Code
-2. Vitest extension loads
-3. All scenarios appear in the test explorer
+2. Vitest extension loads → `specs/features/udd/dev-experience/test_discovery/vscode_detection.feature`
+3. All scenarios appear in the test explorer → `specs/features/udd/dev-experience/test_discovery/editor_status.feature`
 4. Test status is visible in the editor
 
 ## Success Criteria
@@ -20,11 +20,6 @@ ensures Vitest extension properly discovers and displays all scenarios.
 - Vitest extension shows all scenarios
 - Test status is visible in the editor
 - Tests can be run from the IDE
-
-## Scenarios
-
-- `specs/features/udd/dev-experience/test_discovery/vscode_detection.feature` - VS Code detection
-- `specs/features/udd/dev-experience/test_discovery/editor_status.feature` - Editor status
 
 ## Use Cases
 

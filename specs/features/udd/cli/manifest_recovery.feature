@@ -1,5 +1,24 @@
 Feature: Manifest Corruption and Recovery
 
+# User Need: Developers need clear, actionable reporting when the
+# project manifest is corrupted or inconsistent so they can restore
+# traceability between journeys and generated scenarios without losing
+# work or introducing silent failures.
+#
+# Alternatives Considered:
+# - Fail-fast with non-zero exit code: rejected because it would
+#   interrupt CI and block other checks; prefer graceful reporting.
+# - Auto-repair manifest silently: rejected due to risk of data loss
+#   and surprising automation. Prefer informative suggestions and
+#   optional commands to repair or refresh the manifest.
+#
+# Success Criteria:
+# - Running udd commands on broken manifests exits with code 0
+#   (non-blocking) and prints a clear diagnostic message.
+# - Output contains actionable guidance (e.g. which entry is missing,
+#   commands to refresh or remove entries). Tests assert on messages
+#   and exit codes.
+
   As a developer using udd
   I want the CLI to detect corrupted or inconsistent manifests
   So I can be informed about what went wrong and how to recover

@@ -1,6 +1,18 @@
 @phase:3
 Feature: Orchestrated Iteration Until Complete
 
+# User Need: Orchestrators need to delegate work to agents and monitor until completion
+#
+# Alternatives Considered:
+# - Manual iteration: Too slow, doesn't scale
+# - Fire-and-forget: No visibility into completion
+# - Structured iteration with status checks: Best balance of automation and oversight
+#
+# Success Criteria:
+# - Orchestrator can delegate tasks to worker agents
+# - Worker reports progress back to orchestrator
+# - Orchestrator knows when work is complete
+
   As a developer using OpenCode with UDD
   I want an orchestrator agent to coordinate worker agents
   So that tasks are completed autonomously without manual re-prompting
@@ -43,3 +55,15 @@ Feature: Orchestrated Iteration Until Complete
     When the orchestrator reviews the project status
     Then it should return a response containing "COMPLETE"
     And the orchestration process should terminate successfully
+
+  Scenario: Orchestrator handles worker failure
+    Given a worker agent is processing a task
+    When the worker fails with an error
+    Then the orchestrator should capture the error
+    And the orchestrator should preserve session state for retry
+
+  Scenario: Orchestrator handles maximum iteration limit
+    Given the iteration limit is set to 5
+    When the task requires more than 5 iterations
+    Then the orchestrator should stop at the limit
+    And report partial completion

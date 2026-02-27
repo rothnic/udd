@@ -11,7 +11,7 @@ capturing is too high-friction. This journey makes it effortless.
 ## Steps
 
 1. **Trigger**: Developer has idea while working
-2. **Capture**: Developer runs `udd inbox add "idea description"`
+2. **Capture**: Developer runs `udd inbox add "idea description"` → `specs/features/udd/cli/inbox/add_item_via_cli.feature`
 3. **Confirmation**: CLI confirms idea captured with ID
 4. **Return**: Developer returns to coding immediately
 
@@ -20,10 +20,6 @@ capturing is too high-friction. This journey makes it effortless.
 - Capture takes < 5 seconds
 - No context switching required
 - Idea is traceable later
-
-## Scenarios
-
-- `specs/features/udd/cli/inbox/add_item_via_cli.feature` - Basic capture
 
 ## Use Cases
 

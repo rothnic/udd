@@ -5,6 +5,7 @@ import { Command } from "commander";
 import yaml from "yaml";
 import { listExamples, resolvePaths } from "../lib/paths.js";
 import { getProjectStatus } from "../lib/status.js";
+import type { TestReviewRecord } from "../types.js";
 
 export const statusCommand = new Command("status")
 	.description("Summarize current test-based status")
@@ -399,6 +400,63 @@ Recommendations:",
 							),
 						);
 					}
+				}
+
+				// Test Governance Section
+				console.log(chalk.bold("\nTest Governance:"));
+				try {
+					const testReviewsPath = path.join(
+						process.cwd(),
+						".udd/test-reviews.yml",
+					);
+					let testReviews: TestReviewRecord[] = [];
+					try {
+						const content = await fs.readFile(testReviewsPath, "utf-8");
+						testReviews = yaml.parse(content) || [];
+					} catch {
+						// File doesn't exist
+					}
+
+					if (testReviews.length === 0) {
+						console.log(chalk.yellow("  ○ Not configured"));
+						console.log(chalk.dim("    Run: udd test scan"));
+					} else {
+						const dirtyTests = testReviews.filter((t) => t.status === "dirty");
+						const stubTests = testReviews.filter((t) => (t as any).hasStubs);
+						const reviewedTests = testReviews.filter((t) => t.lastReviewed);
+						const coverage = Math.round(
+							(reviewedTests.length / testReviews.length) * 100,
+						);
+
+						console.log(chalk.green("  ✓ Active"));
+
+						if (dirtyTests.length > 0) {
+							console.log(chalk.yellow(`  Dirty tests: ${dirtyTests.length}`));
+							console.log(chalk.dim("    Run: udd test status --dirty"));
+						} else {
+							console.log(chalk.green(`  Dirty tests: 0`));
+						}
+
+						console.log(
+							`  Clean tests: ${testReviews.length - dirtyTests.length}`,
+						);
+
+						if (stubTests.length > 0) {
+							console.log(
+								chalk.yellow(`  Stub assertions: ${stubTests.length}`),
+							);
+						}
+
+						const coverageColor =
+							coverage >= 80
+								? chalk.green
+								: coverage >= 50
+									? chalk.yellow
+									: chalk.red;
+						console.log(`  Review coverage: ${coverageColor(coverage + "%")}`);
+					}
+				} catch {
+					console.log(chalk.yellow("  ○ Unable to load test governance data"));
 				}
 
 				const { git } = status;

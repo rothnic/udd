@@ -1,6 +1,26 @@
 @phase:3
 Feature: UDD Status Tool for Orchestration
 
+# User Need:
+#   Orchestrators need a concise, machine-readable view of project health
+#   (phases, feature/test coverage, git state, and orphaned scenarios) so
+#   they can prioritize work, delegate tasks to agents, and signal completion.
+#
+# Alternatives Considered:
+#   - Human-driven manual review: high accuracy but slow and error-prone for
+#     large repos. Rejected for scale and automation needs.
+#   - Ad-hoc scripts that parse test output: faster but brittle across
+#     projects and not traceable to UDD artifacts. Prefer a structured tool.
+#   - Dashboard UI: useful for humans but adds deployment and maintenance
+#     overhead. CLI/json output chosen for automation and CI integration.
+#
+# Success Criteria:
+#   - Tool returns JSON with the documented fields (current_phase, phases,
+#     features, use_cases, git, orphaned_scenarios).
+#   - Recommends next action when failures or gaps exist (e.g., "Fix failing tests first").
+#   - Correctly recognizes project completion and phase-complete vs deferred work.
+#   - Includes graceful error messages when UDD is uninitialized or repo is empty.
+
   As an orchestrator agent working on a UDD project
   I want a structured status tool
   So that I can make informed decisions about delegation and completion
@@ -50,3 +70,25 @@ Feature: UDD Status Tool for Orchestration
     Then it should recognize current phase work is complete
     And deferred work should not block completion
     And the orchestrator should signal "PHASE_COMPLETE"
+
+  # Error handling: UDD not initialized or missing product/journeys
+  Scenario: Fail gracefully when UDD is not initialized
+    Given a repository without UDD initialized
+    When the orchestrator runs "udd status --json"
+    Then it should return an error object containing:
+      | field | value |
+      | error | "UDD not initialized" |
+      | code |  2 |
+    And the message should advise: "Run `udd init` to create product/journeys/ and try again"
+
+  # Edge case: empty project with no scenarios or journeys
+  Scenario: Handle empty project status
+    Given an initialized UDD project with no journeys and no tests
+    When the orchestrator runs "udd status --json"
+    Then it should return a JSON object where:
+      | field | value |
+      | current_phase | 0 |
+      | features | {} |
+      | use_cases | {} |
+      | orphaned_scenarios | [] |
+    And the recommendation should be: "Create journeys with `udd new journey <name>`"

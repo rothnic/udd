@@ -11,8 +11,8 @@ ensures the agent has access to project status and can guide users.
 ## Steps
 
 1. Developer opens Copilot chat
-2. Agent has access to `udd status` output
-3. Agent guides user through UDD process
+2. Agent has access to `udd status` output → `specs/features/udd/agent/status_prompt.feature`
+3. Agent guides user through UDD process → `specs/features/udd/agent/guide_user.feature`
 4. User gets contextual assistance
 
 ## Success Criteria
@@ -20,11 +20,6 @@ ensures the agent has access to project status and can guide users.
 - Agent has access to project status
 - Agent can guide users through UDD workflow
 - Assistance is contextual and helpful
-
-## Scenarios
-
-- `specs/features/udd/agent/status_prompt.feature` - Agent status access
-- `specs/features/udd/agent/guide_user.feature` - Agent guides user
 
 ## Use Cases
 

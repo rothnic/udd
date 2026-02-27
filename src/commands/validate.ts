@@ -4,6 +4,7 @@ import chalk from "chalk";
 import { Command } from "commander";
 import { glob } from "glob";
 import { isStrictMode, resolvePaths } from "../lib/paths.js";
+import { detectStubAssertions } from "../lib/test-governance.js";
 
 export const validateCommand = new Command("validate")
 	.description("Check feature scenario completeness")
@@ -12,6 +13,7 @@ export const validateCommand = new Command("validate")
 		"Validate specific feature file (default: all in specs/)",
 	)
 	.option("--strict", "Require all completeness checks to pass", false)
+	.option("--check-tests", "Validate test files for stub assertions", false)
 	.option("--example <name>", "Validate a specific example project")
 	.action(async (options) => {
 		const rootDir = process.cwd();
@@ -113,6 +115,34 @@ export const validateCommand = new Command("validate")
 
 			console.log();
 			totalScore += result.score;
+		}
+
+		// If requested, validate test files for stub assertions
+		if (options.checkTests) {
+			console.log(
+				chalk.blue.bold(`\n🔍 Validating Test Files for Stub Assertions`),
+			);
+
+			const testPattern = path.join(rootDir, "tests", "**", "*.e2e.test.ts");
+			const testFiles: string[] = await glob(testPattern);
+
+			if (testFiles.length === 0) {
+				console.log(chalk.yellow("No test files found to check."));
+			} else {
+				for (const tf of testFiles) {
+					const content = await fs.readFile(tf, "utf-8");
+					const { hasStubs, stubPatterns } = detectStubAssertions(content);
+					if (hasStubs) {
+						hasIssues = true;
+						const rel = path.relative(rootDir, tf);
+						console.log(`${chalk.red("[FAIL]")} ${chalk.white(rel)}`);
+						for (const p of stubPatterns) {
+							console.log(`  ${chalk.red("✗")} Stub assertions detected: ${p}`);
+						}
+						console.log();
+					}
+				}
+			}
 		}
 
 		// Summary
