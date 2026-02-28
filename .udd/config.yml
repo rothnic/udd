@@ -1,0 +1,21 @@
+# UDD configuration file
+# Minimum average completeness % required for strict validation to pass
+validation:
+  strict_threshold: 90
+project:
+  name: udd
+  type: product
+paths:
+  product: product
+  specs: specs
+  tests: tests
+examples: {}
+traceability:
+  product:
+    strict: false
+    require_journey_links: true
+    require_test_coverage: true
+  examples:
+    strict: false
+    require_journey_links: false
+    require_test_coverage: false
