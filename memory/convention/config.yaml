@@ -1,0 +1,27 @@
+name: convention
+collection: memory_convention
+enabled: true
+
+description: |
+  Coding standards, naming conventions, project patterns, 
+  and style guidelines that apply across the codebase.
+
+triggers:
+  - pattern: "We should always"
+  - pattern: "The convention is"
+  - pattern: "Standard practice"
+  - pattern: "Let's standardize"
+  - pattern: "Naming convention"
+
+embedding:
+  model: openai/text-embedding-3-small
+  dimensions: 1536
+
+storage:
+  maxTokens: 1500
+  priority: medium
+  
+retrieval:
+  contextRadius: 2
+  maxResults: 8
+  minRelevance: 0.75

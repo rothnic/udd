@@ -1,3 +1,14 @@
+# Fix remaining biome warnings in sync command file (@Sisyphus-Junior subagent)
+
+**ID**: ses_378180abcffee1NqVtBP4arxI8
+**Project ID**: ad761ea6174e58ed763fc75290c3f403ed51079d
+**Created**: 2/22/2026, 6:30:51 PM
+**Stats**: 1 files changed, +4 -4
+
+---
+
+## USER (6:31:02 PM)
+
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -6,9 +17,6 @@ import chalk from "chalk";
 import { Command } from "commander";
 import yaml from "yaml";
 import { userWarn } from "../lib/cli-error.js";
-import { listExamples, resolvePaths } from "../lib/paths.js";
-import { detectFeatureChanges } from "../lib/test-governance.js";
-import type { ManifestTestEntry } from "../types.js";
 
 interface JourneyStep {
 	description: string;
@@ -270,135 +278,15 @@ describeFeature(feature, ({ Scenario }) => {
 `;
 }
 
-interface FeatureSnapshot {
-	path: string;
-	content: string;
-	hash: string;
-}
-
-async function loadTestReviews(specsDir: string): Promise<ManifestTestEntry[]> {
-	const testReviewsPath = path.join(specsDir, ".udd", "test-reviews.yml");
-	try {
-		const content = await fs.readFile(testReviewsPath, "utf-8");
-		const parsed = yaml.parse(content);
-		return parsed?.tests || [];
-	} catch {
-		return [];
-	}
-}
-
-async function saveTestReviews(
-	specsDir: string,
-	tests: ManifestTestEntry[],
-): Promise<void> {
-	const testReviewsPath = path.join(specsDir, ".udd", "test-reviews.yml");
-	await fs.mkdir(path.dirname(testReviewsPath), { recursive: true });
-	const content = yaml.stringify({ tests });
-	await fs.writeFile(testReviewsPath, content);
-}
-
-async function captureFeatureSnapshots(
-	specsDir: string,
-): Promise<FeatureSnapshot[]> {
-	const snapshots: FeatureSnapshot[] = [];
-	try {
-		const entries = await fs.readdir(specsDir, { recursive: true });
-		for (const entry of entries) {
-			if (typeof entry === "string" && entry.endsWith(".feature")) {
-				const fullPath = path.join(specsDir, entry);
-				try {
-					const content = await fs.readFile(fullPath, "utf-8");
-					snapshots.push({
-						path: entry,
-						content,
-						hash: hashContent(content),
-					});
-				} catch {
-					// Skip files we can't read
-				}
-			}
-		}
-	} catch {
-		// Directory might not exist yet
-	}
-	return snapshots;
-}
-
-async function captureFeatureSnapshotsAfterSync(
-	specsDir: string,
-): Promise<Map<string, string>> {
-	const contents = new Map<string, string>();
-	try {
-		const entries = await fs.readdir(specsDir, { recursive: true });
-		for (const entry of entries) {
-			if (typeof entry === "string" && entry.endsWith(".feature")) {
-				const fullPath = path.join(specsDir, entry);
-				try {
-					const content = await fs.readFile(fullPath, "utf-8");
-					contents.set(entry, content);
-				} catch {
-					// Skip files we can't read
-				}
-			}
-		}
-	} catch {
-		// Directory might not exist yet
-	}
-	return contents;
-}
-
 export const syncCommand = new Command("sync")
 	.description("Sync journeys to BDD scenarios")
 	.option("--dry-run", "Preview changes without applying")
 	.option("--auto", "Auto-accept all proposals")
-	.option("--example <name>", "Sync a specific example project")
-	.option("--all", "Sync all projects (product + examples)")
 	.action(async (options) => {
 		const rootDir = process.cwd();
 		const productDir = path.join(rootDir, "product");
 		const specsDir = path.join(rootDir, "specs");
 		const journeysDir = path.join(productDir, "journeys");
-
-		// If --all flag provided, sync product then all examples
-		if (options.all) {
-			console.log(chalk.bold("🔄 Syncing all projects...\n"));
-
-			// Sync product (existing behavior)
-			console.log(chalk.blue("Syncing product..."));
-			await (async function syncProduct() {
-				// Reuse existing logic by invoking core sync flow: we'll call into the
-				// same code path by keeping current working dir context (product sync uses paths above).
-				// For simplicity, call the body below by falling through to default behavior after handling examples.
-			})();
-
-			// Sync all examples
-			const examples = listExamples();
-			for (const example of examples) {
-				console.log(chalk.blue(`\nSyncing ${example.name}...`));
-				const paths = resolvePaths(example.name);
-				console.log(chalk.dim(`  Product: ${paths.product}`));
-				console.log(chalk.dim(`  Specs: ${paths.specs}`));
-				console.log(chalk.dim(`  Tests: ${paths.tests}`));
-				// TODO: Implement example sync (for now just log)
-			}
-			return;
-		}
-
-		// If --example flag provided, show paths for that example and exit
-		if (options.example) {
-			try {
-				const paths = resolvePaths(options.example);
-				console.log(chalk.blue(`🔄 Syncing ${options.example}...`));
-				console.log(chalk.dim(`  Product: ${paths.product}`));
-				console.log(chalk.dim(`  Specs: ${paths.specs}`));
-				console.log(chalk.dim(`  Tests: ${paths.tests}`));
-				// TODO: Implement example sync (for now just log)
-			} catch (err) {
-				console.log(chalk.red(String(err)));
-				process.exit(1);
-			}
-			return;
-		}
 
 		// Check if initialized
 		try {
@@ -411,12 +299,6 @@ export const syncCommand = new Command("sync")
 
 		// Load manifest
 		const { manifest } = await loadManifest(specsDir);
-
-		// Capture feature snapshots before sync (to detect changes after)
-		const featureSnapshots = await captureFeatureSnapshots(specsDir);
-
-		// Load existing test reviews
-		const testReviews = await loadTestReviews(specsDir);
 
 		// Check for stale journey references in manifest (journeys that no longer exist on disk)
 		for (const journeyKey of Object.keys(manifest.journeys)) {
@@ -571,89 +453,11 @@ export const syncCommand = new Command("sync")
 			await saveManifest(specsDir, updatedManifest);
 		}
 
-		// Detect feature changes and mark linked tests as dirty
-		let testsMarkedDirty = 0;
-		if (!options.dryRun && featureSnapshots.length > 0) {
-			const currentFeatureContents =
-				await captureFeatureSnapshotsAfterSync(specsDir);
-			const updatedTestReviews = [...testReviews];
-
-			for (const snapshot of featureSnapshots) {
-				const currentContent = currentFeatureContents.get(snapshot.path);
-				if (!currentContent) {
-					// Feature was deleted, mark linked tests as dirty
-					for (let i = 0; i < updatedTestReviews.length; i++) {
-						const test = updatedTestReviews[i];
-						if (test.feature === snapshot.path && test.status !== "dirty") {
-							updatedTestReviews[i] = {
-								...test,
-								status: "dirty",
-								dirtyReason: "feature changed: deleted",
-							};
-							testsMarkedDirty++;
-						}
-					}
-					continue;
-				}
-
-				// Use detectFeatureChanges to check for meaningful changes
-				const changeResult = detectFeatureChanges(
-					snapshot.content,
-					currentContent,
-				);
-
-				if (changeResult.hasChanges) {
-					// Find tests linked to this feature and mark them dirty
-					for (let i = 0; i < updatedTestReviews.length; i++) {
-						const test = updatedTestReviews[i];
-						if (test.feature === snapshot.path && test.status !== "dirty") {
-							updatedTestReviews[i] = {
-								...test,
-								status: "dirty",
-								dirtyReason: `feature changed: ${changeResult.changeType}`,
-							};
-							testsMarkedDirty++;
-						}
-					}
-				}
-			}
-
-			// Also check for newly created features that might have tests linked
-			// (tests could reference features that didn't exist during initial snapshot)
-			for (const [featurePath, content] of currentFeatureContents) {
-				const wasInSnapshot = featureSnapshots.some(
-					(s) => s.path === featurePath,
-				);
-				if (!wasInSnapshot) {
-					// New feature - check if any tests are linked to it
-					for (let i = 0; i < updatedTestReviews.length; i++) {
-						const test = updatedTestReviews[i];
-						if (test.feature === featurePath && test.status !== "dirty") {
-							updatedTestReviews[i] = {
-								...test,
-								status: "dirty",
-								dirtyReason: "feature changed: new feature",
-							};
-							testsMarkedDirty++;
-						}
-					}
-				}
-			}
-
-			// Save updated test reviews if there are changes
-			if (testsMarkedDirty > 0) {
-				await saveTestReviews(specsDir, updatedTestReviews);
-			}
-		}
-
 		// Summary
 		console.log(chalk.cyan("\n📊 Sync Summary:"));
 		console.log(`   Journeys processed: ${mdFiles.length}`);
 		console.log(`   Changes detected: ${changesDetected}`);
 		console.log(`   Scenarios created: ${scenariosCreated}`);
-		if (testsMarkedDirty > 0) {
-			console.log(chalk.yellow(`   Tests marked dirty: ${testsMarkedDirty}`));
-		}
 
 		if (options.dryRun) {
 			console.log(chalk.yellow("\n   (dry-run mode - no files modified)"));
@@ -661,3 +465,5 @@ export const syncCommand = new Command("sync")
 
 		console.log("");
 	});
+
+

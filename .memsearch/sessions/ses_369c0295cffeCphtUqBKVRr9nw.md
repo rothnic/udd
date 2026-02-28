@@ -1,3 +1,227 @@
+# Update sync command for multi-project (@Sisyphus-Junior subagent)
+
+**ID**: ses_369c0295cffeCphtUqBKVRr9nw
+**Project ID**: ad761ea6174e58ed763fc75290c3f403ed51079d
+**Created**: 2/25/2026, 1:21:32 PM
+**Stats**: 2 files changed, +52 -3
+
+---
+
+## USER (1:21:32 PM)
+
+import fs from "node:fs/promises";
+import path from "node:path";
+import chalk from "chalk";
+import { Command } from "commander";
+import { resolvePaths } from "../lib/paths.js";
+
+export const newCommand = new Command("new").description("Scaffold new specs");
+
+newCommand
+	.command("journey")
+	.argument("<slug>", "Journey slug (e.g. new_user_onboarding)")
+	.description("Create a new user journey")
+	.option("--example <name>", "Create journey in an example project")
+	.action(async (slug, options) => {
+		// Resolve paths based on context (product or example)
+		const paths = options?.example
+			? resolvePaths(options.example)
+			: resolvePaths("product");
+		const journeysDir = path.join(paths.product, "journeys");
+		const filePath = path.join(journeysDir, `${slug}.md`);
+
+		const journeyName = slug
+			.split("_")
+			.map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+			.join(" ");
+
+		const content = `# Journey: ${journeyName}
+
+**Actor:** User  
+**Goal:** TODO: Describe the user's goal
+
+## Steps
+
+1. TODO: First step → \`specs/domain/action.feature\`
+
+## Success
+
+TODO: Define success criteria
+`;
+
+		try {
+			await fs.mkdir(journeysDir, { recursive: true });
+			await fs.writeFile(filePath, content);
+			console.log(chalk.green(`Created journey: ${filePath}`));
+			console.log(chalk.dim("Next: Run `udd sync` to generate scenarios"));
+		} catch (error) {
+			console.error(chalk.red("Error creating journey:"), error);
+			process.exit(1);
+		}
+	});
+
+newCommand
+	.command("scenario")
+	.argument("<domain>", "Domain (e.g. auth)")
+	.argument("<action>", "Action slug (e.g. login)")
+	.description("Create a new scenario and test stub")
+	.action(async (domain, action) => {
+		const rootDir = process.cwd();
+		const specsDir = path.join(rootDir, "specs", domain);
+		const filePath = path.join(specsDir, `${action}.feature`);
+
+		const scenarioName = action
+			.split("_")
+			.map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+			.join(" ");
+
+		const content = `Feature: ${domain}
+
+  Scenario: ${scenarioName}
+    Given I am a User
+    When I ${action.replace(/_/g, " ")}
+    Then the action is completed successfully
+`;
+
+		const testDir = path.join(rootDir, "tests", domain);
+		const testFilePath = path.join(testDir, `${action}.e2e.test.ts`);
+		const testContent = `import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
+import { expect } from "vitest";
+
+const feature = await loadFeature("specs/${domain}/${action}.feature");
+
+describeFeature(feature, ({ Scenario }) => {
+	Scenario("${scenarioName}", ({ Given, When, Then }) => {
+		Given(/I am a (.+)/, (actor: string) => {
+			// TODO: Implement - set up actor context
+		});
+
+		When(/I (.+)/, (action: string) => {
+			// TODO: Implement - perform action
+		});
+
+		Then("the action is completed successfully", () => {
+			// TODO: Implement - verify outcome
+			expect(true).toBe(true);
+		});
+	});
+});
+`;
+
+		try {
+			// Create scenario
+			await fs.mkdir(specsDir, { recursive: true });
+			await fs.writeFile(filePath, content);
+			console.log(chalk.green(`Created scenario: ${filePath}`));
+
+			// Create test
+			await fs.mkdir(testDir, { recursive: true });
+			await fs.writeFile(testFilePath, testContent);
+			console.log(chalk.green(`Created test: ${testFilePath}`));
+		} catch (error) {
+			console.error(chalk.red("Error creating scenario:"), error);
+			process.exit(1);
+		}
+	});
+
+newCommand
+	.command("feature")
+	.argument("<domain>", "Domain (e.g. auth, user, reporting)")
+	.argument(
+		"<feature-name>",
+		"Feature name slug (e.g. export_csv, password_reset)",
+	)
+	.description(
+		"Create feature file from SysML template (use 'scenario' for simple features, 'discover' for guided creation)",
+	)
+	.action(async (domain, featureName) => {
+		const rootDir = process.cwd();
+		const templatePath = path.join(
+			rootDir,
+			"templates",
+			"feature-template.feature",
+		);
+
+		// Create feature directory structure: specs/features/<domain>/<feature-name>/
+		const featureDir = path.join(
+			rootDir,
+			"specs",
+			"features",
+			domain,
+			featureName,
+		);
+		const featureFilePath = path.join(featureDir, `${featureName}.feature`);
+
+		// Convert feature name to title case for display
+		const featureTitle = featureName
+			.split("_")
+			.map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+			.join(" ");
+
+		try {
+			// Read template
+			const templateContent = await fs.readFile(templatePath, "utf-8");
+
+			// Replace [Feature Name] placeholder with actual feature name
+			const content = templateContent.replace(
+				/\[Feature Name\]/g,
+				featureTitle,
+			);
+
+			// Create feature directory and file
+			await fs.mkdir(featureDir, { recursive: true });
+			await fs.writeFile(featureFilePath, content);
+
+			console.log(chalk.green(`✓ Created feature: ${featureFilePath}`));
+			console.log(chalk.dim("\nNext steps:"));
+			console.log(
+				chalk.dim("  1. Edit the feature file to fill in context sections"),
+			);
+			console.log(chalk.dim("  2. Replace placeholders with actual scenarios"));
+			console.log(
+				chalk.dim("  3. See examples/feature-features/ for reference examples"),
+			);
+			console.log(
+				chalk.dim("  4. Run 'udd lint' to validate the feature file"),
+			);
+			console.log(
+				chalk.dim(
+					"\nNote: This creates a rich template with SysML context sections.",
+				),
+			);
+			console.log(
+				chalk.dim(
+					"      For simpler features, use 'udd new scenario' instead.",
+				),
+			);
+			console.log(
+				chalk.dim(
+					"      For guided creation, use 'udd discover feature' instead.",
+				),
+			);
+		} catch (error) {
+			if (
+				(error as NodeJS.ErrnoException).code === "ENOENT" &&
+				(error as NodeJS.ErrnoException).path?.includes("template")
+			) {
+				console.error(
+					chalk.red(
+						"Error: Template file not found at templates/feature-template.feature",
+					),
+				);
+				console.error(
+					chalk.dim(
+						"Make sure you're running this command from the project root",
+					),
+				);
+			} else {
+				console.error(chalk.red("Error creating feature:"), error);
+			}
+			process.exit(1);
+		}
+	});
+
+
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -7,8 +231,6 @@ import { Command } from "commander";
 import yaml from "yaml";
 import { userWarn } from "../lib/cli-error.js";
 import { listExamples, resolvePaths } from "../lib/paths.js";
-import { detectFeatureChanges } from "../lib/test-governance.js";
-import type { ManifestTestEntry } from "../types.js";
 
 interface JourneyStep {
 	description: string;
@@ -270,83 +492,6 @@ describeFeature(feature, ({ Scenario }) => {
 `;
 }
 
-interface FeatureSnapshot {
-	path: string;
-	content: string;
-	hash: string;
-}
-
-async function loadTestReviews(specsDir: string): Promise<ManifestTestEntry[]> {
-	const testReviewsPath = path.join(specsDir, ".udd", "test-reviews.yml");
-	try {
-		const content = await fs.readFile(testReviewsPath, "utf-8");
-		const parsed = yaml.parse(content);
-		return parsed?.tests || [];
-	} catch {
-		return [];
-	}
-}
-
-async function saveTestReviews(
-	specsDir: string,
-	tests: ManifestTestEntry[],
-): Promise<void> {
-	const testReviewsPath = path.join(specsDir, ".udd", "test-reviews.yml");
-	await fs.mkdir(path.dirname(testReviewsPath), { recursive: true });
-	const content = yaml.stringify({ tests });
-	await fs.writeFile(testReviewsPath, content);
-}
-
-async function captureFeatureSnapshots(
-	specsDir: string,
-): Promise<FeatureSnapshot[]> {
-	const snapshots: FeatureSnapshot[] = [];
-	try {
-		const entries = await fs.readdir(specsDir, { recursive: true });
-		for (const entry of entries) {
-			if (typeof entry === "string" && entry.endsWith(".feature")) {
-				const fullPath = path.join(specsDir, entry);
-				try {
-					const content = await fs.readFile(fullPath, "utf-8");
-					snapshots.push({
-						path: entry,
-						content,
-						hash: hashContent(content),
-					});
-				} catch {
-					// Skip files we can't read
-				}
-			}
-		}
-	} catch {
-		// Directory might not exist yet
-	}
-	return snapshots;
-}
-
-async function captureFeatureSnapshotsAfterSync(
-	specsDir: string,
-): Promise<Map<string, string>> {
-	const contents = new Map<string, string>();
-	try {
-		const entries = await fs.readdir(specsDir, { recursive: true });
-		for (const entry of entries) {
-			if (typeof entry === "string" && entry.endsWith(".feature")) {
-				const fullPath = path.join(specsDir, entry);
-				try {
-					const content = await fs.readFile(fullPath, "utf-8");
-					contents.set(entry, content);
-				} catch {
-					// Skip files we can't read
-				}
-			}
-		}
-	} catch {
-		// Directory might not exist yet
-	}
-	return contents;
-}
-
 export const syncCommand = new Command("sync")
 	.description("Sync journeys to BDD scenarios")
 	.option("--dry-run", "Preview changes without applying")
@@ -411,12 +556,6 @@ export const syncCommand = new Command("sync")
 
 		// Load manifest
 		const { manifest } = await loadManifest(specsDir);
-
-		// Capture feature snapshots before sync (to detect changes after)
-		const featureSnapshots = await captureFeatureSnapshots(specsDir);
-
-		// Load existing test reviews
-		const testReviews = await loadTestReviews(specsDir);
 
 		// Check for stale journey references in manifest (journeys that no longer exist on disk)
 		for (const journeyKey of Object.keys(manifest.journeys)) {
@@ -571,89 +710,11 @@ export const syncCommand = new Command("sync")
 			await saveManifest(specsDir, updatedManifest);
 		}
 
-		// Detect feature changes and mark linked tests as dirty
-		let testsMarkedDirty = 0;
-		if (!options.dryRun && featureSnapshots.length > 0) {
-			const currentFeatureContents =
-				await captureFeatureSnapshotsAfterSync(specsDir);
-			const updatedTestReviews = [...testReviews];
-
-			for (const snapshot of featureSnapshots) {
-				const currentContent = currentFeatureContents.get(snapshot.path);
-				if (!currentContent) {
-					// Feature was deleted, mark linked tests as dirty
-					for (let i = 0; i < updatedTestReviews.length; i++) {
-						const test = updatedTestReviews[i];
-						if (test.feature === snapshot.path && test.status !== "dirty") {
-							updatedTestReviews[i] = {
-								...test,
-								status: "dirty",
-								dirtyReason: "feature changed: deleted",
-							};
-							testsMarkedDirty++;
-						}
-					}
-					continue;
-				}
-
-				// Use detectFeatureChanges to check for meaningful changes
-				const changeResult = detectFeatureChanges(
-					snapshot.content,
-					currentContent,
-				);
-
-				if (changeResult.hasChanges) {
-					// Find tests linked to this feature and mark them dirty
-					for (let i = 0; i < updatedTestReviews.length; i++) {
-						const test = updatedTestReviews[i];
-						if (test.feature === snapshot.path && test.status !== "dirty") {
-							updatedTestReviews[i] = {
-								...test,
-								status: "dirty",
-								dirtyReason: `feature changed: ${changeResult.changeType}`,
-							};
-							testsMarkedDirty++;
-						}
-					}
-				}
-			}
-
-			// Also check for newly created features that might have tests linked
-			// (tests could reference features that didn't exist during initial snapshot)
-			for (const [featurePath, content] of currentFeatureContents) {
-				const wasInSnapshot = featureSnapshots.some(
-					(s) => s.path === featurePath,
-				);
-				if (!wasInSnapshot) {
-					// New feature - check if any tests are linked to it
-					for (let i = 0; i < updatedTestReviews.length; i++) {
-						const test = updatedTestReviews[i];
-						if (test.feature === featurePath && test.status !== "dirty") {
-							updatedTestReviews[i] = {
-								...test,
-								status: "dirty",
-								dirtyReason: "feature changed: new feature",
-							};
-							testsMarkedDirty++;
-						}
-					}
-				}
-			}
-
-			// Save updated test reviews if there are changes
-			if (testsMarkedDirty > 0) {
-				await saveTestReviews(specsDir, updatedTestReviews);
-			}
-		}
-
 		// Summary
 		console.log(chalk.cyan("\n📊 Sync Summary:"));
 		console.log(`   Journeys processed: ${mdFiles.length}`);
 		console.log(`   Changes detected: ${changesDetected}`);
 		console.log(`   Scenarios created: ${scenariosCreated}`);
-		if (testsMarkedDirty > 0) {
-			console.log(chalk.yellow(`   Tests marked dirty: ${testsMarkedDirty}`));
-		}
 
 		if (options.dryRun) {
 			console.log(chalk.yellow("\n   (dry-run mode - no files modified)"));
@@ -661,3 +722,5 @@ export const syncCommand = new Command("sync")
 
 		console.log("");
 	});
+
+

@@ -124,7 +124,4 @@ steps:
 			expect(result.stdout).toContain("Syncing");
 		});
 	});
-
-
-
 });

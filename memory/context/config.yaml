@@ -1,0 +1,27 @@
+name: context
+collection: memory_context
+enabled: true
+
+description: |
+  Important context about the project, domain knowledge, 
+  user preferences, and session continuity information.
+
+triggers:
+  - pattern: "Remember that"
+  - pattern: "Important context"
+  - pattern: "For future reference"
+  - pattern: "The user prefers"
+  - pattern: "Project context"
+
+embedding:
+  model: openai/text-embedding-3-small
+  dimensions: 1536
+
+storage:
+  maxTokens: 3000
+  priority: medium
+  
+retrieval:
+  contextRadius: 5
+  maxResults: 15
+  minRelevance: 0.65
