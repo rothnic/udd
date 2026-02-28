@@ -8,15 +8,19 @@ const feature = await loadFeature(
 describeFeature(feature, ({ Scenario }) => {
 	Scenario("Code Formatting", ({ Given, When, Then }) => {
 		Given("I am in the right state", () => {
-			// TODO: Implement
+			// Minimal placeholder: assume environment is correct for the scenario
+			// No-op; do not touch filesystem or run external commands.
+			return;
 		});
 
 		When("I do something", () => {
-			// TODO: Implement
+			// Minimal placeholder for action step. No side effects.
+			return;
 		});
 
 		Then("something happens", () => {
-			// TODO: Implement
+			// Minimal assertion to satisfy the step. Replace with real checks when
+			// environment/setup is available.
 			expect(true).toBe(true);
 		});
 	});

@@ -3,6 +3,7 @@ import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
 import { glob } from "glob";
+import yaml from "yaml";
 import { isStrictMode, resolvePaths } from "../lib/paths.js";
 import { detectStubAssertions } from "../lib/test-governance.js";
 
@@ -17,6 +18,20 @@ export const validateCommand = new Command("validate")
 	.option("--example <name>", "Validate a specific example project")
 	.action(async (options) => {
 		const rootDir = process.cwd();
+
+		async function loadUddConfig(root: string) {
+			const cfgPath = path.join(root, ".udd", "config.yml");
+			try {
+				const raw = await fs.readFile(cfgPath, "utf-8");
+				const parsed = yaml.parse(raw);
+				return parsed ?? {};
+			} catch {
+				return {};
+			}
+		}
+
+		const uddConfig = await loadUddConfig(rootDir);
+		const strictThreshold = uddConfig?.validation?.strict_threshold ?? 90;
 		// Determine validation mode based on flags and config
 		const useStrict = options.strict || (!options.example && isStrictMode());
 		const context = options.example || "product";
@@ -178,9 +193,20 @@ export const validateCommand = new Command("validate")
 			);
 		}
 
-		if (options.strict && hasIssues) {
-			console.log(chalk.red("\n✗ Validation failed (strict mode)"));
-			process.exit(1);
+		if (options.strict) {
+			if (avgScore < strictThreshold) {
+				console.log(
+					chalk.red(
+						`\n✗ Validation failed (strict mode) - average completeness ${avgScore}% < threshold ${strictThreshold}%`,
+					),
+				);
+				process.exit(1);
+			}
+
+			if (hasIssues) {
+				console.log(chalk.red("\n✗ Validation failed (strict mode)"));
+				process.exit(1);
+			}
 		}
 
 		if (!hasIssues) {

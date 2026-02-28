@@ -107,15 +107,15 @@ describeFeature(feature, ({ Scenario }) => {
 				| undefined;
 
 			Given("I have a feature file without SysML comments", () => {
-				// specs/features/udd/cli/check_status.feature exists and doesn't have SysML comments
+				// specs/features/udd/cli/sync_edge_cases.feature exists and doesn't have SysML comments
 			});
 
 			When(
-				'I run "udd validate -f specs/features/udd/cli/check_status.feature"',
+				'I run "udd validate -f specs/features/udd/cli/sync_edge_cases.feature"',
 				async () => {
 					try {
 						commandOutput = await runUdd(
-							"validate -f specs/features/udd/cli/check_status.feature",
+							"validate -f specs/features/udd/cli/sync_edge_cases.feature",
 						);
 					} catch (error) {
 						_commandError = error as {

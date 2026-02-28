@@ -31,7 +31,7 @@ Feature: Validate Feature Completeness
 
   Scenario: Validate reports missing SysML context
     Given I have a feature file without SysML comments
-    When I run "udd validate -f specs/features/udd/cli/check_status.feature"
+    When I run "udd validate -f specs/features/udd/cli/sync_edge_cases.feature"
     Then the output should warn about missing user need context
     And the output should warn about missing alternatives analysis
     And the output should warn about missing success criteria
