@@ -1,0 +1,63 @@
+version: 1
+
+# Memory type configurations (scanned from memory/*/config.yaml)
+memoryTypes:
+  - name: decision
+    collection: memory_decision
+    enabled: true
+  - name: convention
+    collection: memory_convention
+    enabled: true
+  - name: context
+    collection: memory_context
+    enabled: true
+
+# Extraction agent configuration
+extraction:
+  # Default model for extraction (uses opencode framework)
+  defaultModel: opencode/memory-extractor
+  # Timeout in seconds
+  timeout: 60
+  # Retry attempts
+  maxRetries: 2
+  # Whether to run extraction automatically
+  autoExtract: false
+
+  # Frequency control
+  frequency:
+    # Options: manual, per-session, interval-minutes, on-demand
+    mode: manual
+    intervalMinutes: 60
+    # Run extraction after compaction
+    onCompact: true
+
+# Collection settings
+collections:
+  # Auto-create collections with metadata
+  autoCreate: true
+  # Default metadata fields
+  metadataFields:
+    - technologies
+    - tags
+    - session_id
+    - extracted_at
+
+# Duplicate detection
+deduplication:
+  # Enable duplicate detection
+  enabled: true
+  # Similarity threshold (0-1)
+  similarityThreshold: 0.85
+  # Whether to auto-merge or prompt
+  autoMerge: false
+
+# Compaction capture
+compaction:
+  # Capture compaction output to memory
+  capture: true
+  # Memory type to capture to
+  memoryType: context
+
+# Global defaults (can be overridden per memory type)
+defaults:
+  maxTokens: 2000
