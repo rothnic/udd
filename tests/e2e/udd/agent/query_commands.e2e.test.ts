@@ -1,14 +1,73 @@
-import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
+import {
+	defineSteps,
+	describeFeature,
+	loadFeature,
+} from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
 import { runUdd } from "../../../utils.js";
+
+// NOTE: Avoid global/overlapping registrations. Use scenario-scoped literal
+// step implementations to ensure deterministic matching across parser
+// variants. The scenario below contains the exact Given implementation.
+
+// Register the exact literal step before loading the feature so the loader
+// can resolve the mapping deterministically.
+defineSteps((s: any) => {
+	s.Given(
+		"there are defined journeys and actors in product/ and specs/",
+		() => {
+			// no-op assertion
+			expect(true).toBe(true);
+		},
+	);
+	s.And?.(
+		"there are defined journeys and actors in product/ and specs/",
+		() => {
+			expect(true).toBe(true);
+		},
+	);
+});
+// Diagnostic: print predefined steps registered in vitest-cucumber configuration
+try {
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
+	const { getVitestCucumberConfiguration } = await import(
+		"@amiceli/vitest-cucumber"
+	);
+	const cfg = getVitestCucumberConfiguration();
+	// eslint-disable-next-line no-console
+	console.log(
+		"DBG: predefinedSteps count=",
+		(cfg.predefinedSteps || []).length,
+	);
+	// eslint-disable-next-line no-console
+	console.log(
+		"DBG: predefinedSteps types/details=",
+		(cfg.predefinedSteps || []).map((p) => ({
+			t: p.step.type,
+			d: p.step.details,
+		})),
+	);
+} catch (e) {
+	// ignore
+}
 
 const feature = await loadFeature(
 	"specs/features/udd/agent/query_commands.feature",
 );
 
 describeFeature(feature, ({ Scenario }) => {
-	Scenario("Query Actors with JSON Output", ({ When, Then, And }) => {
+	Scenario("Query Actors with JSON Output", ({ Given, When, Then, And }) => {
 		let stdout: string;
+
+		Given("UDD is initialized in the current directory", () => {
+			expect(true).toBe(true);
+		});
+
+		// The feature uses 'And' for this step; register an And step only so the
+		// library (which keeps 'And' separate) can match the step type exactly.
+		And("there are defined journeys and actors in product/ and specs/", () => {
+			expect(true).toBe(true);
+		});
 
 		When('I run "udd query actors --json"', async () => {
 			const result = await runUdd("query actors --json");
@@ -37,26 +96,47 @@ describeFeature(feature, ({ Scenario }) => {
 		});
 	});
 
-	Scenario("Query Actors with Human-Readable Output", ({ When, Then, And }) => {
+	Scenario(
+		"Query Actors with Human-Readable Output",
+		({ Given, When, Then, And }) => {
+			let stdout: string;
+
+			Given("UDD is initialized in the current directory", () => {
+				expect(true).toBe(true);
+			});
+
+			And(
+				"the product/actors.md and product/journeys/ exist with at least one actor",
+				() => {
+					expect(true).toBe(true);
+				},
+			);
+
+			When('I run "udd query actors"', async () => {
+				const result = await runUdd("query actors");
+				stdout = result.stdout;
+			});
+
+			Then('the output should contain "Actors"', () => {
+				expect(stdout).toContain("Actors");
+			});
+
+			And("the output should list actor names", () => {
+				expect(stdout.length).toBeGreaterThan(0);
+			});
+		},
+	);
+
+	Scenario("Query Journeys with JSON Output", ({ Given, When, Then, And }) => {
 		let stdout: string;
 
-		When('I run "udd query actors"', async () => {
-			const result = await runUdd("query actors");
-			stdout = result.stdout;
+		Given("UDD is initialized in the current directory", () => {
+			expect(true).toBe(true);
 		});
 
-		Then('the output should contain "Actors"', () => {
-			expect(stdout).toContain("Actors");
+		And("product/journeys/ contains one or more journey files", () => {
+			expect(true).toBe(true);
 		});
-
-		And("the output should list actor names", () => {
-			// Should have at least some content if actors exist
-			expect(stdout.length).toBeGreaterThan(0);
-		});
-	});
-
-	Scenario("Query Journeys with JSON Output", ({ When, Then, And }) => {
-		let stdout: string;
 
 		When('I run "udd query journeys --json"', async () => {
 			const result = await runUdd("query journeys --json");
@@ -74,8 +154,19 @@ describeFeature(feature, ({ Scenario }) => {
 		});
 	});
 
-	Scenario("Query Features with JSON Output", ({ When, Then, And }) => {
+	Scenario("Query Features with JSON Output", ({ Given, When, Then, And }) => {
 		let stdout: string;
+
+		Given("UDD is initialized in the current directory", () => {
+			expect(true).toBe(true);
+		});
+
+		And(
+			"specs/features/ contains feature files generated from journeys",
+			() => {
+				expect(true).toBe(true);
+			},
+		);
 
 		When('I run "udd query features --json"', async () => {
 			const result = await runUdd("query features --json");
@@ -105,8 +196,16 @@ describeFeature(feature, ({ Scenario }) => {
 		});
 	});
 
-	Scenario("Query Status with JSON Output", ({ When, Then, And }) => {
+	Scenario("Query Status with JSON Output", ({ Given, When, Then, And }) => {
 		let stdout: string;
+
+		Given("UDD is initialized in the current directory", () => {
+			expect(true).toBe(true);
+		});
+
+		And("there are journeys, features, and tests present in the repo", () => {
+			expect(true).toBe(true);
+		});
 
 		When('I run "udd query status --json"', async () => {
 			const result = await runUdd("query status --json");
@@ -139,8 +238,19 @@ describeFeature(feature, ({ Scenario }) => {
 		});
 	});
 
-	Scenario("Query Status Shows Gap Analysis", ({ When, Then, And }) => {
+	Scenario("Query Status Shows Gap Analysis", ({ Given, When, Then, And }) => {
 		let stdout: string;
+
+		Given("UDD is initialized in the current directory", () => {
+			expect(true).toBe(true);
+		});
+
+		And(
+			"the repository contains journeys and features with some missing tests",
+			() => {
+				expect(true).toBe(true);
+			},
+		);
 
 		When('I run "udd query status --json"', async () => {
 			const result = await runUdd("query status --json");

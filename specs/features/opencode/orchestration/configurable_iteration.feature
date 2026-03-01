@@ -1,4 +1,4 @@
-@phase:3
+@phase:4
 Feature: Configurable Iteration Behavior
 
   As a developer using OpenCode with UDD

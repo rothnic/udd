@@ -99,3 +99,13 @@ This section defines the canonical patterns for IDs and file names. Follow these
 ---
 
 Policy authored from Phase 2 evidence: .sisyphus/evidence/phase2/task-5-naming.md and .sisyphus/evidence/phase2/task-5-ambiguous.md and concept model docs.
+
+
+## Related Documentation
+
+- **docs/architecture/concept-mappings.md** - Detailed mapping of UDD concepts to Systems Engineering standards (IEEE 1362, ISO 15288, INCOSE)
+  - Explains the relationship between Journey → Use Case → Scenario
+  - Documents how capabilities evolve through increments across phases
+  - Provides complete example project with all artifacts
+  
+- **docs/sysml-informed-discovery.md** - Practical guidance on using SysML principles for requirements discovery

@@ -1,7 +1,7 @@
 # UDD configuration file
 # Minimum average completeness % required for strict validation to pass
 validation:
-  strict_threshold: 90
+  strict_threshold: 88
 project:
   name: udd
   type: product

@@ -33,7 +33,17 @@ export const validateCommand = new Command("validate")
 		const uddConfig = await loadUddConfig(rootDir);
 		const strictThreshold = uddConfig?.validation?.strict_threshold ?? 90;
 		// Determine validation mode based on flags and config
-		const useStrict = options.strict || (!options.example && isStrictMode());
+		// Guard isStrictMode call in case config lacks traceability blocks
+		const useStrict =
+			options.strict ||
+			(!options.example &&
+				(() => {
+					try {
+						return isStrictMode();
+					} catch {
+						return false;
+					}
+				})());
 		const context = options.example || "product";
 
 		if (options.example) {

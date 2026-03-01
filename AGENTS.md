@@ -6,6 +6,30 @@ UDD is a spec-first workflow where **user journeys are requirements** and **BDD 
 
 **Never implement behavior that isn't specified.** If asked to write code without a spec, guide to create the spec first.
 
+## Critical Testing Principle
+
+**NEVER disable or skip failing tests solely to achieve a 100% pass rate.**
+
+This is absolutely prohibited:
+- ❌ Skipping test files to make metrics look good
+- ❌ Commenting out failing tests  
+- ❌ Using `.skip()` or `.todo()` to hide failures
+- ❌ Moving tests to different phases without fixing the underlying issue
+
+**The only legitimate reasons to skip a test:**
+- The test applies to a future phase (e.g., @phase:4 when current_phase=3)
+- The test is temporarily disabled with a clear TODO and issue link
+- The feature being tested has been explicitly deprioritized
+
+**When tests fail, you must:**
+1. Investigate the root cause
+2. Fix the actual issue (in code OR test)
+3. If the test is wrong, fix the test
+4. If the code is wrong, fix the code
+5. If infrastructure is broken, fix the infrastructure
+
+**Metrics are meaningless if achieved by hiding problems.**
+
 ## SysML-Informed Discovery
 
 UDD uses **SysML principles to create better feature scenarios**, not to add artifact layers.
@@ -17,15 +41,39 @@ UDD uses **SysML principles to create better feature scenarios**, not to add art
 
 **See `docs/sysml-informed-discovery.md` for practical examples.**
 
+## Architecture & Concept Mappings
+
+UDD concepts map to formal Systems Engineering (SE) concepts:
+
+| UDD Concept | SE Equivalent | Purpose |
+|-------------|---------------|---------|
+| **Journey** | CONOPS (IEEE 1362) | Operational scenarios, user workflows |
+| **Use Case** | System Requirements | Functional specifications |
+| **Scenario** | Acceptance Criteria | Testable BDD specifications |
+| **Roadmap** | Life Cycle Plan | Phase assignments, timing |
+| **Concept** | Project Charter | Philosophy, principles, scope |
+
+**Capabilities evolve through increments** delivered across phases:
+- v1-basic (current phase)
+- v2-advanced (next phase)  
+- v3-full (future vision)
+
+**See `docs/architecture/concept-mappings.md` for detailed guidance on:**
+- How UDD maps to SE standards (IEEE 1362, ISO 15288, INCOSE)
+- Feature evolution examples
+- Decision guidelines for creating/updating artifacts
+- Validation rules and examples
+
 ## Project Structure
 
 ```
 product/                          # Human-authored intent
+├── concept.md                    # Philosophy, principles, scope (CONOPS-level)
 ├── README.md                     # Product overview
-├── actors.md                     # Who uses it
+├── actors.md                     # Who uses it (Personas)
 ├── constraints.md                # NFRs, hard rules
 ├── changelog.md                  # Decision history (auto)
-└── journeys/                     # User outcomes
+└── journeys/                     # User outcomes (per-scenario CONOPS)
     └── *.md                      # One file per journey
 
 specs/                            # Testable behaviors

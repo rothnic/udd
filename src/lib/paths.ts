@@ -46,29 +46,75 @@ export interface ResolvedPaths {
 export function loadConfig(): UddConfig {
 	const configPath = path.join(process.cwd(), ".udd", "config.yml");
 
+	const defaults: UddConfig = {
+		project: { name: "udd", type: "product" },
+		paths: { product: "product", specs: "specs", tests: "tests" },
+		examples: {},
+		traceability: {
+			product: {
+				strict: true,
+				require_journey_links: true,
+				require_test_coverage: true,
+			},
+			examples: {
+				strict: false,
+				require_journey_links: false,
+				require_test_coverage: false,
+			},
+		},
+	};
+
 	if (!fs.existsSync(configPath)) {
-		// Return default config if not found
-		return {
-			project: { name: "udd", type: "product" },
-			paths: { product: "product", specs: "specs", tests: "tests" },
-			examples: {},
+		return defaults;
+	}
+
+	try {
+		const content = fs.readFileSync(configPath, "utf-8");
+		const parsed = (yaml.parse(content) || {}) as Partial<UddConfig>;
+
+		// Merge parsed config with defaults, only for expected top-level keys
+		const merged: UddConfig = {
+			project: {
+				name: parsed.project?.name ?? defaults.project.name,
+				type: parsed.project?.type ?? defaults.project.type,
+			},
+			paths: {
+				product: parsed.paths?.product ?? defaults.paths.product,
+				specs: parsed.paths?.specs ?? defaults.paths.specs,
+				tests: parsed.paths?.tests ?? defaults.paths.tests,
+			},
+			examples: parsed.examples ?? defaults.examples,
 			traceability: {
 				product: {
-					strict: true,
-					require_journey_links: true,
-					require_test_coverage: true,
+					strict:
+						parsed.traceability?.product?.strict ??
+						defaults.traceability.product.strict,
+					require_journey_links:
+						parsed.traceability?.product?.require_journey_links ??
+						defaults.traceability.product.require_journey_links,
+					require_test_coverage:
+						parsed.traceability?.product?.require_test_coverage ??
+						defaults.traceability.product.require_test_coverage,
 				},
 				examples: {
-					strict: false,
-					require_journey_links: false,
-					require_test_coverage: false,
+					strict:
+						parsed.traceability?.examples?.strict ??
+						defaults.traceability.examples.strict,
+					require_journey_links:
+						parsed.traceability?.examples?.require_journey_links ??
+						defaults.traceability.examples.require_journey_links,
+					require_test_coverage:
+						parsed.traceability?.examples?.require_test_coverage ??
+						defaults.traceability.examples.require_test_coverage,
 				},
 			},
 		};
-	}
 
-	const content = fs.readFileSync(configPath, "utf-8");
-	return yaml.parse(content) as UddConfig;
+		return merged;
+	} catch (err) {
+		// On any parse/read error, fall back to defaults
+		return defaults;
+	}
 }
 
 /**
