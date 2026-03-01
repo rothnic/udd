@@ -20,7 +20,7 @@ Feature: Approve Tests
     Given a UDD project is initialized
     And test files exist awaiting approval
 
-  @phase:1
+  @phase:3
   Scenario: Approve single test
     Given a test "tests/auth/signup.test.ts" needs approval
     When I run "udd approve tests/auth/signup.test.ts --by lead@example.com"
@@ -28,28 +28,28 @@ Feature: Approve Tests
     And the approver should be recorded as "lead@example.com"
     And the approval timestamp should be recorded
 
-  @phase:1
+  @phase:3
   Scenario: Approve multiple tests at once
     Given tests "tests/auth/signup.test.ts" and "tests/auth/login.test.ts" need approval
     When I run "udd approve tests/auth/signup.test.ts tests/auth/login.test.ts --by lead@example.com"
     Then both tests should be marked as approved
     And the approval should apply to all specified tests
 
-  @phase:1
+  @phase:3
   Scenario: Approve all tests in a feature
     Given the "auth" feature has 5 tests awaiting approval
     When I run "udd approve --feature auth --by lead@example.com"
     Then all 5 tests should be marked as approved
     And the feature approval status should be updated
 
-  @phase:1
+  @phase:3
   Scenario: Approve with comment
     Given a test needs approval with context
     When I run "udd approve tests/auth/signup.test.ts --by lead@example.com --comment 'Good coverage of edge cases'"
     Then the approval should include the comment
     And the comment should be visible in status output
 
-  @phase:1
+  @phase:3
   Scenario: View pending approvals
     Given some tests are approved and some are pending
     When I run "udd status --pending-approvals"
@@ -57,7 +57,7 @@ Feature: Approve Tests
     And approved tests should be excluded
     And wait time since submission should be displayed
 
-  @phase:1
+  @phase:3
   Scenario: Revoke approval
     Given a test was approved in error
     When I run "udd revoke-approval tests/auth/signup.test.ts --by lead@example.com"
@@ -65,7 +65,7 @@ Feature: Approve Tests
     And the revocation should be recorded
     And the previous approval should be retained in history
 
-  @phase:1
+  @phase:3
   @error
   Scenario: Cannot approve already approved test
     Given a test is already approved
@@ -73,7 +73,7 @@ Feature: Approve Tests
     Then the command should warn about existing approval
     And the new approval should be recorded as re-approval
 
-  @phase:1
+  @phase:3
   Scenario: Approval shows in test history
     Given a test has been approved multiple times
     When I run "udd test-history tests/auth/signup.test.ts"
@@ -81,7 +81,7 @@ Feature: Approve Tests
     And each approval should show approver and date
     And comments should be included in the history
 
-  @phase:1
+  @phase:3
   Scenario: Approval required before merge
     Given the project requires approval for merge
     And a test is not yet approved

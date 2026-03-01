@@ -21,7 +21,7 @@ Feature: Pre-Commit Validation
     And git hooks are installed
     And I have staged changes ready to commit
 
-  @phase:1
+  @phase:3
   Scenario: Pre-commit passes with clean tests
     Given all tests linked to changed features are clean
     And no governance rules are violated
@@ -29,7 +29,7 @@ Feature: Pre-Commit Validation
     Then the commit should succeed
     And the pre-commit hook should exit with code 0
 
-  @phase:1
+  @phase:3
   Scenario: Pre-commit blocks when tests are dirty
     Given I have modified "specs/features/auth/login.feature"
     And I have not marked the linked tests as clean
@@ -38,7 +38,7 @@ Feature: Pre-Commit Validation
     And the output should indicate dirty tests must be reviewed
     And the specific dirty tests should be listed
 
-  @phase:1
+  @phase:3
   Scenario: Pre-commit validates only staged files
     Given I have unstaged changes that violate rules
     And my staged changes are clean
@@ -46,7 +46,7 @@ Feature: Pre-Commit Validation
     Then the commit should succeed
     And unstaged violations should not block the commit
 
-  @phase:1
+  @phase:3
   Scenario: Pre-commit detects broken feature links
     Given I staged a test file with an invalid @feature reference
     When I run "git commit -m 'add test'"
@@ -54,14 +54,14 @@ Feature: Pre-Commit Validation
     And the output should indicate the broken link
     And the invalid reference should be shown
 
-  @phase:1
+  @phase:3
   Scenario: Bypass pre-commit with flag
     Given tests are dirty but I need to commit anyway
     When I run "git commit -m 'WIP: feature update' --no-verify"
     Then the commit should succeed
     And a warning should be logged about bypassed validation
 
-  @phase:1
+  @phase:3
   Scenario: Pre-commit shows summary of staged changes
     Given I have staged multiple feature and test files
     When the pre-commit hook runs
@@ -69,14 +69,14 @@ Feature: Pre-Commit Validation
     And it should indicate which features are affected
     And validation progress should be shown
 
-  @phase:1
+  @phase:3
   Scenario: Pre-commit runs fast for small changes
     Given I have staged only one small file
     When I run "git commit -m 'quick fix'"
     Then validation should complete within 2 seconds
     And the commit should proceed without noticeable delay
 
-  @phase:1
+  @phase:3
   Scenario: Pre-commit detects missing tests for new scenarios
     Given I add a new scenario to a feature file
     And I do not add a corresponding test

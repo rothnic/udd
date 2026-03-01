@@ -20,7 +20,7 @@ Feature: Health Metrics
     Given a UDD project is initialized
     And test data exists for metric calculation
 
-  @phase:1
+  @phase:3
   Scenario: Calculate test coverage percentage
     Given 10 features have scenarios defined
     And 8 features have linked tests
@@ -28,7 +28,7 @@ Feature: Health Metrics
     Then the coverage percentage should be 80%
     And the metric should be displayed with precision to 1 decimal
 
-  @phase:1
+  @phase:3
   Scenario: Calculate dirty test ratio
     Given 50 tests exist in the project
     And 5 tests are marked dirty
@@ -36,7 +36,7 @@ Feature: Health Metrics
     Then the dirty ratio should be 10%
     And the output should show both count and percentage
 
-  @phase:1
+  @phase:3
   Scenario: Calculate average review wait time
     Given tests exist with various review wait times
     When I run "udd metrics review-wait-time"
@@ -44,7 +44,7 @@ Feature: Health Metrics
     And the median wait time should also be shown
     And the calculation should exclude already-approved tests
 
-  @phase:1
+  @phase:3
   Scenario: Calculate test flakiness score
     Given tests have run history with pass/fail data
     When I run "udd metrics flakiness"
@@ -52,7 +52,7 @@ Feature: Health Metrics
     And flaky tests (inconsistent results) should be identified
     And the score should range from 0 (stable) to 100 (unreliable)
 
-  @phase:1
+  @phase:3
   Scenario: Calculate test execution time trends
     Given tests have execution time history
     When I run "udd metrics execution-time"
@@ -60,7 +60,7 @@ Feature: Health Metrics
     And trends (improving/degrading) should be indicated
     And outliers (sudden spikes) should be flagged
 
-  @phase:1
+  @phase:3
   Scenario: View all metrics summary
     When I run "udd metrics"
     Then a summary of all metrics should be displayed
@@ -68,21 +68,21 @@ Feature: Health Metrics
     And trends should be shown where applicable
     And threshold violations should be highlighted
 
-  @phase:1
+  @phase:3
   Scenario: Metrics respect date range filter
     Given historical metric data exists
     When I run "udd metrics --since 2024-01-01 --until 2024-02-01"
     Then only data within the date range should be considered
     And the metrics should reflect the filtered period
 
-  @phase:1
+  @phase:3
   Scenario: Export metrics to file
     When I run "udd metrics --export metrics.json"
     Then metrics should be saved to "metrics.json"
     And the file should be in JSON format
     And it should include timestamp and all calculated values
 
-  @phase:1
+  @phase:3
   Scenario: Compare metrics between periods
     Given historical data exists for multiple periods
     When I run "udd metrics --compare --periods 4"

@@ -19,14 +19,14 @@ Feature: Test Review Process
     Given a UDD project is initialized
     And feature files exist with linked tests
 
-  @phase:1
+  @phase:3
   Scenario: Mark test as needing review
     Given I create a new test file "tests/auth/signup.test.ts"
     When I run "udd review-request tests/auth/signup.test.ts"
     Then the test should be marked with status "needs-review"
     And "udd status" should show the test as awaiting review
 
-  @phase:1
+  @phase:3
   Scenario: Approve a test
     Given a test "tests/auth/signup.test.ts" is marked "needs-review"
     When I run "udd review-approve tests/auth/signup.test.ts --by reviewer@example.com"
@@ -34,7 +34,7 @@ Feature: Test Review Process
     And the approval should include reviewer and timestamp
     And "udd status" should show the test as approved
 
-  @phase:1
+  @phase:3
   Scenario: Request changes on a test
     Given a test "tests/auth/signup.test.ts" is marked "needs-review"
     When I run "udd review-changes tests/auth/signup.test.ts --comment 'Add edge case for invalid email'"
@@ -42,14 +42,14 @@ Feature: Test Review Process
     And the comment should be attached to the test record
     And "udd status --verbose" should show the review comment
 
-  @phase:1
+  @phase:3
   Scenario: View tests awaiting review
     Given multiple tests exist with different review statuses
     When I run "udd status --needs-review"
     Then only tests with status "needs-review" should be displayed
     And approved and pending tests should be excluded
 
-  @phase:1
+  @phase:3
   Scenario: Test approval blocks on unreviewed changes
     Given a test "tests/auth/signup.test.ts" is approved
     When I modify the test file
@@ -57,7 +57,7 @@ Feature: Test Review Process
     Then the test should show status "approved-stale"
     And the output should suggest re-review due to changes
 
-  @phase:1
+  @phase:3
   @error
   Scenario: Cannot approve own test
     Given I create and submit a test for review
@@ -66,7 +66,7 @@ Feature: Test Review Process
     And the output should contain "Cannot approve own test"
     And the test should remain in "needs-review" status
 
-  @phase:1
+  @phase:3
   Scenario: Bulk approve tests in a feature
     Given a feature "auth" has 3 tests all awaiting review
     When I run "udd review-approve --feature auth --by reviewer@example.com"

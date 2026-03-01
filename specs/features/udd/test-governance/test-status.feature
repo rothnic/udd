@@ -20,7 +20,7 @@ Feature: Test Status Visibility
     Given a UDD project is initialized
     And test files exist with valid feature linkages
 
-  @phase:1
+  @phase:3
   Scenario: View test status for all features
     Given tests exist with various statuses
     When I run "udd status --tests"
@@ -28,7 +28,7 @@ Feature: Test Status Visibility
     And the output should include passing/failing/pending counts
     And the output should show last run timestamps
 
-  @phase:1
+  @phase:3
   Scenario: Feature shows mixed test status
     Given a feature "checkout" has 3 scenarios
     And 2 scenarios have passing tests
@@ -37,7 +37,7 @@ Feature: Test Status Visibility
     Then "checkout" should show status "partial"
     And the output should indicate "2 passing, 1 failing"
 
-  @phase:1
+  @phase:3
   Scenario: Test never run shows as pending
     Given a feature "new-feature" has scenarios
     And no tests have been executed for "new-feature"
@@ -45,7 +45,7 @@ Feature: Test Status Visibility
     Then "new-feature" should show status "pending"
     And the output should indicate tests need to be run
 
-  @phase:1
+  @phase:3
   Scenario: Failed test shows error details
     Given a test "auth/login.e2e.test.ts" has failed
     And the failure is "AssertionError: expected 200 but got 401"
@@ -54,14 +54,14 @@ Feature: Test Status Visibility
     And the output should show the failing test file path
     And the output should suggest checking the test output
 
-  @phase:1
+  @phase:3
   Scenario: Filter status by outcome
     Given tests exist with passing, failing, and pending statuses
     When I run "udd status --failed-only"
     Then only features with failing tests should be displayed
     And passing and pending features should be hidden
 
-  @phase:1
+  @phase:3
   Scenario: Test status aggregates across test types
     Given feature "payment" has unit tests, integration tests, and e2e tests
     When I run "udd status"

@@ -1,6 +1,7 @@
 id: agent_customization
 name: Agent Customization
 summary: "Customize the GitHub Copilot agent for UDD"
+phase: 3
 actors:
   - user
 outcomes:

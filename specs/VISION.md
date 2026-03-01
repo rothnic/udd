@@ -2,7 +2,6 @@
 id: "udd_tool"
 name: "User Driven Development Tool"
 version: "0.0.1"
-current_phase: 3
 phases:
   1: "Core CLI & Validation"
   2: "Research & Tech Specs"
@@ -89,4 +88,3 @@ main                              # Stable, all tests pass
 
 *   [Custom Agent File Structure](https://code.visualstudio.com/docs/copilot/customization/custom-agents#_custom-agent-file-structure)
 *   [Prompt Files](https://code.visualstudio.com/docs/copilot/customization/prompt-files)
-

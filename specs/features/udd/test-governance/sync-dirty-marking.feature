@@ -20,7 +20,7 @@ Feature: Sync with Dirty Marking
     Given a UDD project is initialized
     And feature files exist with linked tests
 
-  @phase:1
+  @phase:3
   Scenario: Sync marks changed feature tests as dirty
     Given "specs/features/auth/login.feature" has linked tests
     And I have modified the feature file
@@ -28,7 +28,7 @@ Feature: Sync with Dirty Marking
     Then the linked tests should be automatically marked dirty
     And the sync output should list the affected tests
 
-  @phase:1
+  @phase:3
   Scenario: Sync output shows dirty test summary
     Given multiple feature files have changed
     When I run "udd sync"
@@ -36,7 +36,7 @@ Feature: Sync with Dirty Marking
     And the section should count how many tests were marked dirty
     And it should list each feature with dirty tests
 
-  @phase:1
+  @phase:3
   Scenario: Dry run shows dirty marking without applying
     Given I have modified "specs/features/auth/login.feature"
     When I run "udd sync --dry-run"
@@ -44,7 +44,7 @@ Feature: Sync with Dirty Marking
     And no tests should actually be marked dirty
     And the manifest should remain unchanged
 
-  @phase:1
+  @phase:3
   Scenario: Sync does not re-mark already dirty tests
     Given a test is already marked dirty
     And the feature file changes again
@@ -53,7 +53,7 @@ Feature: Sync with Dirty Marking
     And the dirty timestamp should reflect the most recent change
     And no duplicate dirty entries should be created
 
-  @phase:1
+  @phase:3
   Scenario: Sync marks tests dirty for new scenarios only
     Given I add a new scenario to "specs/features/auth/login.feature"
     And existing scenarios are unchanged
@@ -61,14 +61,14 @@ Feature: Sync with Dirty Marking
     Then tests should be marked dirty with reason "new-scenario"
     And the specific new scenario should be identified
 
-  @phase:1
+  @phase:3
   Scenario: Sync with no changes does not mark anything dirty
     Given no feature files have changed since last sync
     When I run "udd sync"
     Then no tests should be marked dirty
     And the output should indicate "No changes detected"
 
-  @phase:1
+  @phase:3
   Scenario: Sync reports stale tests separately from dirty
     Given some tests are dirty due to feature changes
     And some tests are failing

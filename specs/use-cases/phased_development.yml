@@ -1,6 +1,7 @@
 id: phased_development
 name: Phased Development
 summary: "Support incremental delivery by allowing scenarios to be marked as planned for future phases"
+phase: 3
 actors:
   - developer
   - agent

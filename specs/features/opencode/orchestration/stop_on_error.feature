@@ -1,4 +1,4 @@
-@phase:4
+@phase:3
 Feature: Error Handling in Orchestration
 
   As a developer using OpenCode with UDD

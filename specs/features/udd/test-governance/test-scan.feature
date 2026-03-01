@@ -20,7 +20,7 @@ Feature: Scan for Tests
     Given a UDD project is initialized
     And test files exist in various directories
 
-  @phase:1
+  @phase:3
   Scenario: Scan discovers all test files
     Given test files exist in "tests/" and subdirectories
     When I run "udd scan-tests"
@@ -28,7 +28,7 @@ Feature: Scan for Tests
     And the count should be displayed
     And the list should include file paths
 
-  @phase:1
+  @phase:3
   Scenario: Scan categorizes tests by type
     Given tests exist of types unit, integration, and e2e
     When I run "udd scan-tests"
@@ -36,7 +36,7 @@ Feature: Scan for Tests
     And counts per type should be shown
     And uncategorized tests should be flagged
 
-  @phase:1
+  @phase:3
   Scenario: Scan identifies test-feature linkages
     Given some tests have @feature declarations
     And some tests do not
@@ -45,7 +45,7 @@ Feature: Scan for Tests
     And unlinked tests should be listed separately
     And the linkage coverage percentage should be calculated
 
-  @phase:1
+  @phase:3
   Scenario: Scan detects orphaned tests
     Given a test links to "features/deleted.feature"
     When I run "udd scan-tests"
@@ -53,7 +53,7 @@ Feature: Scan for Tests
     And the broken link should be displayed
     And remediation suggestions should be provided
 
-  @phase:1
+  @phase:3
   Scenario: Scan shows test metadata
     Given tests exist with various attributes
     When I run "udd scan-tests --verbose"
@@ -61,21 +61,21 @@ Feature: Scan for Tests
     And last modified date should be shown
     And feature linkage should be shown
 
-  @phase:1
+  @phase:3
   Scenario: Scan exports discovery results
     When I run "udd scan-tests --export tests.json"
     Then results should be saved to "tests.json"
     And the format should be JSON
     And it should include all discovered test metadata
 
-  @phase:1
+  @phase:3
   Scenario: Scan specific directory only
     Given tests exist in "tests/unit/" and "tests/e2e/"
     When I run "udd scan-tests tests/unit/"
     Then only tests in "tests/unit/" should be discovered
     And other directories should be excluded
 
-  @phase:1
+  @phase:3
   Scenario: Scan detects duplicate test names
     Given two test files have the same describe/it names
     When I run "udd scan-tests"
@@ -83,7 +83,7 @@ Feature: Scan for Tests
     And the conflicting names should be listed
     And locations should be provided for disambiguation
 
-  @phase:1
+  @phase:3
   Scenario: Scan integrates with status
     When I run "udd status --with-tests"
     Then the status should include scan summary

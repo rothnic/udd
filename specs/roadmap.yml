@@ -1,0 +1,205 @@
+# UDD Project Roadmap
+# Single source of truth for phase assignments and capability evolution
+
+# Current active phase
+current_phase: opencode-integration
+
+# Phase definitions
+phases:
+  - id: core-cli
+    name: "Core CLI & Validation"
+    number: 1
+    status: completed
+    description: "Basic scaffolding, validation, status reporting"
+    
+  - id: research-specs
+    name: "Research & Tech Specs"
+    number: 2
+    status: completed
+    description: "Research workflow, tech spec scaffolding"
+    
+  - id: opencode-integration
+    name: "OpenCode Integration"
+    number: 3
+    status: active
+    description: "Custom tools, orchestrator plugin, JSON output"
+    use_cases:
+      - id: orchestrated_iteration
+        capability: autonomous-development
+        increment: v1-basic
+        scenarios:
+          - opencode/orchestration/iterate_until_complete
+          - opencode/orchestration/stop_on_error
+          - opencode/orchestration/configurable_iteration
+          - opencode/tools/udd_status_tool
+          
+      - id: agent_customization
+        capability: autonomous-development
+        increment: v1-basic
+        scenarios:
+          - opencode/agent/customize_prompts
+          
+      - id: capture_ideas
+        capability: idea-management
+        increment: v1-basic
+        scenarios:
+          - udd/cli/inbox/add_item_via_cli
+          
+      - id: track_test_quality
+        capability: test-governance
+        increment: v1-basic
+        scenarios:
+          - udd/test-governance/test-linkage
+          - udd/test-governance/test-status
+          - udd/test-governance/test-review
+          
+      - id: prevent_regression
+        capability: test-governance
+        increment: v1-basic
+        scenarios:
+          - udd/test-governance/feature-change-detection
+          - udd/test-governance/dirty-marking
+          - udd/test-governance/sync-dirty-marking
+          
+      - id: manage_test_lifecycle
+        capability: test-governance
+        increment: v1-basic
+        scenarios:
+          - udd/test-governance/test-scan
+          - udd/test-governance/test-approval
+          
+      - id: enforce_quality_gates
+        capability: test-governance
+        increment: v1-basic
+        scenarios:
+          - udd/test-governance/hooks-installation
+          - udd/test-governance/pre-commit-validation
+          - udd/test-governance/ci-validation
+          
+      - id: monitor_test_health
+        capability: test-governance
+        increment: v1-basic
+        scenarios:
+          - udd/test-governance/status-integration
+          - udd/test-governance/health-metrics
+          - udd/test-governance/setup-health-check
+          
+      - id: validate_phase_consistency
+        capability: compliance
+        increment: v1-basic
+        scenarios:
+          - udd/compliance/phase-consistency-validation
+          
+  - id: agent-intelligence
+    name: "Agent Intelligence"
+    number: 4
+    status: planned
+    description: "Copilot integration improvements, autonomous maintenance, smart suggestions"
+    
+  - id: advanced-workflows
+    name: "Advanced Workflows"
+    number: 5
+    status: planned
+    description: "Spec change tracking, migration tools, team collaboration features"
+
+# Capability definitions - enduring functional areas delivered through increments
+capabilities:
+  autonomous-development:
+    name: "Autonomous Development"
+    description: "Enduring ability for AI agents to develop software autonomously"
+    current_increment: v1-basic
+    increments:
+      - version: v1-basic
+        phase: opencode-integration
+        number: 3
+        status: delivered
+        use_cases:
+          - orchestrated_iteration
+          - agent_customization
+          
+      - version: v2-advanced
+        phase: agent-intelligence
+        number: 4
+        status: planned
+        use_cases:
+          - orchestrated_iteration_advanced
+          
+      - version: v3-full
+        phase: advanced-workflows
+        number: 5
+        status: vision
+        use_cases: []
+        
+  idea-management:
+    name: "Idea Management"
+    description: "Enduring ability to capture and organize ideas"
+    current_increment: v1-basic
+    increments:
+      - version: v1-basic
+        phase: opencode-integration
+        number: 3
+        status: delivered
+        use_cases:
+          - capture_ideas
+          
+  test-governance:
+    name: "Test Governance"
+    description: "Enduring ability to track, review, and enforce test quality"
+    current_increment: v1-basic
+    increments:
+      - version: v1-basic
+        phase: opencode-integration
+        number: 3
+        status: delivered
+        use_cases:
+          - track_test_quality
+          - prevent_regression
+          - manage_test_lifecycle
+          - enforce_quality_gates
+          - monitor_test_health
+          
+      - version: v2-advanced
+        phase: agent-intelligence
+        number: 4
+        status: planned
+        use_cases: []
+        
+  compliance:
+    name: "Compliance & Validation"
+    description: "Enduring ability to validate project consistency and compliance"
+    current_increment: v1-basic
+    increments:
+      - version: v1-basic
+        phase: opencode-integration
+        number: 3
+        status: delivered
+        use_cases:
+          - validate_phase_consistency
+
+# Validation rules for phase consistency
+validation_rules:
+  # Scenario @phase tags must match their use case's phase
+  scenario_phase_must_match_use_case_phase: true
+  
+  # Use case phase must match roadmap phase assignment
+  use_case_phase_must_match_roadmap_phase: true
+  
+  # Allow planning features for future phases
+  allow_future_phase_planning: true
+  
+  # Strict mode fails on warnings
+  strict_mode: false
+  
+  # Maximum phase gap allowed (phases ahead of current)
+  max_phase_ahead: 1
+
+# Traceability rules
+traceability:
+  # Every scenario must have a corresponding test
+  require_test_per_scenario: true
+  
+  # Every use case must have at least one journey
+  require_journey_per_use_case: true
+  
+  # Every capability must have at least one use case
+  require_use_case_per_capability: true

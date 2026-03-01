@@ -21,7 +21,7 @@ Feature: Test-Feature Linkage
     And the project has feature files in "specs/features/"
     And the project has test files in "tests/"
 
-  @phase:1
+  @phase:3
   Scenario: Test file declares linkage to feature file
     Given a feature file exists at "specs/features/auth/login.feature"
     When I create a test file at "tests/auth/login.e2e.test.ts"
@@ -29,7 +29,7 @@ Feature: Test-Feature Linkage
     Then the linkage should be valid
     And "udd status" should show the test as linked
 
-  @phase:1
+  @phase:3
   Scenario: Feature file with no linked tests is flagged
     Given a feature file exists at "specs/features/payment/checkout.feature"
     And no test file links to "payment/checkout.feature"
@@ -37,7 +37,7 @@ Feature: Test-Feature Linkage
     Then the output should flag "payment/checkout.feature" as having no tests
     And the feature should appear in the "untested" section
 
-  @phase:1
+  @phase:3
   Scenario: Multiple tests can link to one feature
     Given a feature file exists at "specs/features/user/profile.feature"
     When I create test file "tests/user/profile-unit.test.ts" linking to "user/profile.feature"
@@ -45,7 +45,7 @@ Feature: Test-Feature Linkage
     Then both linkages should be valid
     And "udd status" should show 2 tests for "user/profile.feature"
 
-  @phase:1
+  @phase:3
   @error
   Scenario: Test linking to non-existent feature file
     Given I create a test file at "tests/auth/invalid.test.ts"
@@ -54,7 +54,7 @@ Feature: Test-Feature Linkage
     Then the output should warn about broken link to "auth/nonexistent.feature"
     And the test should appear in the "orphan tests" section
 
-  @phase:1
+  @phase:3
   Scenario: Renaming feature file updates linkage
     Given a feature file exists at "specs/features/old-name.feature"
     And a test file links to "old-name.feature"
