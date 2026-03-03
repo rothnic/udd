@@ -6,6 +6,12 @@ import { Command } from "commander";
 const HOOK_PATH = ".husky/pre-commit";
 const VALIDATION_COMMAND = "udd validate --check-tests";
 
+interface HookOptions {
+	backup?: string;
+	only?: string;
+	config?: string;
+}
+
 /**
  * Check if test governance hooks are installed
  */
@@ -43,6 +49,51 @@ async function makeExecutable(filePath: string): Promise<void> {
 	}
 }
 
+/**
+ * Backup existing hook file
+ */
+async function backupHook(backupPath: string): Promise<void> {
+	try {
+		const content = await fs.readFile(HOOK_PATH, "utf-8");
+		await fs.writeFile(backupPath, content);
+		console.log(chalk.dim(`  Backup created: ${backupPath}`));
+	} catch (error) {
+		console.warn(chalk.yellow("Warning: Could not create backup"));
+	}
+}
+
+/**
+ * Load configuration from file
+ */
+async function loadConfig(configPath: string): Promise<Partial<HookOptions>> {
+	try {
+		const content = await fs.readFile(configPath, "utf-8");
+		return JSON.parse(content) as Partial<HookOptions>;
+	} catch (error) {
+		console.warn(
+			chalk.yellow(`Warning: Could not load config from ${configPath}`),
+		);
+		return {};
+	}
+}
+
+/**
+ * Get validation command with optional filtering
+ */
+function getValidationCommand(onlyHooks?: string): string {
+	if (!onlyHooks) {
+		return VALIDATION_COMMAND;
+	}
+	const hooks = onlyHooks
+		.split(",")
+		.map((h) => h.trim())
+		.filter(Boolean);
+	if (hooks.length === 0) {
+		return VALIDATION_COMMAND;
+	}
+	return `udd validate --check-tests --only ${hooks.join(",")}`;
+}
+
 export const hooksCommand = new Command("hooks").description(
 	"Manage Git hooks for test governance",
 );
@@ -50,20 +101,41 @@ export const hooksCommand = new Command("hooks").description(
 hooksCommand
 	.command("install")
 	.description("Install test governance hooks (adds validation to pre-commit)")
-	.action(async () => {
+	.option("-b, --backup <path>", "backup existing hook to specified path")
+	.option(
+		"-o, --only <hooks>",
+		"install only specified hooks (comma-separated)",
+	)
+	.option("-c, --config <path>", "load options from config file")
+	.action(async (options: HookOptions) => {
 		try {
+			// Load config file if specified
+			let finalOptions = options;
+			if (options.config) {
+				const config = await loadConfig(options.config);
+				finalOptions = { ...config, ...options };
+			}
+
 			// Check if already installed
 			if (await isHooksInstalled()) {
 				console.log(chalk.yellow("Hooks already installed"));
 				return;
 			}
 
+			// Backup existing hook if requested
+			if (finalOptions.backup) {
+				await backupHook(finalOptions.backup);
+			}
+
 			// Read current content
 			const content = await readHookContent();
 
+			// Get appropriate validation command
+			const validationCommand = getValidationCommand(finalOptions.only);
+
 			// Append validation command
 			const updatedContent =
-				content.trimEnd() + "\n" + VALIDATION_COMMAND + "\n";
+				content.trimEnd() + "\n" + validationCommand + "\n";
 
 			// Write hook file
 			await fs.writeFile(HOOK_PATH, updatedContent);
@@ -73,6 +145,9 @@ hooksCommand
 
 			console.log(chalk.green("✓ Test governance hooks installed"));
 			console.log(chalk.dim(`  Added to: ${HOOK_PATH}`));
+			if (finalOptions.only) {
+				console.log(chalk.dim(`  Filters: ${finalOptions.only}`));
+			}
 		} catch (error) {
 			console.error(chalk.red("Error installing hooks:"), error);
 			process.exit(1);
