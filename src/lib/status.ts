@@ -127,6 +127,15 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 			const frontmatter = yaml.parse(frontmatterMatch[1]);
 			currentPhase = frontmatter.current_phase || 1;
 			phases = frontmatter.phases || {};
+		} else {
+			// Fallback: accept a simple "Current Phase: Phase N - Name" line
+			const simpleMatch = visionContent.match(
+				/Current Phase:\s*Phase\s*(\d+)\s*-\s*(.+)/i,
+			);
+			if (simpleMatch) {
+				currentPhase = Number.parseInt(simpleMatch[1], 10) || currentPhase;
+				phases = { [String(currentPhase)]: simpleMatch[2].trim() };
+			}
 		}
 	} catch {
 		// Default to phase 1 if VISION.md is missing

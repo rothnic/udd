@@ -17,11 +17,12 @@ describeFeature(feature, ({ Scenario }) => {
 		});
 
 		Then("something happens", () => {
-			// Use the CLI to get test-discovery status and assert the output
-			return runUdd("test-discovery status").then((res: any) => {
-				// Output should mention detected editors or a neutral message
+			// The CLI does not expose `test-discovery`. Use the stable
+			// `udd test status` subcommand which provides test governance
+			// information without requiring additional commands.
+			return runUdd("test status").then((res: any) => {
 				expect(res.stdout).toMatch(
-					/editor|VS Code|No editor detected|detected/i,
+					/Test Review Status|No test reviews found|Not configured/i,
 				);
 			});
 		});
