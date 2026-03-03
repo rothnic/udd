@@ -14,6 +14,10 @@ export const statusCommand = new Command("status")
 	.option("--example <name>", "Show status for a specific example")
 	.option("--all", "Show status for all projects (product + examples)")
 	.option("--tests", "Show test-specific status information")
+	.option(
+		"--with-tests",
+		"Show test-specific status information (alias for --tests)",
+	)
 	.option("--verbose", "Show detailed status output")
 	.option("--failed-only", "Show only failed/pending items")
 	.action(async (options) => {
@@ -62,7 +66,7 @@ export const statusCommand = new Command("status")
 			const status = await getProjectStatus();
 
 			// Basic handling for newly added flags
-			const showTestsOnly = !!options.tests;
+			const showTestsOnly = !!(options.tests || options.withTests);
 			const verboseMode = !!options.verbose;
 			const failedOnly = !!options.failedOnly;
 
