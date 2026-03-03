@@ -602,3 +602,53 @@ testCommand.addCommand(
 			);
 		}),
 );
+
+// Add history subcommand separately to show test review history
+testCommand.addCommand(
+  new Command("history")
+    .description("Show test review history")
+    .argument("<path>", "Path to test file")
+    .option("--json", "Output as JSON")
+    .action(async (testPath: string, options: { json?: boolean }) => {
+      const rootDir = process.cwd();
+      const absPath = path.isAbsolute(testPath)
+        ? testPath
+        : path.join(rootDir, testPath);
+
+      const tests = await loadTestManifest(rootDir);
+      const testEntry = tests.find(t => t.path === absPath || t.path === testPath || t.path === path.relative(rootDir, absPath));
+
+      if (!testEntry) {
+        if (options.json) {
+          console.log(JSON.stringify({ error: "No history found for test" }, null, 2));
+        } else {
+          console.log(chalk.yellow("No review history found for this test."));
+          console.log(chalk.dim("Run: udd test review " + testPath));
+        }
+        process.exit(0);
+        return;
+      }
+
+      const history = {
+        path: testEntry.path,
+        status: testEntry.status,
+        lastReviewed: testEntry.lastReviewed,
+        reviewCount: testEntry.reviewCount || 0,
+        dirtyReason: testEntry.dirtyReason,
+      };
+
+      if (options.json) {
+        console.log(JSON.stringify(history, null, 2));
+      } else {
+        console.log(chalk.bold("Test Review History"));
+        console.log(chalk.dim("=".repeat(40)));
+        console.log(`Path: ${chalk.cyan(history.path)}`);
+        console.log(`Status: ${history.status === 'clean' ? chalk.green('✓ Clean') : chalk.yellow('○ Dirty')}`);
+        console.log(`Last Reviewed: ${history.lastReviewed ? new Date(history.lastReviewed).toLocaleString() : chalk.dim('Never')}`);
+        console.log(`Review Count: ${history.reviewCount}`);
+        if (history.dirtyReason) {
+          console.log(`Dirty Reason: ${chalk.yellow(history.dirtyReason)}`);
+        }
+      }
+    }),
+);
