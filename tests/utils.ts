@@ -2,7 +2,7 @@ import { exec } from "node:child_process";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { promisify } from "node:util";
+import { promisify, stripVTControlCharacters } from "node:util";
 
 /**
  * Create a temporary directory, switch cwd to it, run the callback, and
@@ -40,10 +40,14 @@ export const uddBin = path.resolve(rootDir, "bin/udd.ts");
 export async function runUdd(
 	args: string,
 	opts?: { cwd?: string; env?: NodeJS.ProcessEnv },
-) {
+): Promise<{ stdout: string; stderr: string; exitCode?: number }> {
 	const command = `npx tsx ${uddBin} ${args}`;
 	const execOpts: any = {};
 	if (opts?.cwd) execOpts.cwd = opts.cwd;
 	if (opts?.env) execOpts.env = { ...process.env, ...opts.env };
-	return execAsync(command, execOpts);
+	const result = await execAsync(command, execOpts);
+	return {
+		stdout: stripVTControlCharacters(result.stdout.toString()),
+		stderr: stripVTControlCharacters(result.stderr.toString()),
+	};
 }
