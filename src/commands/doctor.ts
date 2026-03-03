@@ -1431,7 +1431,9 @@ export const doctorCommand = new Command("doctor")
 	.option("--resume", "Continue from previous checkpoint when running --fix")
 	.option("--strict", "Exit with error if any issues are found")
 	.option("--plan", "Generate a bead-based recovery plan from drift issues")
+	.option("--create-backlog", "Generate recovery backlog (alias for --plan)")
 	.option("--bead-status", "Show current bead plan progress and ready beads")
+	.option("--backlog-status", "Show backlog progress (alias for --bead-status)")
 	.option("--check-stubs", "Check for stub assertions in tests")
 	.option(
 		"--mode <mode>",
@@ -1446,15 +1448,15 @@ export const doctorCommand = new Command("doctor")
 				process.exit(1);
 			}
 
-			// Handle --plan option
-			if (options.plan) {
+			// Handle --plan / --create-backlog option
+			if (options.plan || options.createBacklog) {
 				const drift = await detectDrift();
 				await generatePlan(drift, options.json || false);
 				return;
 			}
 
-			// Handle --bead-status option
-			if (options.beadStatus) {
+			// Handle --bead-status / --backlog-status option
+			if (options.beadStatus || options.backlogStatus) {
 				await showBeadStatus(options.json || false);
 				return;
 			}
