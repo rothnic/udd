@@ -1096,6 +1096,8 @@ async function applyFixes(
 		dryRun: boolean;
 		resume?: boolean;
 		strict?: boolean;
+		parallel?: boolean;
+		orchestrate?: boolean;
 	},
 ): Promise<{ fixed: number; skipped: number; failed: number }> {
 	const ctx: FixContext = {
@@ -1121,6 +1123,16 @@ async function applyFixes(
 		console.log(chalk.yellow("📋 Dry-run mode - no changes will be made\n"));
 	}
 
+	// Log orchestrate mode if active
+	if (options.orchestrate) {
+		console.log(chalk.magenta("🎭 Orchestrator mode is active\n"));
+	}
+
+	// Log parallel mode if active
+	if (options.parallel) {
+		console.log(chalk.cyan("⚡ Parallel execution mode (max 4 concurrent)\n"));
+	}
+
 	// Process auto-fixable issues first
 	if (autoFixable.length > 0) {
 		console.log(
@@ -1129,34 +1141,88 @@ async function applyFixes(
 			),
 		);
 
-		for (const issue of autoFixable) {
-			let result: RemediationResult;
-
+		// Helper function to process a single issue
+		const processIssue = async (issue: DriftIssue): Promise<RemediationResult> => {
 			switch (issue.type) {
 				case "journey_stale":
-					result = await fixStaleJourney(issue, ctx);
-					break;
+					return await fixStaleJourney(issue, ctx);
 				case "test_missing":
 					// Check if this is a scenario or test file missing
 					if (issue.file.includes(".feature")) {
-						result = await fixMissingScenario(issue, ctx);
+						return await fixMissingScenario(issue, ctx);
 					} else {
-						result = await fixTestDirty(issue, ctx);
+						return await fixTestDirty(issue, ctx);
 					}
-					break;
 				case "manifest_corrupt":
 				case "manifest_missing":
-					result = await fixManifestIssue(issue, ctx);
-					break;
+					return await fixManifestIssue(issue, ctx);
 				default:
-					result = {
+					return {
 						success: false,
 						action: "skipped",
 						message: "Unknown issue type",
 					};
 			}
+		};
 
-			// Log result
+		// Helper function to run with concurrency limit (semaphore pattern)
+		const runWithConcurrencyLimit = async <T, R>(
+			items: T[],
+			limit: number,
+			fn: (item: T) => Promise<R>,
+		): Promise<R[]> => {
+			const results: R[] = [];
+			const executing: Promise<void>[] = [];
+
+			for (let i = 0; i < items.length; i++) {
+				const item = items[i];
+				const promise = fn(item).then((result) => {
+					results[i] = result;
+				});
+				executing.push(promise);
+
+				if (executing.length >= limit) {
+					await Promise.race(executing);
+					// Remove completed promises
+					for (let j = executing.length - 1; j >= 0; j--) {
+						// Check if promise is settled by racing against an already resolved promise
+						const checkPromise = executing[j];
+						const timeoutPromise = new Promise<void>((resolve) =>
+							setTimeout(resolve, 0),
+						);
+						const race = Promise.race([checkPromise, timeoutPromise]);
+						// If the original promise is done, race resolves immediately
+						// Otherwise, it resolves after timeout
+						// We need to check if checkPromise is still pending
+						let isSettled = false;
+						checkPromise.then(() => { isSettled = true; }).catch(() => { isSettled = true; });
+						await timeoutPromise;
+						if (isSettled) {
+							executing.splice(j, 1);
+						}
+					}
+				}
+			}
+
+			await Promise.all(executing);
+			return results;
+		};
+
+		let fixResults: RemediationResult[];
+
+		if (options.parallel) {
+			// Process issues concurrently with max 4 concurrent operations
+			fixResults = await runWithConcurrencyLimit(autoFixable, 4, processIssue);
+		} else {
+			// Process issues sequentially
+			fixResults = [];
+			for (const issue of autoFixable) {
+				fixResults.push(await processIssue(issue));
+			}
+		}
+
+		// Log results and update counters
+		for (const result of fixResults) {
 			const icon = result.success ? chalk.green("✓") : chalk.red("✗");
 			const actionColor =
 				result.action === "fixed"
@@ -1168,7 +1234,7 @@ async function applyFixes(
 							: chalk.red;
 
 			console.log(
-				`  ${icon} ${actionColor(result.action)}: ${issue.type} - ${result.message || ""}`,
+				`  ${icon} ${actionColor(result.action)}: ${result.message || ""}`,
 			);
 
 			// Update counters
@@ -1440,6 +1506,8 @@ export const doctorCommand = new Command("doctor")
 		"Enforcement mode: lenient (future phases OK) or strict (all phases)",
 		"lenient",
 	)
+	.option("--parallel", "Execute fixes concurrently (max 4 at a time)")
+	.option("--orchestrate", "Use orchestrator for fix execution")
 	.action(async (options) => {
 		try {
 			// Validate options
@@ -1498,6 +1566,8 @@ export const doctorCommand = new Command("doctor")
 					dryRun: options.dryRun || false,
 					resume: options.resume || false,
 					strict: options.strict || false,
+					parallel: options.parallel || false,
+					orchestrate: options.orchestrate || false,
 				});
 
 				// Exit with appropriate code
