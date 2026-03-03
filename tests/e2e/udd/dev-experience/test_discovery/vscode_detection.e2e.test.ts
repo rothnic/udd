@@ -16,9 +16,16 @@ describeFeature(feature, ({ Scenario }) => {
 		});
 
 		Then("something happens", () => {
-			// TODO: Implement
-			// @phase:5 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			// Call the CLI to run VSCode detection and assert expected messaging
+			const { runUdd } = require("../../../../../tests/utils.js");
+			return runUdd("test-discovery detect --editor vscode").then(
+				(res: any) => {
+					// Expect output that either reports detection or a graceful fallback
+					expect(res.stdout).toMatch(
+						/VS Code|vscode|No VS Code detected|detected/i,
+					);
+				},
+			);
 		});
 	});
 });

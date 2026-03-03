@@ -1,5 +1,6 @@
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
+import { runUdd } from "../../../../utils.js";
 
 const feature = await loadFeature(
 	"specs/features/udd/dev-experience/test_discovery/editor_status.feature",
@@ -16,9 +17,13 @@ describeFeature(feature, ({ Scenario }) => {
 		});
 
 		Then("something happens", () => {
-			// TODO: Implement
-			// @phase:5 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			// Use the CLI to get test-discovery status and assert the output
+			return runUdd("test-discovery status").then((res: any) => {
+				// Output should mention detected editors or a neutral message
+				expect(res.stdout).toMatch(
+					/editor|VS Code|No editor detected|detected/i,
+				);
+			});
 		});
 	});
 });

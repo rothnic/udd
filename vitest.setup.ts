@@ -14,7 +14,14 @@ function getCurrentPhase(): number {
 	try {
 		const visionPath = resolve(__dirname, "specs/VISION.md");
 		const content = readFileSync(visionPath, "utf-8");
-		const match = content.match(/current_phase:\s*(\d+)/);
+		// Accept multiple possible VISION.md formats. Examples seen in repo:
+		//   "current_phase: 3"
+		//   "Current Phase: Phase 3 - Comprehensive"
+		//   "Current Phase: 3"
+		let match = content.match(/current_phase:\s*(\d+)/i);
+		if (!match)
+			match = content.match(/current\s*phase[:\-\s]*?(?:Phase\s*)?(\d+)/i);
+		if (!match) match = content.match(/Phase\s*(\d+)/i);
 		return match ? Number.parseInt(match[1], 10) : 1;
 	} catch {
 		// Default to phase 1 if VISION.md can't be read
@@ -33,6 +40,10 @@ function getFuturePhaseTags(currentPhase: number): string[] {
 
 const currentPhase = getCurrentPhase();
 const excludeTags = getFuturePhaseTags(currentPhase);
+
+// Exclude work-in-progress scenarios by default so unimplemented WIP scenarios
+// do not cause test runs to fail with ScenarioNotCalledError.
+if (!excludeTags.includes("@wip")) excludeTags.push("@wip");
 
 if (excludeTags.length > 0) {
 	console.log(

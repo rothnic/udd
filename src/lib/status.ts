@@ -57,6 +57,7 @@ export interface JourneyStatus {
 	scenariosFailing: number;
 	hash: string;
 	isStale: boolean;
+	blocking?: string[];
 }
 
 export interface ProjectStatus {
@@ -193,6 +194,7 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 				let goal = "";
 				const linkedScenarios: string[] = [];
 
+				const blockingList: string[] = [];
 				for (const line of content.split("\n")) {
 					if (line.startsWith("# ")) {
 						name = line.replace(/^#\s*(Journey:\s*)?/, "").trim();
@@ -207,6 +209,14 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 					if (stepMatch) {
 						linkedScenarios.push(stepMatch[1]);
 					}
+					const blockedMatch = line.match(/Blocked by:\s*([^\n]+)/i);
+					if (blockedMatch) {
+						const parts = blockedMatch[1]
+							.split(/[,\s]+/)
+							.map((p) => p.trim())
+							.filter(Boolean);
+						for (const p of parts) blockingList.push(p);
+					}
 				}
 
 				// Check scenario statuses
@@ -214,7 +224,8 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 				let scenariosPassing = 0;
 				const scenariosFailing = 0;
 
-				for (const scenarioPath of linkedScenarios) {
+				const saneLinked = linkedScenarios.filter(Boolean);
+				for (const scenarioPath of saneLinked) {
 					try {
 						await fs.access(path.join(rootDir, scenarioPath));
 						// For now, assume exists = passing (proper status would need test run)
@@ -234,6 +245,7 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 					scenariosFailing,
 					hash,
 					isStale,
+					blocking: blockingList,
 				};
 			}
 		} catch {

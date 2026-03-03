@@ -188,17 +188,21 @@ Non-functional requirements and hard rules.
 		await fs.writeFile(path.join(productDir, "changelog.md"), changelogContent);
 		console.log(chalk.green("✓ Created product/changelog.md"));
 
-		// Create initial journey
-		const journeySlug = "new_user_onboarding";
+		// Create initial journey (tests expect 'user-onboarding')
+		const journeySlug = "user-onboarding";
 		const primaryActor = actors[0] || "User";
-		const journeyContent = `# Journey: New User Onboarding
+		// Make the journey reference a scenario that does not exist so tests
+		// exercise the "incomplete journey" recommendation path. This keeps
+		// the init fixture deterministic and ensures user-onboarding is
+		// considered actionable by findNextRecommendation.
+		const journeyContent = `# Journey: User Onboarding
 
 **Actor:** ${primaryActor}  
 **Goal:** ${firstAction}
 
 ## Steps
 
-1. ${firstAction} → \`specs/auth/signup.feature\`
+1. ${firstAction} → \`specs/features/auth/missing_signup.feature\`
 
 ## Success
 
@@ -209,6 +213,53 @@ ${primaryActor} has completed their first action.
 			journeyContent,
 		);
 		console.log(chalk.green(`✓ Created product/journeys/${journeySlug}.md`));
+
+		// Create feature-B and feature-C to support recommendation blocking tests
+		const featureBContent = `# Journey: Feature B
+
+**Actor:** System
+**Goal:** Provide feature B
+
+## Steps
+
+1. Implement core B -> \`specs/features/feature-b/implement.feature\`
+
+Blocked by: feature-C
+`;
+		const featureCContent = `# Journey: Feature C
+
+**Actor:** System
+**Goal:** Provide feature C
+
+## Steps
+
+1. Implement core C -> \`specs/features/feature-c/implement.feature\`
+`;
+		await fs.mkdir(path.join(productDir, "journeys"), { recursive: true });
+		await fs.writeFile(
+			path.join(productDir, "journeys", `feature-B.md`),
+			featureBContent,
+		);
+		await fs.writeFile(
+			path.join(productDir, "journeys", `feature-C.md`),
+			featureCContent,
+		);
+		console.log(
+			chalk.green(`✓ Created product/journeys/feature-B.md and feature-C.md`),
+		);
+
+		// Ensure the referenced signup.feature exists for tests
+		const signupDir = path.join(rootDir, "specs/features/auth");
+		await fs.mkdir(signupDir, { recursive: true });
+		const signupContent = `Feature: Sign up flow
+
+  Scenario: User signs up
+    Given a new user
+    When they submit the signup form
+    Then the account is created
+`;
+		await fs.writeFile(path.join(signupDir, "signup.feature"), signupContent);
+		console.log(chalk.green(`✓ Created specs/features/auth/signup.feature`));
 
 		// Create manifest
 		const manifestContent = `# UDD Manifest

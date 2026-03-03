@@ -3,6 +3,8 @@ import {
 	describeFeature,
 	loadFeature,
 } from "@amiceli/vitest-cucumber";
+import fs from "fs";
+import path from "path";
 import { expect } from "vitest";
 import { runUdd } from "../../../utils.js";
 
@@ -16,16 +18,20 @@ defineSteps((s: any) => {
 	s.Given(
 		"there are defined journeys and actors in product/ and specs/",
 		() => {
-			// no-op assertion
-			// @phase:4 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			// Verify product/journeys and specs/features exist in repo
+			const journeysDir = path.join(process.cwd(), "product", "journeys");
+			const specsDir = path.join(process.cwd(), "specs", "features");
+			expect(fs.existsSync(journeysDir)).toBe(true);
+			expect(fs.existsSync(specsDir)).toBe(true);
 		},
 	);
 	s.And?.(
 		"there are defined journeys and actors in product/ and specs/",
 		() => {
-			// @phase:4 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			const journeysDir = path.join(process.cwd(), "product", "journeys");
+			const specsDir = path.join(process.cwd(), "specs", "features");
+			expect(fs.existsSync(journeysDir)).toBe(true);
+			expect(fs.existsSync(specsDir)).toBe(true);
 		},
 	);
 });
@@ -62,15 +68,24 @@ describeFeature(feature, ({ Scenario }) => {
 		let stdout: string;
 
 		Given("UDD is initialized in the current directory", () => {
-			// @phase:4 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			// basic sanity: repo root has package.json
+			expect(fs.existsSync(path.join(process.cwd(), "package.json"))).toBe(
+				true,
+			);
 		});
 
 		// The feature uses 'And' for this step; register an And step only so the
 		// library (which keeps 'And' separate) can match the step type exactly.
 		And("there are defined journeys and actors in product/ and specs/", () => {
-			// @phase:4 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			const journeysDir = path.join(process.cwd(), "product", "journeys");
+			const actorsFile = path.join(process.cwd(), "product", "actors.md");
+			const specsDir = path.join(process.cwd(), "specs", "features");
+			expect(fs.existsSync(journeysDir)).toBe(true);
+			expect(
+				fs.existsSync(actorsFile) ||
+					fs.existsSync(path.join(process.cwd(), "product", "actors")),
+			).toBe(true);
+			expect(fs.existsSync(specsDir)).toBe(true);
 		});
 
 		When('I run "udd query actors --json"', async () => {
@@ -106,15 +121,24 @@ describeFeature(feature, ({ Scenario }) => {
 			let stdout: string;
 
 			Given("UDD is initialized in the current directory", () => {
-			// @phase:4 - Intentional stub for future implementation
-				expect(true).toBe(true);
+				expect(fs.existsSync(path.join(process.cwd(), "package.json"))).toBe(
+					true,
+				);
 			});
 
 			And(
 				"the product/actors.md and product/journeys/ exist with at least one actor",
 				() => {
-				// @phase:4 - Intentional stub for future implementation
-					expect(true).toBe(true);
+					const actorsFile = path.join(process.cwd(), "product", "actors.md");
+					const journeysDir = path.join(process.cwd(), "product", "journeys");
+					expect(
+						fs.existsSync(actorsFile) ||
+							fs.existsSync(path.join(process.cwd(), "product", "actors")),
+					).toBe(true);
+					const entries = fs.existsSync(journeysDir)
+						? fs.readdirSync(journeysDir).filter((e) => !e.startsWith("."))
+						: [];
+					expect(entries.length).toBeGreaterThan(0);
 				},
 			);
 
@@ -137,13 +161,18 @@ describeFeature(feature, ({ Scenario }) => {
 		let stdout: string;
 
 		Given("UDD is initialized in the current directory", () => {
-			// @phase:4 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			expect(fs.existsSync(path.join(process.cwd(), "package.json"))).toBe(
+				true,
+			);
 		});
 
 		And("product/journeys/ contains one or more journey files", () => {
-			// @phase:4 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			const journeysDir = path.join(process.cwd(), "product", "journeys");
+			const entries = fs.existsSync(journeysDir)
+				? fs.readdirSync(journeysDir).filter((e) => !e.startsWith("."))
+				: [];
+			expect(fs.existsSync(journeysDir)).toBe(true);
+			expect(entries.length).toBeGreaterThan(0);
 		});
 
 		When('I run "udd query journeys --json"', async () => {
@@ -166,15 +195,20 @@ describeFeature(feature, ({ Scenario }) => {
 		let stdout: string;
 
 		Given("UDD is initialized in the current directory", () => {
-			// @phase:4 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			expect(fs.existsSync(path.join(process.cwd(), "package.json"))).toBe(
+				true,
+			);
 		});
 
 		And(
 			"specs/features/ contains feature files generated from journeys",
 			() => {
-				// @phase:4 - Intentional stub for future implementation
-				expect(true).toBe(true);
+				const specsDir = path.join(process.cwd(), "specs", "features");
+				expect(fs.existsSync(specsDir)).toBe(true);
+				const entries = fs
+					.readdirSync(specsDir)
+					.filter((e) => !e.startsWith("."));
+				expect(entries.length).toBeGreaterThan(0);
 			},
 		);
 
@@ -210,13 +244,18 @@ describeFeature(feature, ({ Scenario }) => {
 		let stdout: string;
 
 		Given("UDD is initialized in the current directory", () => {
-			// @phase:4 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			expect(fs.existsSync(path.join(process.cwd(), "package.json"))).toBe(
+				true,
+			);
 		});
 
 		And("there are journeys, features, and tests present in the repo", () => {
-			// @phase:4 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			const journeysDir = path.join(process.cwd(), "product", "journeys");
+			const specsDir = path.join(process.cwd(), "specs", "features");
+			const testsDir = path.join(process.cwd(), "tests", "e2e");
+			expect(fs.existsSync(journeysDir)).toBe(true);
+			expect(fs.existsSync(specsDir)).toBe(true);
+			expect(fs.existsSync(testsDir)).toBe(true);
 		});
 
 		When('I run "udd query status --json"', async () => {
@@ -254,15 +293,18 @@ describeFeature(feature, ({ Scenario }) => {
 		let stdout: string;
 
 		Given("UDD is initialized in the current directory", () => {
-			// @phase:4 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			expect(fs.existsSync(path.join(process.cwd(), "package.json"))).toBe(
+				true,
+			);
 		});
 
 		And(
 			"the repository contains journeys and features with some missing tests",
 			() => {
-				// @phase:4 - Intentional stub for future implementation
-				expect(true).toBe(true);
+				const journeysDir = path.join(process.cwd(), "product", "journeys");
+				const specsDir = path.join(process.cwd(), "specs", "features");
+				expect(fs.existsSync(journeysDir)).toBe(true);
+				expect(fs.existsSync(specsDir)).toBe(true);
 			},
 		);
 

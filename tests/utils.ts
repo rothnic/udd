@@ -37,7 +37,13 @@ export const execAsync = promisify(exec);
 export const rootDir = process.cwd();
 export const uddBin = path.resolve(rootDir, "bin/udd.ts");
 
-export async function runUdd(args: string) {
+export async function runUdd(
+	args: string,
+	opts?: { cwd?: string; env?: NodeJS.ProcessEnv },
+) {
 	const command = `npx tsx ${uddBin} ${args}`;
-	return execAsync(command);
+	const execOpts: any = {};
+	if (opts?.cwd) execOpts.cwd = opts.cwd;
+	if (opts?.env) execOpts.env = { ...process.env, ...opts.env };
+	return execAsync(command, execOpts);
 }

@@ -1,5 +1,6 @@
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
+import { runUdd } from "../../../utils.js";
 
 const feature = await loadFeature(
 	"specs/features/udd/dev-experience/commit_hooks.feature",
@@ -19,10 +20,13 @@ describeFeature(feature, ({ Scenario }) => {
 		});
 
 		Then("something happens", () => {
-			// Minimal assertion to satisfy the step. Replace with real checks when
-			// environment/setup is available.
-			// @phase:5 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			// Verify hooks status command output via runUdd helper
+			return runUdd("hooks status").then((res: any) => {
+				// When hooks are not installed the output should mention "not installed"
+				expect(res.stdout).toMatch(
+					/hooks (not )?installed|Test governance hooks/,
+				);
+			});
 		});
 	});
 });
