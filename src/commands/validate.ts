@@ -16,6 +16,9 @@ export const validateCommand = new Command("validate")
 	.option("--strict", "Require all completeness checks to pass", false)
 	.option("--check-tests", "Validate test files for stub assertions", false)
 	.option("--example <name>", "Validate a specific example project")
+	.option("--ci", "CI mode (non-interactive, machine-readable)")
+	.option("--format <type>", "Output format (json|text)", "text")
+	.option("--artifacts <path>", "Write validation artifacts to file")
 	.action(async (options) => {
 		const rootDir = process.cwd();
 
@@ -79,11 +82,15 @@ export const validateCommand = new Command("validate")
 			process.exit(0);
 		}
 
-		console.log(
-			chalk.blue.bold(
-				`\n🔍 Validating Feature Completeness (${featureFiles.length} files)\n`,
-			),
-		);
+		const isCiMode = options.ci || options.format === "json";
+
+		if (!isCiMode) {
+			console.log(
+				chalk.blue.bold(
+					`\n🔍 Validating Feature Completeness (${featureFiles.length} files)\n`,
+				),
+			);
+		}
 
 		const results: Array<{
 			file: string;
@@ -110,61 +117,73 @@ export const validateCommand = new Command("validate")
 		let totalScore = 0;
 
 		for (const result of results) {
-			const scoreColor =
-				result.score >= 80
-					? chalk.green
-					: result.score >= 60
-						? chalk.yellow
-						: chalk.red;
+			if (!isCiMode) {
+				const scoreColor =
+					result.score >= 80
+						? chalk.green
+						: result.score >= 60
+							? chalk.yellow
+							: chalk.red;
 
-			console.log(
-				`${scoreColor(`[${result.score}%]`)} ${chalk.white(result.file)}`,
-			);
+				console.log(
+					`${scoreColor(`[${result.score}%]`)} ${chalk.white(result.file)}`,
+				);
 
-			if (result.issues.length > 0) {
-				hasIssues = true;
-				for (const issue of result.issues) {
-					console.log(`  ${chalk.red("✗")} ${issue}`);
+				if (result.issues.length > 0) {
+					hasIssues = true;
+					for (const issue of result.issues) {
+						console.log(`  ${chalk.red("✗")} ${issue}`);
+					}
+				}
+
+				if (result.warnings.length > 0) {
+					for (const warning of result.warnings) {
+						console.log(`  ${chalk.yellow("!")} ${warning}`);
+					}
+				}
+
+				if (result.issues.length === 0 && result.warnings.length === 0) {
+					console.log(`  ${chalk.green("✓")} Complete`);
+				}
+
+				console.log();
+			} else {
+				if (result.issues.length > 0) {
+					hasIssues = true;
 				}
 			}
-
-			if (result.warnings.length > 0) {
-				for (const warning of result.warnings) {
-					console.log(`  ${chalk.yellow("!")} ${warning}`);
-				}
-			}
-
-			if (result.issues.length === 0 && result.warnings.length === 0) {
-				console.log(`  ${chalk.green("✓")} Complete`);
-			}
-
-			console.log();
 			totalScore += result.score;
 		}
 
 		// If requested, validate test files for stub assertions
 		if (options.checkTests) {
-			console.log(
-				chalk.blue.bold(`\n🔍 Validating Test Files for Stub Assertions`),
-			);
+			if (!isCiMode) {
+				console.log(
+					chalk.blue.bold(`\n🔍 Validating Test Files for Stub Assertions`),
+				);
+			}
 
 			const testPattern = path.join(rootDir, "tests", "**", "*.e2e.test.ts");
 			const testFiles: string[] = await glob(testPattern);
 
 			if (testFiles.length === 0) {
-				console.log(chalk.yellow("No test files found to check."));
+				if (!isCiMode) {
+					console.log(chalk.yellow("No test files found to check."));
+				}
 			} else {
 				for (const tf of testFiles) {
 					const content = await fs.readFile(tf, "utf-8");
 					const { hasStubs, stubPatterns } = detectStubAssertions(content);
 					if (hasStubs) {
 						hasIssues = true;
-						const rel = path.relative(rootDir, tf);
-						console.log(`${chalk.red("[FAIL]")} ${chalk.white(rel)}`);
-						for (const p of stubPatterns) {
-							console.log(`  ${chalk.red("✗")} Stub assertions detected: ${p}`);
+						if (!isCiMode) {
+							const rel = path.relative(rootDir, tf);
+							console.log(`${chalk.red("[FAIL]")} ${chalk.white(rel)}`);
+							for (const p of stubPatterns) {
+								console.log(`  ${chalk.red("✗")} Stub assertions detected: ${p}`);
+							}
+							console.log();
 						}
-						console.log();
 					}
 				}
 			}
@@ -175,52 +194,93 @@ export const validateCommand = new Command("validate")
 		const summaryColor =
 			avgScore >= 80 ? chalk.green : avgScore >= 60 ? chalk.yellow : chalk.red;
 
-		console.log(chalk.blue.bold("📊 Summary\n"));
-		console.log(`Files analyzed: ${results.length}`);
-		console.log(`Average completeness: ${summaryColor(`${avgScore}%`)}`);
+		if (!isCiMode) {
+			console.log(chalk.blue.bold("📊 Summary\n"));
+			console.log(`Files analyzed: ${results.length}`);
+			console.log(`Average completeness: ${summaryColor(`${avgScore}%`)}`);
 
-		// Recommendations
-		if (avgScore < 80) {
-			console.log(chalk.yellow("\n💡 Recommendations:\n"));
-			console.log(
-				chalk.dim(
-					"  • Add comments documenting user needs and alternatives considered",
-				),
-			);
-			console.log(
-				chalk.dim("  • Include error handling and edge case scenarios"),
-			);
-			console.log(
-				chalk.dim("  • Use Background for common setup across scenarios"),
-			);
-			console.log(
-				chalk.dim(
-					"  • See examples/feature-features/ for examples of complete features",
-				),
-			);
-			console.log(
-				chalk.dim("  • Use 'udd discover feature' for guided feature creation"),
-			);
+			// Recommendations
+			if (avgScore < 80) {
+				console.log(chalk.yellow("\n💡 Recommendations:\n"));
+				console.log(
+					chalk.dim(
+						"  • Add comments documenting user needs and alternatives considered",
+					),
+				);
+				console.log(
+					chalk.dim("  • Include error handling and edge case scenarios"),
+				);
+				console.log(
+					chalk.dim("  • Use Background for common setup across scenarios"),
+				);
+				console.log(
+					chalk.dim(
+						"  • See examples/feature-features/ for examples of complete features",
+					),
+				);
+				console.log(
+					chalk.dim("  • Use 'udd discover feature' for guided feature creation"),
+				);
+			}
 		}
 
 		if (options.strict) {
 			if (avgScore < strictThreshold) {
-				console.log(
-					chalk.red(
-						`\n✗ Validation failed (strict mode) - average completeness ${avgScore}% < threshold ${strictThreshold}%`,
-					),
-				);
+				if (!isCiMode) {
+					console.log(
+						chalk.red(
+							`\n✗ Validation failed (strict mode) - average completeness ${avgScore}% < threshold ${strictThreshold}%`,
+						),
+					);
+				}
 				process.exit(1);
 			}
 
 			if (hasIssues) {
-				console.log(chalk.red("\n✗ Validation failed (strict mode)"));
+				if (!isCiMode) {
+					console.log(chalk.red("\n✗ Validation failed (strict mode)"));
+				}
 				process.exit(1);
 			}
 		}
 
-		if (!hasIssues) {
-			console.log(chalk.green("\n✓ All validations passed"));
+		// Handle CI/format output
+		if (isCiMode || options.artifacts) {
+			const output = {
+				valid: !hasIssues && avgScore >= (options.strict ? strictThreshold : 60),
+				score: avgScore,
+				files: results.length,
+				issues: hasIssues,
+				strict: options.strict,
+				threshold: options.strict ? strictThreshold : 60,
+				details: results.map(r => ({
+					file: r.file,
+					score: r.score,
+					issues: r.issues,
+					warnings: r.warnings
+				}))
+			};
+			
+			const jsonOutput = JSON.stringify(output, null, 2);
+			
+			if (options.artifacts) {
+				await fs.writeFile(options.artifacts, jsonOutput, "utf-8");
+			}
+			
+			if (isCiMode) {
+				console.log(jsonOutput);
+			}
+		}
+
+		if (!isCiMode) {
+			if (!hasIssues) {
+				console.log(chalk.green("\n✓ All validations passed"));
+			}
+		}
+
+		// Set exit code based on validation result
+		if (hasIssues || (options.strict && avgScore < strictThreshold)) {
+			process.exit(1);
 		}
 	});
 
