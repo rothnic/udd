@@ -5,6 +5,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { glob } from "glob";
 import yaml from "yaml";
+import phase from "./phase.js";
 
 const execAsync = promisify(exec);
 
@@ -120,22 +121,25 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 	let currentPhase = 1;
 	let phases: Record<string, string> = {};
 	try {
-		const visionPath = path.join(rootDir, "specs/VISION.md");
-		const visionContent = await fs.readFile(visionPath, "utf-8");
-		const frontmatterMatch = visionContent.match(/^---\n([\s\S]*?)\n---/);
-		if (frontmatterMatch) {
-			const frontmatter = yaml.parse(frontmatterMatch[1]);
-			currentPhase = frontmatter.current_phase || 1;
-			phases = frontmatter.phases || {};
-		} else {
-			// Fallback: accept a simple "Current Phase: Phase N - Name" line
-			const simpleMatch = visionContent.match(
-				/Current Phase:\s*Phase\s*(\d+)\s*-\s*(.+)/i,
-			);
-			if (simpleMatch) {
-				currentPhase = Number.parseInt(simpleMatch[1], 10) || currentPhase;
-				phases = { [String(currentPhase)]: simpleMatch[2].trim() };
+		currentPhase = phase.getCurrentPhase(rootDir);
+		// try to also read phases map from frontmatter if present
+		try {
+			const visionPath = path.join(rootDir, "specs/VISION.md");
+			const visionContent = await fs.readFile(visionPath, "utf-8");
+			const frontmatterMatch = visionContent.match(/^---\n([\s\S]*?)\n---/);
+			if (frontmatterMatch) {
+				const frontmatter = yaml.parse(frontmatterMatch[1]);
+				phases = frontmatter.phases || {};
+			} else {
+				const simpleMatch = visionContent.match(
+					/Current Phase:\s*Phase\s*(\d+)\s*-\s*(.+)/i,
+				);
+				if (simpleMatch) {
+					phases = { [String(currentPhase)]: simpleMatch[2].trim() };
+				}
 			}
+		} catch {
+			// ignore
 		}
 	} catch {
 		// Default to phase 1 if VISION.md is missing

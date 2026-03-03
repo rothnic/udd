@@ -519,6 +519,9 @@ export async function getPhaseFromTest(
 				: path.join(root, featureRel);
 			try {
 				const fcont = await fs.readFile(featureAbs, "utf-8");
+				const phaseModule = await import("./phase.js");
+				const fp = phaseModule.getPhaseFromFeature(fcont);
+				if (fp !== undefined) return fp;
 				const fm = fcont.match(re);
 				if (fm) return Number(fm[1]);
 			} catch {
