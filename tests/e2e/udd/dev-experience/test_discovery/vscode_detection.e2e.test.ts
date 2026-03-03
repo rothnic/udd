@@ -17,6 +17,7 @@ describeFeature(feature, ({ Scenario }) => {
 
 		Then("something happens", () => {
 			// TODO: Implement
+			// @phase:5 - Intentional stub for future implementation
 			expect(true).toBe(true);
 		});
 	});

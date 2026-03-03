@@ -5,6 +5,7 @@
  * - Warns when too many files are modified without committing
  * - Tracks file changes via git status or SDK events
  * - Displays warnings via TUI toast notifications
+ * - Checks drift before file write operations
  *
  * Configuration: .opencode/plugin/udd-enforcement.yml
  */
@@ -12,6 +13,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
+import { checkGate } from "../../src/lib/gate.js";
 
 // Types from @opencode-ai/sdk
 interface Session {
@@ -79,6 +81,14 @@ interface PluginInput {
 	) => Promise<{ stdout: string; stderr: string }>;
 }
 
+interface GateResult {
+	passed: boolean;
+	reason?: string;
+	critical: number;
+	warning: number;
+	info: number;
+}
+
 interface Config {
 	max_modified_files: number;
 	show_toasts: boolean;
@@ -87,6 +97,8 @@ interface Config {
 	exclude_patterns: string[];
 	warn_uncommitted_on_idle: boolean;
 	min_uncommitted_for_warning: number;
+	block_on_critical_drift: boolean;
+	warn_on_drift: boolean;
 }
 
 const DEFAULT_CONFIG: Config = {
@@ -102,6 +114,8 @@ const DEFAULT_CONFIG: Config = {
 	],
 	warn_uncommitted_on_idle: true,
 	min_uncommitted_for_warning: 3,
+	block_on_critical_drift: true,
+	warn_on_drift: true,
 };
 
 function loadConfig(directory: string): Config {
@@ -202,7 +216,124 @@ export default async function UDDEnforcement({
 	return {
 		name: "udd-enforcement",
 
-		// Handle file edit events
+		hooks: {
+			// Check drift before file write operations
+			"tool.execute.before": async (context: {
+				tool: string;
+				params: Record<string, unknown>;
+				sessionID: string;
+			}) => {
+				// Only check drift for write-related operations
+				if (context.tool !== "write" && context.tool !== "edit") {
+					return { allowed: true };
+				}
+
+				if (!config.warn_on_drift) {
+					return { allowed: true };
+				}
+
+				try {
+					const result = (await checkGate({ strict: false })) as GateResult;
+
+					// Critical drift: block the write
+					if (!result.passed && result.critical > 0) {
+						const errorMessage = `🚫 UDD Gate Blocked: Critical drift detected (${result.critical} issue${result.critical === 1 ? "" : "s"})\n\n${result.reason}\n\nRun 'udd doctor --fix' to resolve automatically fixable issues.`;
+
+						await showToast(
+							`Critical drift detected! Run 'udd doctor --fix'`,
+							"error",
+							"UDD: Gate Blocked",
+						);
+
+						if (config.block_on_critical_drift) {
+							return {
+								allowed: false,
+								error: errorMessage,
+							};
+						}
+					}
+
+					// Warning drift: show warning but allow (configurable)
+					if (!result.passed && result.warning > 0) {
+						await showToast(
+							`Warning: ${result.warning} drift issue${result.warning === 1 ? "" : "s"} detected. Consider running 'udd doctor' before continuing.`,
+							"warning",
+							"UDD: Drift Warning",
+						);
+
+						// Allow but warn (could be configurable to block)
+						return { allowed: true };
+					}
+
+					// Info drift: show info but always allow
+					if (result.info > 0) {
+						await showToast(
+							`${result.info} improvement suggestion${result.info === 1 ? "" : "s"} available. Run 'udd doctor' for details.`,
+							"info",
+							"UDD: Suggestions Available",
+						);
+					}
+
+					return { allowed: true };
+				} catch (error) {
+					// If gate check fails, log but allow the operation
+					console.error("UDD Gate check failed:", error);
+					return { allowed: true };
+				}
+			},
+
+			// Show status banner when session is idle
+			"session.idle": async (context: {
+				sessionID: string;
+				duration: number;
+			}) => {
+				if (!config.warn_uncommitted_on_idle) {
+					return;
+				}
+
+				try {
+					const count = await getGitModifiedCount();
+
+					if (count >= config.min_uncommitted_for_warning) {
+						await showToast(
+							`${count} uncommitted files. Remember to commit your progress!`,
+							"info",
+							"UDD: Uncommitted Changes",
+						);
+					}
+
+					// Also check for drift during idle and show status
+					const driftResult = (await checkGate({
+						strict: false,
+					})) as GateResult;
+
+					if (driftResult.critical > 0) {
+						await showToast(
+							`🚫 Critical drift detected (${driftResult.critical} issue${driftResult.critical === 1 ? "" : "s"}). Run 'udd doctor --fix' to resolve.`,
+							"error",
+							"UDD: Critical Drift",
+						);
+					} else if (driftResult.warning > 0) {
+						await showToast(
+							`⚠ ${driftResult.warning} drift warning${driftResult.warning === 1 ? "" : "s"} detected. Run 'udd doctor' for details.`,
+							"warning",
+							"UDD: Drift Warning",
+						);
+					} else if (driftResult.info > 0) {
+						await showToast(
+							`ℹ ${driftResult.info} suggestion${driftResult.info === 1 ? "" : "s"} available. Run 'udd doctor' for details.`,
+							"info",
+							"UDD: Suggestions",
+						);
+					}
+				} catch (error) {
+					// Silently fail for idle checks
+					console.error("UDD idle check failed:", error);
+				}
+			},
+		},
+
+		// Handle file edit events (legacy format for backwards compatibility)
 		"tool.execute.after": async (
 			input: { tool: string; sessionID: string },
 			output: { title: string; output: string },
@@ -239,7 +370,7 @@ export default async function UDDEnforcement({
 			}
 		},
 
-		// Handle session idle - warn about uncommitted changes
+		// Handle session idle - warn about uncommitted changes (legacy format)
 		event: async ({ event }: { event: Event }) => {
 			if (event.type === "session.idle" && config.warn_uncommitted_on_idle) {
 				const count = await getGitModifiedCount();

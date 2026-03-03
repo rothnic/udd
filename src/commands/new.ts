@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
+import { checkGate, handleGateResult } from "../lib/gate.js";
 import { resolvePaths } from "../lib/paths.js";
 
 export const newCommand = new Command("new").description("Scaffold new specs");
@@ -11,7 +12,11 @@ newCommand
 	.argument("<slug>", "Journey slug (e.g. new_user_onboarding)")
 	.description("Create a new user journey")
 	.option("--example <name>", "Create journey in an example project")
+	.option("--skip-gate", "Skip gate check (not recommended)")
 	.action(async (slug, options) => {
+		// Gate check before scaffolding (critical issues always block)
+		const gateResult = await checkGate({ skipGate: options.skipGate || false });
+		handleGateResult(gateResult);
 		// Resolve paths based on context (product or example)
 		const paths = options?.example
 			? resolvePaths(options.example)
@@ -54,7 +59,11 @@ newCommand
 	.argument("<domain>", "Domain (e.g. auth)")
 	.argument("<action>", "Action slug (e.g. login)")
 	.description("Create a new scenario and test stub")
-	.action(async (domain, action) => {
+	.option("--skip-gate", "Skip gate check (not recommended)")
+	.action(async (domain, action, options) => {
+		// Gate check before scaffolding (critical issues always block)
+		const gateResult = await checkGate({ skipGate: options.skipGate || false });
+		handleGateResult(gateResult);
 		const rootDir = process.cwd();
 		const specsDir = path.join(rootDir, "specs", domain);
 		const filePath = path.join(specsDir, `${action}.feature`);
@@ -123,7 +132,11 @@ newCommand
 	.description(
 		"Create feature file from SysML template (use 'scenario' for simple features, 'discover' for guided creation)",
 	)
-	.action(async (domain, featureName) => {
+	.option("--skip-gate", "Skip gate check (not recommended)")
+	.action(async (domain, featureName, options) => {
+		// Gate check before scaffolding (critical issues always block)
+		const gateResult = await checkGate({ skipGate: options.skipGate || false });
+		handleGateResult(gateResult);
 		const rootDir = process.cwd();
 		const templatePath = path.join(
 			rootDir,

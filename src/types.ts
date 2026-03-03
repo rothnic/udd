@@ -165,3 +165,79 @@ export type TestReviewChecklist = z.infer<typeof TestReviewChecklistSchema>;
 export type TestReviewRecord = z.infer<typeof TestReviewRecordSchema>;
 export type TestGovernanceConfig = z.infer<typeof TestGovernanceConfigSchema>;
 export type ManifestTestEntry = z.infer<typeof ManifestTestEntrySchema>;
+
+// -------------------------
+// Manifest / Drift tracking
+// -------------------------
+
+export const ManifestJourneySchema = z.object({
+	path: z.string(),
+	hash: z.string().optional(),
+	scenarios: z.array(z.string()).optional(),
+});
+
+export const ManifestScenarioSchema = z.object({
+	hash: z.string().optional(),
+	test: z.string().optional(),
+	status: z.string().optional(),
+});
+
+export const DriftIssueSchema = z.object({
+	id: z.string(),
+	severity: z.enum(["critical", "warning", "info"]),
+	type: z.enum([
+		"journey_stale",
+		"scenario_orphan",
+		"test_missing",
+		"manifest_corrupt",
+		"test_failing",
+		"manifest_missing",
+		"journey_missing",
+		"validation_error",
+		"low_coverage",
+	]),
+	file: z.string(),
+	message: z.string().optional(),
+	auto_fixable: z.boolean().optional(),
+	requires_user_input: z.boolean().optional(),
+});
+
+export const DriftStateSchema = z.object({
+	status: z.enum([
+		"clean",
+		"drift-detected",
+		"remediation-in-progress",
+		"verified",
+	]),
+	last_check: z.string().optional(),
+	issues: z.array(DriftIssueSchema).optional(),
+	summary: z
+		.object({
+			critical: z.number().optional(),
+			warning: z.number().optional(),
+			info: z.number().optional(),
+			total: z.number().optional(),
+		})
+		.optional(),
+});
+
+export const RemediationLogEntrySchema = z.object({
+	timestamp: z.string(),
+	action: z.string(),
+	issue_id: z.string().optional(),
+	agent: z.string().optional(),
+	result: z.enum(["success", "checkpoint", "failed"]),
+});
+
+export const ManifestSchema = z.object({
+	journeys: z.record(z.string(), ManifestJourneySchema).optional(),
+	scenarios: z.record(z.string(), ManifestScenarioSchema).optional(),
+	// Optional drift tracking and remediation history
+	drift_state: DriftStateSchema.optional(),
+	remediation_log: z.array(RemediationLogEntrySchema).optional(),
+});
+
+export type DriftIssue = z.infer<typeof DriftIssueSchema>;
+export type DriftState = z.infer<typeof DriftStateSchema>;
+export type RemediationLogEntry = z.infer<typeof RemediationLogEntrySchema>;
+export type Manifest = z.infer<typeof ManifestSchema>;

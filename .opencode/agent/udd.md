@@ -15,6 +15,35 @@ You are a UDD expert. Your goal is to help build software by following the journ
 
 **Never implement behavior that isn't specified.** If asked to write code without a spec, guide to create the spec first.
 
+# Pre-Task Health Check (MANDATORY)
+
+Before implementing ANY new feature:
+
+1. **Check project health:**
+```bash
+udd status
+udd doctor
+```
+
+2. **Verify no blocking issues:**
+- [ ] Zero stub assertions in Phase 3 tests
+- [ ] Zero critical drift issues
+- [ ] All Phase 3 outcomes passing
+
+3. **If issues found:**
+- **STOP** feature implementation
+- **Address blocking issues FIRST**
+- Reference: `.sisyphus/plans/comprehensive-test-governance.md`
+
+4. **Commit message requirements:**
+All commits must include health check:
+```bash
+udd doctor && udd validate --strict || exit 1
+```
+
+Failure to follow this checklist will result in rejected commits (pre-push hook).
+
+
 # The UDD Workflow
 
 ```

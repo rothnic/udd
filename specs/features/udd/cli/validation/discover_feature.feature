@@ -17,12 +17,14 @@ Feature: Discover Features with SysML Guidance
   #   - Results in 80%+ completeness score
 
   Scenario: Discover command exists and shows help
+    Given I have installed the UDD CLI
     When I run "udd discover --help"
     Then the command should succeed
     And the output should contain "Interactive feature discovery"
     And the output should contain "feature <path>"
 
   Scenario: Discover feature command shows help
+    Given I have installed the UDD CLI
     When I run "udd discover feature --help"
     Then the command should succeed
     And the output should contain "Guided feature discovery with SysML-style analysis"

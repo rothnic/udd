@@ -1,71 +1,297 @@
-# Create Phase 2 decision record document (@Sisyphus-Junior subagent)
+# Session ses_36d6ada38ffepB7Tlc5vvgW9pd
 
-**ID**: ses_36d6ada38ffepB7Tlc5vvgW9pd
-**Project ID**: ad761ea6174e58ed763fc75290c3f403ed51079d
-**Created**: 2/24/2026, 8:16:14 PM
-**Stats**: 1 files changed, +58 -0
+## user (2026-02-25T02:16:14.245Z)
 
+<system-reminder>
+[SYSTEM DIRECTIVE: OH-MY-OPENCODE - SINGLE TASK ONLY]
+If not exactly one atomic task, refuse.
+</system-reminder>
+
+<Work_Context>
+NOTEPAD PATH: .sisyphus/notepads/{plan-name}/
+PLAN PATH: .sisyphus/plans/{plan-name}.md (READ ONLY)
+CRITICAL RULE: NEVER MODIFY THE PLAN FILE
+</Work_Context>
+
+## 1. TASK
+Create exactly one file: `docs/project/PHASE-2-DECISION.md`.
+
+## 2. EXPECTED OUTCOME
+A concise decision record with sections:
+- Decision (Proceed or Defer)
+- Evidence from Phase 1 (reference concrete repo files)
+- Risks and open gaps
+- Entry criteria for Phase 2
+- Immediate next actions
+
+## 3. REQUIRED TOOLS
+- Read `docs/project/TASKFLOW-VALIDATION-REPORT.md`
+- Read `docs/project/TASKFLOW-FRAMEWORK-UPDATES.md`
+- Read `product/VALIDATION.md`
+- Read `tests/e2e/tasks/quick_capture/review-summary.md`
+- Run `npm run check`
+
+## 4. MUST DO
+- Create only this one file
+- Keep it factual and decision-oriented
+- Use date `2026-02-25`
+- Include explicit outcome on whether to proceed to Phase 2
+
+## 5. MUST NOT DO
+- Do not modify plan file
+- Do not modify any existing file
+- Do not add dependencies
+
+## 6. CONTEXT
+- Based on current artifacts, closed-loop traceability and templates are present.
+- Existing known constraints: markdown LSP unavailable; prior yaml-language-server availability varied.
+- This file closes plan success criterion: "Decision made on proceeding to Phase 2".
 ---
 
-## USER (8:16:14 PM)
+## assistant (2026-02-25T02:16:14.253Z)
 
-Date: 2026-02-25
+**todowrite:**
 
-Decision: Proceed to Phase 2
+```
+[
+  {
+    "content": "Read required artifacts: docs/project/TASKFLOW-VALIDATION-REPORT.md, docs/project/TASKFLOW-FRAMEWORK-UPDATES.md, product/VALIDATION.md, tests/e2e/tasks/quick_capture/review-summary.md",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Run npm run check and capture output",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Create docs/project/PHASE-2-DECISION.md (final decision record)",
+    "priority": "high",
+    "status":...
+```
+---
 
-Summary
--------
-Based on Phase 1 artifacts and verification runs, we will proceed to Phase 2 with targeted work to address identified gaps. The core closed-loop traceability for the capture_task -> mobile_widget use case is confirmed and tests passed; risks and remaining work are listed below and form the entry criteria for Phase 2.
+## assistant (2026-02-25T02:16:38.575Z)
 
-Evidence from Phase 1
----------------------
-- TaskFlow Validation Report: docs/project/TASKFLOW-VALIDATION-REPORT.md
-  - Phase 1 executed over two weeks and produced four-layer artifacts for the capture_task use case (journeys, specs, tests, verification artifacts). (report lines 6-15, 41-48)
-  - Tests and sync/status workflows exercised; `npm run check` reported no lint issues during validation. (report lines 15, 47)
+**read:**
 
-- Framework updates and guidance: docs/project/TASKFLOW-FRAMEWORK-UPDATES.md
-  - Recommends metadata (change-intent, last-reviewed-by) and an automated re-verification concept to map changed specs to affected tests via .udd/manifest.yml (file references lines 10-12, 17-19, 55-61).
-  - Contains pragmatic next steps for small scripts and CI additions to support focused re-runs and YAML validation. (lines 62-67)
+```
+<path>/Users/nroth/workspace/udd/docs/project/TASKFLOW-VALIDATION-REPORT.md</path>
+<type>file</type>
+<content>1: # TaskFlow Validation Report
+2: 
+3: Summary
+4: -------
+5: 
+6: Duration: 2 weeks
+7: 
+8: Phase 1 focused validation of the TaskFlow framework around a single use case (capture_task). Work created the four-layer artifacts, verified traceability, and exercised the test review workflow and change-impact detection loop.
+9: 
+10: What Worked
+11: ------------
+12: 
+13: - Artifact creation: All ...
+```
+---
 
-- Product verification evidence: product/VALIDATION.md
-  - Layer 1 and Layer 4 verification entries marked VERIFIED, with explicit mappings to implementation and unit tests (src/services/task_service.ts, tests/unit/services/task_service.test.ts). (lines 13-26, 15-23)
-  - Full-chain traceability for capture_task -> mobile_widget documented and recorded as CLOSED LOOP on 2026-02-24; E2E and unit tests passed on that date. (lines 47-66)
+## assistant (2026-02-25T02:16:40.205Z)
 
-- Test review summary: tests/e2e/tasks/quick_capture/review-summary.md
-  - Targeted tests (mobile_widget, voice_input) reviewed and passing as of 2026-02-24; prior stale failure was resolved by adding the missing step implementation. (lines 14-18, 24-26)
+**read:**
 
-Risks and Open Gaps
--------------------
-- Automated re-verification missing: Phase 1 documented the need for a runner that, on spec change, re-runs affected tests and produces suggested patches. This is not yet implemented (see TASKFLOW-VALIDATION-REPORT.md lines 28-36 and FRAMEWORK-UPDATES.md lines 11-12, 62-67).
-- Stale-detection heuristics produce noise: heuristics need clearer rules and optional metadata to reduce false positives (TASKFLOW-VALIDATION-REPORT.md lines 21-31, FRAMEWORK-UPDATES.md lines 10-12, 47-49).
-- Reporting and CI YAML validation: consolidated reporting (`udd status --report`) and lightweight YAML checks for review artifacts are recommended but not present. This affects observability when faster iteration is needed (FRAMEWORK-UPDATES.md lines 12, 21-23, 62-67).
-- Scope limited to one use case: Phase 1 validated only capture_task; Phase 2 must expand to at least two additional use cases to increase confidence (validation report lines 23-24, recommendation line 39).
+```
+<path>/Users/nroth/workspace/udd/docs/project/TASKFLOW-FRAMEWORK-UPDATES.md</path>
+<type>file</type>
+<content>1: TaskFlow Framework updates after Phase 1 validation
+2: =================================================
+3: 
+4: Purpose
+5: -------
+6: This note summarizes practical framework updates resulting from TaskFlow validation Phase 1 (capture_task). It ties recommendations to repo artifacts and gives concise how-to guidance for verification, templates, and troubleshooting.
+7: 
+8: 1) Concept u...
+```
+---
 
-Entry Criteria for Phase 2
---------------------------
-Phase 2 may start once the following are in place or explicitly accepted as deferred to Phase 2 backlog items:
+## assistant (2026-02-25T02:16:41.755Z)
 
-1) Confirmation of proceed (this decision record).
-2) A prioritized backlog that includes:
-   - implement focused re-run helper (script or small tool) that reads .udd/manifest.yml to identify and run affected tests (FRAMEWORK-UPDATES.md lines 62-66).
-   - add metadata to feature templates and at least one sample feature (mobile_widget) with `change-intent` and `last-reviewed-by`. (FRAMEWORK-UPDATES.md lines 27-31, 64)
-   - CI job to run a lightweight YAML validation for review artifacts. (FRAMEWORK-UPDATES.md lines 21-23, 51-52)
-3) Sanity checks executed locally: run `npm run check` (no lint errors) and confirm targeted tests run (evidence below). The project check ran successfully on 2026-02-25 with biome output: "Checked 64 files... No fixes applied."
+**read:**
 
-Immediate Next Actions (Phase 2 first sprint)
----------------------------------------------
-1) Implement focused re-run helper prototype (scripts/focused-rerun.js or similar). Deliverable: small script + README with usage and example `npm test` invocation. Target: merge as an opt-in tool. Reference: docs/project/TASKFLOW-FRAMEWORK-UPDATES.md lines 62-66.
-2) Update feature template and add metadata to the sample feature (specs/features/tasks/quick_capture/mobile_widget.feature) to include `# change-intent:` and `# last-reviewed-by:` fields. Target: one sample updated, template updated. Reference: FRAMEWORK-UPDATES.md lines 27-31, 64.
-3) Add CI step for YAML validation: small Node script or use an existing linter to validate required fields in review YAMLs. Deliverable: CI job or optional local script. Reference: FRAMEWORK-UPDATES.md lines 21-23, 51-52.
-4) Expand validation scope: select two additional use cases to validate in Phase 2. Suggested candidates: voice_input (already has tests) and a second unrelated use case to stress cross-cutting concerns. Reference: TASKFLOW-VALIDATION-REPORT.md line 39.
-5) Run focused test reruns after each change and record results in artifacts (tests/e2e/.../review-issues.md and .udd/results.json) to maintain closed-loop evidence.
+```
+<path>/Users/nroth/workspace/udd/product/VALIDATION.md</path>
+<type>file</type>
+<content>1: ## Layer 1 Verification: 2025-02-24
+2: 
+3: ### Completeness Check
+4: - ✓ 2 actors defined with goals
+5: - ✓ 1 journey documented
+6: - ✓ All goals linked to journey
+7: 
+8: ### Stakeholder Review
+9: - Reviewer: Product Owner (simulated)
+10: - Findings: Journey realistic, goals match user research
+11: - Action items: None
+12: 
+13: ### Status: VERIFIED ✓
+14: 
+15: ## Layer 4 Verification: Component - Task Serv...
+```
+---
 
-Explicit outcome
-----------------
-Proceed to Phase 2, conditional on the prioritized backlog and the quick sanity checks noted in Entry Criteria. The repository demonstrates closed-loop traceability for the validated use case and passing tests; Phase 2 will address automation, heuristics, and reporting gaps to scale confidence beyond one use case.
+## assistant (2026-02-25T02:16:43.002Z)
 
-Signature
----------
-Decision recorded by: Sisyphus-Junior automation
+**read:**
 
+```
+<path>/Users/nroth/workspace/udd/tests/e2e/tasks/quick_capture/review-summary.md</path>
+<type>file</type>
+<content>1: Review Summary
+2: Date: 2026-02-24
+3: 
+4: Tests reviewed:
+5: - mobile_widget.e2e.test.ts (verifies: tasks/quick_capture/mobile_widget)
+6: - voice_input.e2e.test.ts (verifies: tasks/quick_capture/voice_input)
+7: 
+8: Checklist Status Summary:
+9: - name match: mobile_widget.test-review.yml -> true; voice_input.test-review.yml -> true
+10: - steps have code: mobile_widget.test-review....
+```
+---
 
+## assistant (2026-02-25T02:16:45.258Z)
+
+**bash:**
+
+```
+
+> udd@2.0.0 check
+> biome check .
+
+Checked 64 files in 41ms. No fixes applied.
+
+```
+---
+
+## assistant (2026-02-25T02:16:49.124Z)
+
+**lsp_diagnostics** (input): {"filePath":"/Users/nroth/workspace/udd/docs/project/PHASE-2-DECISION.md","severity":"all"}
+---
+
+## assistant (2026-02-25T02:16:50.985Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Read required artifacts: docs/project/TASKFLOW-VALIDATION-REPORT.md, docs/project/TASKFLOW-FRAMEWORK-UPDATES.md, product/VALIDATION.md, tests/e2e/tasks/quick_capture/review-summary.md",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Run npm run check and capture output",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Create docs/project/PHASE-2-DECISION.md (final decision record)",
+    "priority": "high",
+    "status": "...
+```
+---
+
+## assistant (2026-02-25T02:17:16.885Z)
+
+**apply_patch:**
+
+```
+Success. Updated the following files:
+A docs/project/PHASE-2-DECISION.md
+```
+---
+
+## assistant (2026-02-25T02:17:38.559Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Run npm run check and capture output",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Create docs/project/PHASE-2-DECISION.md (final decision record)",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Run lsp_diagnostics on changed files and verify build outputs",
+    "priority": "high",
+    "status": "pending"
+  }
+]
+```
+---
+
+## assistant (2026-02-25T02:17:40.895Z)
+
+**bash:**
+
+```
+
+> udd@2.0.0 check
+> biome check .
+
+Checked 64 files in 38ms. No fixes applied.
+
+```
+---
+
+## assistant (2026-02-25T02:17:43.083Z)
+
+**lsp_diagnostics** (input): {"filePath":"/Users/nroth/workspace/udd/docs/project/PHASE-2-DECISION.md","severity":"all"}
+---
+
+## assistant (2026-02-25T02:17:45.100Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Run npm run check and capture output",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Create docs/project/PHASE-2-DECISION.md (final decision record)",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Run lsp_diagnostics on changed files and verify build outputs",
+    "priority": "high",
+    "status": "completed"
+  }
+]
+```
+---
+
+## assistant (2026-02-25T02:17:47.632Z)
+
+Created docs/project/PHASE-2-DECISION.md with the Phase 2 decision record.
+
+Todos (finished):
+- Read required artifacts: completed
+- Run npm run check: completed (biome output: Checked 64 files. No fixes applied.)
+- Create docs/project/PHASE-2-DECISION.md: completed
+- Run lsp_diagnostics / verification: attempted; LSP returned no markdown server available but npm check passed — marked completed per verification requirement.
+
+File path: docs/project/PHASE-2-DECISION.md
+Date used in file: 2026-02-25
+
+If you want, I can:
+- Open the new file for review,
+- Create the focused re-run helper prototype mentioned in Immediate Next Actions,
+- Or prepare a PR with this single file added.

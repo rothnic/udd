@@ -11,3 +11,12 @@ outcomes:
   - description: "Agent guides user through UDD process"
     scenarios:
       - "udd/agent/guide_user"
+  - description: "Agent can check deep status"
+    scenarios:
+      - "opencode/tools/status_deep"
+  - description: "Agent can get next recommendation"
+    scenarios:
+      - "opencode/tools/next_recommendation"
+  - description: "Agent can list all issues"
+    scenarios:
+      - "opencode/tools/issues_list"

@@ -1,0 +1,38 @@
+#!/bin/sh
+# Commit message template for UDD project
+# Use Conventional Commits as the base: https://www.conventionalcommits.org/
+# Example: feat(scope): short description [health:✓]
+#   - type: feat, fix, chore, docs, refactor, test, perf, ci
+#   - scope: optional (area or package)
+#   - description: concise imperative summary (max ~72 chars)
+# Health indicator legend:
+#   [health:✓]  - All health checks passed (udd doctor, no stub assertions)
+#   [health:⚠]  - Warnings present (non-critical; please investigate)
+#   [health:✗]  - Blocking issues detected (do not push until resolved)
+#
+# BEFORE YOU COMMIT
+# 1) Run the health checks locally:
+#      udd doctor        # quick diagnostic
+#      udd status        # confirm journey/scenario/test coverage
+# 2) Ensure there are no stub assertions in Phase 3 tests:
+#      rg "expect(true).toBe(true)" tests/ || true
+#    If any are present, either replace with a real assertion or tag the
+#    scenario with @phase:4 and open an issue tracking completion.
+# 3) Run relevant tests (or the smoke test):
+#      bun run test       # or `bun run test:smoke` if available
+#
+# Commit message format (one-line summary, optional body)
+# -------------------------------------------------------
+# <type>(<scope>): <short description> [health:✓|⚠|✗]
+#
+# Long description / details (optional):
+# - Explain WHY the change was made, not HOW.
+# - Reference related journeys, feature files, or issue IDs when applicable.
+# - If you deliberately bypassed a health check, explain why and link issue.
+#
+# Examples:
+# feat(auth): add token refresh endpoint [health:✓]
+# fix(cli): handle missing config file gracefully [health:⚠]
+# docs: update onboarding guide for API keys [health:✓]
+
+# ---------------- (END TEMPLATE) ----------------

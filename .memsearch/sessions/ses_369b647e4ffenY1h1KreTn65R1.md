@@ -1,66 +1,78 @@
-# Update README.md with architecture section (@Sisyphus-Junior subagent)
+# Session ses_369b647e4ffenY1h1KreTn65R1
 
-**ID**: ses_369b647e4ffenY1h1KreTn65R1
-**Project ID**: ad761ea6174e58ed763fc75290c3f403ed51079d
-**Created**: 2/25/2026, 1:32:19 PM
-**Stats**: 1 files changed, +46 -0
+## user (2026-02-25T19:32:19.836Z)
 
----
+<system-reminder>
 
-## USER (1:32:19 PM)
+[SYSTEM DIRECTIVE: OH-MY-OPENCODE - SINGLE TASK ONLY]
 
-# User Driven Development (UDD)
+**STOP. READ THIS BEFORE PROCEEDING.**
 
-A spec-first CLI tool where **user journeys are requirements** and **BDD scenarios are tests**. Features are done when E2E tests pass.
+If you were NOT given **exactly ONE atomic task**, you MUST:
+1. **IMMEDIATELY REFUSE** this request
+2. **DEMAND** the orchestrator provide a single, specific task
 
-## Quick Start
+**Your response if multiple tasks detected:**
+> "I refuse to proceed. You provided multiple tasks. An orchestrator's impatience destroys work quality.
+> 
+> PROVIDE EXACTLY ONE TASK. One file. One change. One verification.
+> 
+> Your rushing will cause: incomplete work, missed edge cases, broken tests, wasted context."
 
-```bash
-# Initialize in your project
-npx udd init
+**WARNING TO ORCHESTRATOR:**
+- Your hasty batching RUINS deliverables
+- Each task needs FULL attention and PROPER verification  
+- Batch delegation = sloppy work = rework = wasted tokens
 
-# Sync journeys to scenarios
-udd sync
+**REFUSE multi-task requests. DEMAND single-task clarity.**
+</system-reminder>
 
-# Check status
-udd status
-```
+<Work_Context>
+## Notepad Location (for recording learnings)
+NOTEPAD PATH: .sisyphus/notepads/{plan-name}/
+- learnings.md: Record patterns, conventions, successful approaches
+- issues.md: Record problems, blockers, gotchas encountered
+- decisions.md: Record architectural choices and rationales
+- problems.md: Record unresolved issues, technical debt
 
-## How It Works
+You SHOULD append findings to notepad files after completing work.
+IMPORTANT: Always APPEND to notepad files - never overwrite or use Edit tool.
 
-```
-product/journeys/  →→→  specs/<domain>/*.feature  →→→  tests/<domain>/*.e2e.test.ts
-  (what users do)        (testable behaviors)          (verification)
-```
+## Plan Location (READ ONLY)
+PLAN PATH: .sisyphus/plans/{plan-name}.md
 
-1. **Define journeys** in `product/journeys/` - what users accomplish
-2. **Run `udd sync`** - generates BDD scenarios from journeys  
-3. **Implement code** - make the tests pass
-4. **Iterate** - update journeys, sync again
+CRITICAL RULE: NEVER MODIFY THE PLAN FILE
 
-## Project Structure
+The plan file (.sisyphus/plans/*.md) is SACRED and READ-ONLY.
+- You may READ the plan to understand tasks
+- You may READ checkbox items to know what to do
+- You MUST NOT edit, modify, or update the plan file
+- You MUST NOT mark checkboxes as complete in the plan
+- Only the Orchestrator manages the plan file
 
-```
-product/                          # Human-authored
-├── README.md                     # Product overview
-├── actors.md                     # Who uses it
-├── constraints.md                # NFRs, hard rules
-├── changelog.md                  # Decision history (auto)
-└── journeys/                     # User outcomes
-    └── new_user_onboarding.md
+VIOLATION = IMMEDIATE FAILURE. The Orchestrator tracks plan state.
+</Work_Context>
 
-specs/                            # Agent-generated
-├── .udd/manifest.yml             # Traceability (auto)
-└── auth/
-    ├── signup.feature
-    └── login.feature
+## 1. TASK
+Update `README.md` to add architecture section explaining the three-tier structure. This is Phase 4 Task 4.1.
 
-tests/                            # Agent-generated
-└── auth/
-    ├── signup.e2e.test.ts
-    └── login.e2e.test.ts
-```
- 
+**Current README.md structure** (read it first):
+1. Title and tagline
+2. Quick Start
+3. How It Works
+4. Project Structure (generic template)
+5. Commands
+6. SysML-Informed Discovery
+7. Creating Features section
+8. Feature Templates
+9. Journey Format
+10. Feature Evolution
+11. vitest-cucumber Integration
+12. License
+
+**Add the following section** after the "Project Structure" section (around line 51) and before "Commands":
+
+```markdown
 ## Repository Structure
 
 UDD uses a three-tier architecture that separates concerns:
@@ -106,135 +118,233 @@ This repository demonstrates the full UDD workflow:
 - **product/** - UDD managing itself
 - **examples/** - Standalone projects users can copy
 - **docs/** - Reference documentation
+```
 
-## Commands
+## 2. EXPECTED OUTCOME
+- [ ] New "Repository Structure" section added after "Project Structure"
+- [ ] New "Dogfooding" section added after "Repository Structure"
+- [ ] Sections appear before "Commands"
+- [ ] Markdown formatting is correct
+- [ ] File reads cleanly
 
-| Command | Purpose |
-|---------|---------|
-| `udd init` | Initialize product/ structure with interview |
-| `udd sync` | Detect journey changes, propose scenarios |
-| `udd status` | Show journey → scenario → test coverage |
-| `udd new journey <slug>` | Create new journey file |
-| `udd new scenario <domain> <action>` | Create scenario + test stub |
-| `udd new feature <domain> <feature-name>` | Create feature file from SysML-informed template |
-| `udd discover feature <domain> <name>` | Interactive feature discovery with SysML principles |
-| `udd lint` | Validate spec structure |
-| `udd validate` | Check feature scenario completeness |
+## 3. REQUIRED TOOLS
+- Use `Read` to check current file
+- Use `Edit` to insert new sections
 
-## SysML-Informed Discovery
+## 4. MUST DO
+- Read README.md first
+- Insert after "Project Structure" section (around line 51)
+- Use exact content provided
+- Preserve all existing content
 
-UDD uses **SysML principles to create richer feature scenarios** without adding complexity:
+## 5. MUST NOT DO
+- Do NOT remove existing sections
+- Do NOT change other content
+- Do NOT modify after "Commands" section
 
-- 📝 Document user needs and alternatives in feature comments
-- 🎯 Comprehensive scenarios covering edge cases
-- 🤔 Structured thinking about requirements
-- 🤖 Agent-assisted discovery workflow
+## 6. CONTEXT
+### Plan Reference
+- Phase 4 Task 4.1 from `.sisyphus/plans/udd-complete-reorganization-plan.md`
+- Lines 493-527
 
-Use `udd discover feature` for guided requirements analysis or see [docs/sysml-informed-discovery.md](docs/sysml-informed-discovery.md) for examples.
+### Current State
+- README.md exists with current content
+- Need to add architecture explanation between Project Structure and Commands
 
-## Creating Features: Which Command to Use?
-
-UDD provides three different ways to create feature files, each optimized for different workflows:
-
-### `udd new scenario` - Quick, Simple Scenarios
-**Use when:** You need a basic feature file and test stub quickly.
+### Verification
+After changes, verify:
 ```bash
-udd new scenario auth login
+head -100 README.md | tail -60
+# Should show new Repository Structure and Dogfooding sections
 ```
-- Creates: `specs/auth/login.feature` (simple scenario)
-- Creates: `tests/auth/login.e2e.test.ts` (test stub)
-- Best for: Simple, single-scenario features or when rapid prototyping
-- Context: Minimal (just basic Given/When/Then)
+---
 
-### `udd new feature` - Template-Based Features
-**Use when:** You want a structured starting point with SysML context sections.
-```bash
-udd new feature reporting export_csv
-```
-- Creates: `specs/features/reporting/export_csv/export_csv.feature` (from template)
-- Includes: User needs, alternatives, success criteria, multiple scenario patterns
-- Best for: Complex features requiring thoughtful design documentation
-- Context: Rich template with comment sections prompting for context
-- **Does NOT create test files** - you write those after defining scenarios
+## assistant (2026-02-25T19:32:19.845Z)
 
-### `udd discover feature` - Interactive Discovery
-**Use when:** You want guided, interview-style feature creation.
-```bash
-udd discover feature reporting/csv-export
-```
-- Creates: Feature file through interactive prompts
-- Includes: All SysML sections filled in based on your answers
-- Best for: When you need help thinking through requirements systematically
-- Context: Fully guided with questions about users, alternatives, edge cases
-
-**Summary:**
-- **`new scenario`** = Fast & minimal → `specs/<domain>/` (flat structure)
-- **`new feature`** = Template with guidance → `specs/features/<domain>/<name>/` (nested structure)
-- **`discover feature`** = Interactive interview → Wherever specified
-
-## Feature Templates
-
-The `udd new feature` command uses `templates/feature-template.feature` which includes:
-- **User Need Context** - Who needs this and why
-- **Alternatives Considered** - Document design decisions
-- **Success Criteria** - Measurable outcomes
-- **Comprehensive Scenarios** - Happy path, errors, and edge cases
-
-See [examples/feature-features/](examples/feature-features/) for complete examples like `export_data.feature` and `password_reset.feature`.
-
-**Manual Usage:**
-```bash
-cp templates/feature-template.feature specs/features/<domain>/<feature-name>/<feature-name>.feature
-# Edit placeholders with your feature details
-```
-
-## Journey Format
-
-```markdown
-# Journey: New User Onboarding
-
-**Actor:** User  
-**Goal:** Sign up and start using the app
-
-## Steps
-
-1. User signs up → `specs/auth/signup.feature`
-2. User creates first task → `specs/tasks/create.feature`
-
-## Success
-
-User has created their first task within 5 minutes.
-```
-
-## Feature Evolution
-
-Split features as they grow:
+**todowrite:**
 
 ```
-specs/auth/
-├── login_basic.feature       # Email + password
-├── login_2fa.feature         # Two-factor
-└── login_social.feature      # OAuth
+[
+  {
+    "content": "Read README.md to find insertion point",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Insert 'Repository Structure' and 'Dogfooding' sections after Project Structure and before Commands using exact content",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Run lsp_diagnostics on README.md to ensure no diagnostics on changed files",
+    "priority": "medium",
+    "status": "pending"
+  },
+  {
+    "content": "Verify insertion ...
 ```
+---
 
-## vitest-cucumber Integration
+## assistant (2026-02-25T19:32:26.532Z)
 
-Uses [@amiceli/vitest-cucumber](https://github.com/amiceli/vitest-cucumber):
+**read:**
 
-```typescript
-import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
-
-const feature = await loadFeature("specs/auth/signup.feature");
-
-describeFeature(feature, ({ Scenario }) => {
-  Scenario("User signs up with email", ({ Given, When, Then }) => {
-    // Step implementations
-  });
-});
 ```
+<path>/Users/nroth/workspace/udd/README.md</path>
+<type>file</type>
+<content>1: # User Driven Development (UDD)
+2: 
+3: A spec-first CLI tool where **user journeys are requirements** and **BDD scenarios are tests**. Features are done when E2E tests pass.
+4: 
+5: ## Quick Start
+6: 
+7: ```bash
+8: # Initialize in your project
+9: npx udd init
+10: 
+11: # Sync journeys to scenarios
+12: udd sync
+13: 
+14: # Check status
+15: udd status
+16: ```
+17: 
+18: ## How It Works
+19: 
+20: ```
+21: product/journeys/  →→...
+```
+---
 
-## License
+## assistant (2026-02-25T19:32:27.823Z)
 
-MIT
+**todowrite:**
 
+```
+[
+  {
+    "content": "Read README.md to find insertion point",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Insert 'Repository Structure' and 'Dogfooding' sections after Project Structure and before Commands using exact content",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Run lsp_diagnostics on README.md to ensure no diagnostics on changed files",
+    "priority": "medium",
+    "status": "pending"
+  },
+  {
+    "content": "Verify insert...
+```
+---
 
+## assistant (2026-02-25T19:32:36.719Z)
+
+**apply_patch:**
+
+```
+Success. Updated the following files:
+M README.md
+```
+---
+
+## assistant (2026-02-25T19:32:40.676Z)
+
+**lsp_diagnostics** (input): {"filePath":"/Users/nroth/workspace/udd/README.md","severity":"all"}
+---
+
+## assistant (2026-02-25T19:32:41.891Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Read README.md to find insertion point",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Insert 'Repository Structure' and 'Dogfooding' sections after Project Structure and before Commands using exact content",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Run lsp_diagnostics on README.md to ensure no diagnostics on changed files",
+    "priority": "medium",
+    "status": "completed"
+  },
+  {
+    "content": "Verify inse...
+```
+---
+
+## assistant (2026-02-25T19:32:43.836Z)
+
+**bash:**
+
+```
+specs/                            # Agent-generated
+├── .udd/manifest.yml             # Traceability (auto)
+└── auth/
+    ├── signup.feature
+    └── login.feature
+
+tests/                            # Agent-generated
+└── auth/
+    ├── signup.e2e.test.ts
+    └── login.e2e.test.ts
+```
+ 
+## Repository Structure
+
+UDD uses a three-tier architecture that separates concerns:
+
+```
+product/          # UDD's own requirements (dogfooding)
+├── journeys/     # User journeys for UDD features
+├── actors.md     ...
+```
+---
+
+## assistant (2026-02-25T19:32:45.322Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Verify insertion by running head -100 README.md | tail -60 and confirm new sections appear before Commands",
+    "priority": "medium",
+    "status": "completed"
+  }
+]
+```
+---
+
+## assistant (2026-02-25T19:32:47.727Z)
+
+Step 1 — todo list (created)
+- Read README.md to find insertion point — completed
+- Insert 'Repository Structure' and 'Dogfooding' sections after Project Structure and before Commands using exact content — completed
+- Run lsp_diagnostics on README.md to ensure no diagnostics on changed files — completed (no MD LSP configured; reported)
+- Verify insertion by running head -100 README.md | tail -60 and confirm new sections appear before Commands — completed
+
+Change made
+- I inserted the exact "Repository Structure" and "Dogfooding" sections in README.md after the "Project Structure" block and before "Commands" as requested.
+
+Verification
+- Output of head -100 README.md | tail -60 (shows the new sections and that they appear before "Commands") was produced and confirms placement.
+
+Notes
+- lsp_diagnostics returned an error: no LSP server configured for .md files. This is informational only; the markdown file itself was updated and reads cleanly.
+- I did not modify any other content.
+
+If you want, I can:
+- Commit the change (I did not create a git commit because you didn't explicitly request one), or
+- Adjust wording, or
+- Add the same section to other documentation files.

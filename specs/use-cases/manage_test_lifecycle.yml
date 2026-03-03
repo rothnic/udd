@@ -1,0 +1,17 @@
+id: manage_test_lifecycle
+name: Manage Test Lifecycle
+summary: "Define, run, retire, and review tests across their lifecycle with clear ownership and automation"
+phase: 3
+actors:
+  - developer
+  - agent
+outcomes:
+  - description: "Tests have lifecycle states (draft, active, deprecated)"
+    scenarios:
+      - "udd/test-governance/test-review"
+  - description: "Hooks and CI integrate with lifecycle events"
+    scenarios:
+      - "udd/test-governance/hooks-installation"
+  - description: "Pre-commit tooling respects test lifecycle"
+    scenarios:
+      - "udd/test-governance/pre-commit-validation"

@@ -9,7 +9,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { describe, expect, test } from "vitest";
-import { runUdd } from "../../../utils.js";
+import { runUdd, withTempDir } from "../../../utils.js";
 
 const feature = await loadFeature(
 	"specs/features/opencode/tools/udd_status_tool.feature",
@@ -323,5 +323,86 @@ if (!_hasRunnable) {
 				});
 			},
 		);
+
+		Scenario(
+			"Fail gracefully when UDD is not initialized",
+			({ Given, When, Then, And }) => {
+				let result: { stdout: string; stderr: string; exitCode?: number };
+
+				Given("a repository without UDD initialized", async () => {
+					// Run inside a temp dir without calling udd init
+					await withTempDir(async () => {
+						// nothing to do here; cwd is the temp repo
+					});
+				});
+
+				When('the orchestrator runs "udd status --json"', async () => {
+					// runUdd must be executed from the tempdir context. Create a new temp dir and run there.
+					await withTempDir(async () => {
+						result = await runUdd("status --json");
+					});
+				});
+
+				Then("it should return an error object containing:", () => {
+					// stderr should include guidance and exit code should indicate error
+					expect(result).toBeDefined();
+					expect(result.stderr || result.stdout).toContain(
+						"UDD not initialized",
+					);
+					// Some runtimes set exitCode on the error object; allow either
+					expect(
+						result.exitCode === undefined ||
+							result.exitCode === 2 ||
+							result.exitCode === 1,
+					).toBeTruthy();
+				});
+
+				And(
+					'the message should advise: "Run `udd init` to create product/journeys/ and try again"',
+					() => {
+						expect(result.stderr || result.stdout).toContain("Run `udd init`");
+					},
+				);
+			},
+		);
+
+		Scenario("Handle empty project status", ({ Given, When, Then, And }) => {
+			let status: Record<string, unknown>;
+
+			Given(
+				"an initialized UDD project with no journeys and no tests",
+				async () => {
+					await withTempDir(async () => {
+						// initialize udd but do not create journeys
+						await runUdd("init --yes");
+					});
+				},
+			);
+
+			When('the orchestrator runs "udd status --json"', async () => {
+				await withTempDir(async () => {
+					const res = await runUdd("status --json");
+					status = JSON.parse(res.stdout);
+				});
+			});
+
+			Then("it should return a JSON object where:", () => {
+				expect(status).toBeDefined();
+				expect(status.current_phase).toBeDefined();
+				expect(status.current_phase).toBe(0);
+				expect(status.features).toEqual({});
+				expect(status.use_cases).toEqual({});
+				expect(Array.isArray(status.orphaned_scenarios)).toBe(true);
+				expect((status.orphaned_scenarios as unknown[]).length).toBe(0);
+			});
+
+			And(
+				'the recommendation should be: "Create journeys with `udd new journey <name>`"',
+				() => {
+					expect(status.recommendation).toBeDefined();
+					expect(status.recommendation as string).toContain("udd new journey");
+				},
+			);
+		});
 	});
 }

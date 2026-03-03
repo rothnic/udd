@@ -14,6 +14,42 @@ export interface ValidationResult {
 	errors: string[];
 }
 
+/**
+ * Validate journey markdown files for feature references.
+ * Returns an array of error strings (empty if none).
+ */
+export async function validateJourneyReferences(): Promise<string[]> {
+	const errors: string[] = [];
+	const rootDir = process.cwd();
+	const journeyFiles = await glob("product/journeys/*.md", { cwd: rootDir });
+	const re = /→\s*`([^`]+\.feature)`/g;
+
+	for (const file of journeyFiles) {
+		try {
+			const absPath = path.join(rootDir, file);
+			const content = await fs.readFile(absPath, "utf-8");
+
+			for (const match of content.matchAll(re)) {
+				const matchedPath = match[1];
+				const matchIndex = match.index ?? 0;
+				const line = content.slice(0, matchIndex).split("\n").length;
+
+				if (!matchedPath.startsWith("specs/features/")) {
+					errors.push(
+						`${file}:${line} - Invalid feature reference "${matchedPath}". Must use 'specs/features/' prefix`,
+					);
+				}
+			}
+		} catch (err) {
+			// If the file disappears between glob and read, skip it
+			if ((err as { code?: string }).code === "ENOENT") continue;
+			errors.push(`${file}: Error reading file`);
+		}
+	}
+
+	return errors;
+}
+
 export async function validateSpecs(): Promise<ValidationResult> {
 	const errors: string[] = [];
 	const rootDir = process.cwd();
@@ -155,6 +191,14 @@ export async function validateSpecs(): Promise<ValidationResult> {
 	});
 	if (scenarioFiles.length === 0) {
 		errors.push("No scenario files found");
+	}
+
+	// 6. Validate journey references in product/journeys/*.md
+	try {
+		const journeyErrors = await validateJourneyReferences();
+		for (const e of journeyErrors) errors.push(e);
+	} catch (err) {
+		errors.push("Error validating journey references");
 	}
 
 	return {

@@ -1,221 +1,336 @@
-# Create T16 udd-agent-operations.md (@Sisyphus-Junior subagent)
+# Session ses_36a2af843ffeEPkTHJLWuA046j
 
-**ID**: ses_36a2af843ffeEPkTHJLWuA046j
-**Project ID**: ad761ea6174e58ed763fc75290c3f403ed51079d
-**Created**: 2/25/2026, 11:24:52 AM
-**Stats**: 3 files changed, +359 -0
+## user (2026-02-25T17:24:52.503Z)
+
+<system-reminder>
+
+[SYSTEM DIRECTIVE: OH-MY-OPENCODE - SINGLE TASK ONLY]
+
+**STOP. READ THIS BEFORE PROCEEDING.**
+
+If you were NOT given **exactly ONE atomic task**, you MUST:
+1. **IMMEDIATELY REFUSE** this request
+2. **DEMAND** the orchestrator provide a single, specific task
+
+**Your response if multiple tasks detected:**
+> "I refuse to proceed. You provided multiple tasks. An orchestrator's impatience destroys work quality.
+> 
+> PROVIDE EXACTLY ONE TASK. One file. One change. One verification.
+> 
+> Your rushing will cause: incomplete work, missed edge cases, broken tests, wasted context."
+
+**WARNING TO ORCHESTRATOR:**
+- Your hasty batching RUINS deliverables
+- Each task needs FULL attention and PROPER verification  
+- Batch delegation = sloppy work = rework = wasted tokens
+
+**REFUSE multi-task requests. DEMAND single-task clarity.**
+</system-reminder>
+
+## 1. TASK
+Create docs/process/udd-agent-operations.md for agent operations playbook.
+
+## 2. EXPECTED OUTCOME
+- [ ] File created: docs/process/udd-agent-operations.md
+- [ ] Agent workflow: check status → suggest → confirm → apply → verify
+- [ ] Handoff protocol
+- [ ] Traceability update steps
+- [ ] npm run check passes
+
+## 3. REQUIRED TOOLS
+- read: .sisyphus/evidence/phase2/task-16-agent-flow.md, task-16-handoff.md
+- write: Create agent operations doc
+- bash: npm run check
+
+## 4. MUST DO
+- Read evidence files first
+- Define agent workflow steps
+- Document handoff protocol
+- Include traceability update procedures
+- Verify with npm run check
+
+## 5. MUST NOT DO
+- Do NOT modify plan file
+- Do NOT edit evidence files
+- Do NOT create additional files
+- Do NOT commit
+
+## 6. CONTEXT
+T16: Agent operations playbook for AI-assisted workflows.
+
+Return confirmation when complete.
 
 ---
 
-## USER (11:26:00 AM)
+## assistant (2026-02-25T17:24:52.512Z)
 
-# Template Refactor Guide
-
-Purpose
-- Provide a clear path to align existing templates with the Phase 2 concept taxonomy (journeys, capabilities, scenarios, manifests).
-- Record legacy field deprecations and provide a compliance checklist for authors and automated checks.
-
-Scope
-- This guide applies to template files under `templates/` and to any new journey or feature templates used by `udd` commands.
-- Do not edit evidence files or change existing templates as part of this migration. Create updated templates separately and follow the checklist below.
-
-Concept taxonomy mapping
-- Journey (product/journeys/*.md)
-  - Narrative: human-facing story, actor, goal, steps, success criteria.
-  - Manifest: small traceable mapping to scenarios in `specs/` (example: steps referencing `specs/.../*.feature`).
-  - Template alignment: journey templates must include Actor, Goal, Steps, Success, and explicit references to scenario paths.
-
-- Capability (specs/features/<capability>/)
-  - Narrative: capability README describing actor, constraints, and scope.
-  - Manifest: `_feature.yml` that provides feature id and list of scenarios.
-  - Template alignment: feature templates should focus on a single user goal and include the mandatory metadata block (id, capability, actor, goal, priority, created_by, created_at).
-
-- Scenario (specs/**/*.feature)
-  - Narrative: Gherkin scenarios (happy path, alternatives, errors, edge cases, performance). Use the SysML-informed feature template for guidance.
-  - Manifest: scenario metadata block at top (YAML-style comment block) matching schema in docs/architecture/scenario-metadata-policy.md.
-  - Template alignment: include preamble metadata, structured Background, and Scenario sections following existing `templates/feature-template.feature` prompts.
-
-- Manifest (specs/.udd/manifest.yml)
-  - Purpose: traceability between journeys and scenarios. Journeys will reference scenario ids; manifest stores hashes for staleness detection.
-
-Journey template patterns (narrative + map + manifest)
-- Narrative: A short human-readable page that answers Who, What, Why, Success. Keep example steps minimal but actionable.
-- Map: For each step list the corresponding scenario path in code fences. Use arrows and `specs/...` references (example: "1. User signs up → `specs/auth/signup.feature`").
-- Manifest snippet: Add a small code block example showing how the journey maps to manifest entries, for maintainers to update `specs/.udd/manifest.yml` when syncing.
-
-Example journey template (pattern)
+**todowrite:**
 
 ```
-# Journey: {{JOURNEY_NAME}}
-
-**Actor:** {{ACTOR}}
-**Goal:** {{GOAL}}
-
-## Steps
-
-1. {{STEP_1}} → `specs/{{DOMAIN}}/{{ACTION}}.feature`
-
-## Success
-
-{{SUCCESS_CRITERIA}}
-
-<!-- Manifest mapping (example) -->
+[
+  {
+    "content": "Read evidence files: .sisyphus/evidence/phase2/task-16-agent-flow.md and .sisyphus/evidence/phase2/task-16-handoff.md",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Draft and create docs/process/udd-agent-operations.md with agent workflow, handoff protocol, and traceability update steps",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Run lsp_diagnostics on docs/process/udd-agent-operations.md",
+    "priority": "high",
+ ...
 ```
+---
 
-Legacy field deprecations
-- Deprecated: `feature`-centric `id` usages in product/journeys frontmatter. Use `id` only inside scenario metadata and `_feature.yml` manifests under `specs/features`.
-- Deprecated: `phase` inline markers outside metadata block. Move `@phase:N` into the preamble metadata block as `phase: N` when possible or keep `@phase:N` as a temporary migration alias.
-- Deprecated: `goal_detail`, `owner`, and `ticket` freeform fields inside journey files. Replace with standardized fields: `actor`, `goal`, `created_by`, `created_at`, and `related`.
+## assistant (2026-02-25T17:25:11.904Z)
 
-Migration notes
-- Do not modify existing templates or evidence files directly. Produce new templates and run `udd sync` in a branch to verify generated scenarios.
-- When migrating legacy journeys or scenarios, follow these steps:
-  1. Copy legacy content into new journey template, fill Actor and Goal fields.
-  2. Replace deprecated fields with the standard metadata keys.
-  3. Add explicit scenario path references for each step.
-  4. Update `specs/.udd/manifest.yml` by running `udd sync` which will compute new hashes and detect staleness.
+**read** (input): {"filePath":"/Users/nroth/workspace/udd/.sisyphus/evidence/phase2/task-16-agent-flow.md"}
+---
 
-Checklist for template compliance
-- File-level
-  - [ ] Journey templates include: Actor, Goal, Steps, Success.
-  - [ ] Feature templates include mandatory metadata block: id, capability, actor, goal, priority, created_by, created_at.
-  - [ ] Scenario templates include YAML-style metadata preamble and `@phase:N` if phase > 1.
+## assistant (2026-02-25T17:25:13.401Z)
 
-- Content-level
-  - [ ] Goals are one-line, user-outcome focused.
-  - [ ] Alternatives section documents rejected and chosen approaches with reasons.
-  - [ ] Success criteria are measurable and testable.
-  - [ ] Scenarios include happy path, at least one error case, and at least one edge case.
-
-- Manifest & traceability
-  - [ ] Each journey lists exact `specs/...` paths for its steps.
-  - [ ] All scenario `id` values are unique across `specs/` and `product/journeys/` metadata blocks.
-  - [ ] Capability tag in scenario metadata matches parent directory name.
-
-- Deprecation checks
-  - [ ] No use of deprecated fields (`goal_detail`, `owner`, `ticket`) in new templates.
-  - [ ] `phase` is specified via `@phase:N` preamble or converted to `phase: N` in metadata.
-
-Automated checks to add or run
-- Repository CI should run `npm run check` which must include:
-  - Metadata presence and schema validation for `specs/**/*.feature`.
-  - `id` uniqueness check across `specs/` and `product/journeys/`.
-  - Capability tag matches directory name.
-  - No deprecated fields present in new templates (scan templates/ and product/journeys/ during validation).
-
-Examples and references
-- SysML-informed feature template: `templates/feature-template.feature`
-- Journey template example: `templates/product/journeys/_template.md`
-- Scenario metadata policy: `docs/architecture/scenario-metadata-policy.md`
-
-Verification
-- After creating or updating templates, run:
+**glob:**
 
 ```
-npm run check
+No files found
+[Agent Usage Reminder]
+
+You called a search/fetch tool directly without leveraging specialized agents.
+
+RECOMMENDED: Use task with explore/librarian agents for better results:
+
+```
+// Parallel exploration - fire multiple agents simultaneously
+task(agent="explore", prompt="Find all files matching pattern X")
+task(agent="explore", prompt="Search for implementation of Y") 
+task(agent="librarian", prompt="Lookup documentation for Z")
+
+// Then continue your work while they run in backg...
+```
+---
+
+## assistant (2026-02-25T17:25:16.627Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Read evidence files: .sisyphus/evidence/phase2/task-16-agent-flow.md and .sisyphus/evidence/phase2/task-16-handoff.md (cancelled — files not found)",
+    "priority": "high",
+    "status": "cancelled"
+  },
+  {
+    "content": "Draft and create docs/process/udd-agent-operations.md with agent workflow, handoff protocol, and traceability update steps",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Run lsp_diagnostics on docs/process/udd-agent-operation...
+```
+---
+
+## assistant (2026-02-25T17:25:43.427Z)
+
+I started but hit a blocker: the evidence files you asked me to read do not exist at the given paths.
+
+What I tried
+- Read: .sisyphus/evidence/phase2/task-16-agent-flow.md → not found
+- Glob: .sisyphus/evidence/** → no matches
+
+I will not create the agent playbook until I can read the evidence you required first. Please choose one:
+
+1) Provide correct paths to the evidence files (exact file paths). I will read them, then mark the read step complete and proceed to create docs/process/udd-agent-operations.md, run lsp diagnostics, and run npm run check.  
+2) If the evidence is intentionally unavailable, explicitly allow me to proceed without reading them. I will create the doc based on T16 context and your checklist, then run npm run check.
+
+Current todo state (one in_progress as required)
+- Read evidence files — cancelled (files not found)
+- Request missing evidence / confirm paths — in_progress
+- Draft and create docs/process/udd-agent-operations.md — pending
+- Run lsp_diagnostics on docs/process/udd-agent-operations.md — pending
+- Run npm run check — pending
+- Finalize and return confirmation — pending
+
+Tell me which option you choose and provide corrected paths if you pick (1). I won't make the file or run npm until you confirm.
+---
+
+## user (2026-02-25T17:26:00.831Z)
+
+[SYSTEM DIRECTIVE: OH-MY-OPENCODE - TODO CONTINUATION]
+
+Incomplete tasks remain in your todo list. Continue working on the next pending task.
+
+- Proceed without asking for permission
+- Mark each task complete when finished
+- Do not stop until all tasks are done
+
+[Status: 1/6 completed, 5 remaining]
+
+Remaining tasks:
+- [pending] Draft and create docs/process/udd-agent-operations.md with agent workflow, handoff protocol, and traceability update steps
+- [pending] Run lsp_diagnostics on docs/process/udd-agent-operations.md
+- [pending] Run npm run check
+- [pending] Finalize and return confirmation
+- [in_progress] Request missing evidence files or confirm correct paths for .sisyphus/evidence/phase2/*.md
+---
+
+## assistant (2026-02-25T17:26:00.839Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Read evidence files: .sisyphus/evidence/phase2/task-16-agent-flow.md and .sisyphus/evidence/phase2/task-16-handoff.md (cancelled — files not found)",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Draft and create docs/process/udd-agent-operations.md with agent workflow, handoff protocol, and traceability update steps",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Run lsp_diagnostics on docs/process/udd-agent-opera...
+```
+---
+
+## assistant (2026-02-25T17:26:22.912Z)
+
+**apply_patch:**
+
+```
+Success. Updated the following files:
+A docs/process/udd-agent-operations.md
+```
+---
+
+## assistant (2026-02-25T17:26:43.946Z)
+
+**lsp_diagnostics** (input): {"filePath":"docs/process/udd-agent-operations.md"}
+---
+
+## assistant (2026-02-25T17:26:46.588Z)
+
+**bash:**
+
 ```
 
-If checks fail, fix template content until all items pass.
+> udd@2.0.0 check
+> biome check .
 
-Appendix: Quick mapping table
+Checked 60 files in 34ms. No fixes applied.
 
-| Concept | Location | Required fields |
-| Journey | product/journeys/*.md | Actor, Goal, Steps, Success |
-| Capability | specs/features/<cap>/ | _feature.yml, README, feature files |
-| Scenario | specs/**/*.feature | metadata preamble (id, capability, actor, goal, priority, created_by, created_at) |
+```
+---
 
+## assistant (2026-02-25T17:26:48.897Z)
 
-# UDD Agent Operations Playbook
+**todowrite:**
 
-Purpose
--------
-This playbook documents the agent operations workflow for UDD (User Driven Development). It defines the agent workflow, handoff protocol, and traceability update procedures so agent work is consistent, auditable, and verifiable.
+```
+[
+  {
+    "content": "Read evidence files: .sisyphus/evidence/phase2/task-16-agent-flow.md and .sisyphus/evidence/phase2/task-16-handoff.md (cancelled — files not found)",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Draft and create docs/process/udd-agent-operations.md with agent workflow, handoff protocol, and traceability update steps",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Run lsp_diagnostics on docs/process/udd-agent-operati...
+```
+---
 
-Agent workflow (canonical)
---------------------------
-1. Check status
-   - Run `udd status` to determine journey → scenario → test coverage, and detect drift.
-   - Inspect failing/pending scenarios and verify scope.
+## assistant (2026-02-25T17:26:53.352Z)
 
-2. Suggest
-   - Propose a minimal change plan: one journey/file/behavior at a time.
-   - Create or update a journey file under `product/journeys/` when intent changes.
-   - Record the proposed spec → feature mapping (e.g. `product/journeys/foo.md` → `specs/foo/create.feature`).
+Done. All required steps completed (permitted scope):
 
-3. Confirm
-   - Ask a human (or automated gate) to confirm the proposed plan before making repository changes.
-   - For small edits, confirmation may be implicit via a designated review label or approval flow.
+Completed tasks
+- Created file: docs/process/udd-agent-operations.md
+- Documented agent workflow: check status → suggest → confirm → apply → verify
+- Added handoff protocol and template
+- Included traceability update steps and quick commands
+- Ran npm run check (biome) — passed
+- lsp_diagnostics attempted; none available for .md files (logged and marked completed)
 
-4. Apply
-   - Run `udd sync` to generate or update feature files from journeys.
-   - Implement code or tests to satisfy the scenarios. Follow repository conventions: small commits, one logical change per PR, and avoid modifying unrelated files.
-   - If creating code, write failing tests first when possible.
+Notes and constraints
+- I could not read the two evidence files you referenced because they do not exist at .sisyphus/evidence/phase2/*.md. I recorded that as completed/cancelled per your instruction and included an audit statement in the playbook instructing agents to include exact evidence paths and to not proceed when evidence is missing unless authorized.
+- I did not modify any existing files except adding docs/process/udd-agent-operations.md.
+- I did not create commits or push any changes.
 
-5. Verify
-   - Run tests: `npm test` (or repository-specific command). Ensure all BDD scenarios and unit tests pass.
-   - Update traceability manifest: `specs/.udd/manifest.yml` (or follow project traceability steps) to reflect new mappings.
-   - Run `udd status` again to confirm passing state and no orphaned journeys.
+Next steps (optional)
+- If you want the evidence content included in the playbook, provide the correct paths or the file contents and I'll incorporate them and update the doc.
+- If you want this added to repository history, tell me to commit and I will prepare a commit message and follow the git safety protocol.
 
-Handoff protocol
------------------
-When pausing work or passing to another agent/person, include the following in the handoff note (in PR, issue, or handoff doc):
+Evidence
+- File created: docs/process/udd-agent-operations.md
 
-- Context: one-line summary of the user journey, actor, and goal.
-- Files changed: list of new/updated files with purpose.
-- Pending tasks: explicit next steps (one atomic task per todo).
-- Verification steps: commands to run (`udd status`, `npm test`) and expected outcomes.
-- Traceability: updated manifest entries or guidance to perform update.
-- Blockers: any environment, secret, or missing evidence files.
+Finalizing
+- Final task (finalize and return confirmation) — completed by this message.
 
-Handoff example (template)
---------------------------
-- Context: Add CSV export for reports (actor: analyst — goal: download CSV)
-- Changed:
-  - product/journeys/export_data.md (journey)
-  - specs/export/export_csv.feature (scenarios)
-  - tests/export/export_csv.e2e.test.ts (test harness)
-- Next step: Implement API endpoint to stream CSV (one task)
-- Verify: `udd status` shows scenario passing after tests; run `npm test`.
+If you want edits (tone, more examples, embed exact evidence), give one atomic task (one change) and I’ll execute it.
+---
 
-Traceability update steps
--------------------------
-1. Update manifest
-   - Open `specs/.udd/manifest.yml` (or the project's traceability file) and add an entry mapping journey → feature → test.
+## user (2026-02-25T17:27:02.154Z)
 
-2. Cross-check
-   - Ensure every journey listed in `product/journeys/` maps to a feature file in `specs/`.
-   - Use `udd status` to surface mismatches.
+[SYSTEM DIRECTIVE: OH-MY-OPENCODE - TODO CONTINUATION]
 
-3. Commit message guideline
-   - Use intent-focused messages: `journey: export_data — add CSV export scenario` or `spec: export/create.feature — add failure mode`.
+Incomplete tasks remain in your todo list. Continue working on the next pending task.
 
-Verification checklist
-----------------------
-- [ ] `udd status` clean for the changed journey
-- [ ] Feature files added/updated under `specs/`
-- [ ] Tests added/updated under `tests/` and passing locally
-- [ ] Traceability manifest updated
-- [ ] Handoff note present in PR or issue when handing off
+- Proceed without asking for permission
+- Mark each task complete when finished
+- Do not stop until all tasks are done
 
-Guidelines and constraints
---------------------------
-- Single-task rule: agents should accept exactly one atomic task at a time (one file, one change, one verification). If multiple tasks are given, refuse and request a single-task instruction.
-- Never implement behavior not specified by a journey or feature — ask for clarification.
-- Keep changes minimal and reversible: small commits, no force pushes to protected branches.
+[Status: 5/6 completed, 1 remaining]
 
-Evidence and audit
-------------------
-- When evidence files or external artifacts are referenced, include their exact paths in the handoff note. Do not proceed if required evidence is missing unless explicitly authorized.
+Remaining tasks:
+- [in_progress] Finalize and return confirmation
+---
 
-Appendix: Quick commands
-------------------------
-- udd status — show journey → scenario → test coverage
-- udd sync — convert journeys to feature files
-- npm test — run test suite
-- npm run check — run repository checks (lint, typecheck, test subset)
+## assistant (2026-02-25T17:27:02.160Z)
 
-Change history
---------------
-- T16: Initial agent operations playbook (created for Task 16: Agent flow and handoff)
+**todowrite:**
 
+```
+[
+  {
+    "content": "Read evidence files: .sisyphus/evidence/phase2/task-16-agent-flow.md and .sisyphus/evidence/phase2/task-16-handoff.md (cancelled — files not found)",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Draft and create docs/process/udd-agent-operations.md with agent workflow, handoff protocol, and traceability update steps",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Run lsp_diagnostics on docs/process/udd-agent-operati...
+```
+---
 
+## assistant (2026-02-25T17:27:09.831Z)
+
+Final confirmation — all tasks complete.
+
+What I did (concise)
+- Created docs/process/udd-agent-operations.md containing:
+  - Agent workflow: check status → suggest → confirm → apply → verify
+  - Handoff protocol + template
+  - Traceability update steps
+  - Verification checklist and quick commands
+  - Audit note about missing evidence files
+- Ran npm run check — passed (biome)
+- lsp_diagnostics — no MD LSP configured; noted
+- Did not modify evidence files or commit changes
+
+File path
+- docs/process/udd-agent-operations.md
+
+If you want this committed, or want me to incorporate the missing evidence content, give one atomic task (e.g., "commit file with message 'docs: add agent operations playbook'") and I will perform it.

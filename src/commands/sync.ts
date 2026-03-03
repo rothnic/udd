@@ -6,6 +6,7 @@ import chalk from "chalk";
 import { Command } from "commander";
 import yaml from "yaml";
 import { userWarn } from "../lib/cli-error.js";
+import { checkGate, handleGateResult } from "../lib/gate.js";
 import { listExamples, resolvePaths } from "../lib/paths.js";
 import { detectFeatureChanges } from "../lib/test-governance.js";
 import type { ManifestTestEntry } from "../types.js";
@@ -100,35 +101,47 @@ async function parseJourneyFile(filePath: string): Promise<Journey | null> {
 async function loadManifest(
 	specsDir: string,
 ): Promise<{ manifest: Manifest; wasCorrupted: boolean }> {
-	const manifestPath = path.join(specsDir, ".udd", "manifest.yml");
-	try {
-		const content = await fs.readFile(manifestPath, "utf-8");
-		const parsed = yaml.parse(content);
-		const validation = validateManifest(parsed);
-		if (!validation.valid) {
-			userWarn(`Invalid manifest: ${validation.reason}`);
-			return { manifest: { journeys: {}, scenarios: {} }, wasCorrupted: true };
-		}
-		return {
-			manifest: {
-				journeys: parsed.journeys || {},
-				scenarios: parsed.scenarios || {},
-			},
-			wasCorrupted: false,
-		};
-	} catch (err) {
-		// Distinguish malformed YAML (parse errors) vs missing file
+	const specsManifestPath = path.join(specsDir, ".udd", "manifest.yml");
+	const rootManifestPath = path.join(process.cwd(), ".udd", "manifest.yml");
+	// Try specs/.udd/manifest.yml first, then fall back to root .udd/manifest.yml for compatibility
+	for (const manifestPath of [specsManifestPath, rootManifestPath]) {
 		try {
-			await fs.access(manifestPath);
-			// File exists but couldn't be read/parsed - provide context
-			userWarn(
-				`Could not parse manifest: ${String((err && (err as Error).message) || err)} (manifest path: ${manifestPath})`,
-			);
-		} catch {
-			// File doesn't exist - first run, no warning
+			const content = await fs.readFile(manifestPath, "utf-8");
+			const parsed = yaml.parse(content);
+			const validation = validateManifest(parsed);
+			if (!validation.valid) {
+				userWarn(`Invalid manifest: ${validation.reason}`);
+				return {
+					manifest: { journeys: {}, scenarios: {} },
+					wasCorrupted: true,
+				};
+			}
+			return {
+				manifest: {
+					journeys: parsed.journeys || {},
+					scenarios: parsed.scenarios || {},
+				},
+				wasCorrupted: false,
+			};
+		} catch (err) {
+			// Distinguish malformed YAML (parse errors) vs missing file
+			try {
+				await fs.access(manifestPath);
+				// File exists but couldn't be read/parsed - provide context
+				userWarn(
+					`Could not parse manifest: ${String((err && (err as Error).message) || err)} (manifest path: ${manifestPath})`,
+				);
+				return {
+					manifest: { journeys: {}, scenarios: {} },
+					wasCorrupted: true,
+				};
+			} catch {
+				// File doesn't exist - try next path or return empty later
+			}
 		}
-		return { manifest: { journeys: {}, scenarios: {} }, wasCorrupted: true };
 	}
+	// No manifest found at either location
+	return { manifest: { journeys: {}, scenarios: {} }, wasCorrupted: true };
 }
 
 function validateManifest(obj: unknown): { valid: boolean; reason?: string } {
@@ -353,7 +366,15 @@ export const syncCommand = new Command("sync")
 	.option("--auto", "Auto-accept all proposals")
 	.option("--example <name>", "Sync a specific example project")
 	.option("--all", "Sync all projects (product + examples)")
+	.option("--strict", "Block on warnings (strict mode)")
+	.option("--skip-gate", "Skip gate check (not recommended)")
 	.action(async (options) => {
+		// Gate check before creating files (critical issues always block)
+		const gateResult = await checkGate({
+			strict: options.strict || false,
+			skipGate: options.skipGate || false,
+		});
+		handleGateResult(gateResult);
 		const rootDir = process.cwd();
 		const productDir = path.join(rootDir, "product");
 		const specsDir = path.join(rootDir, "specs");

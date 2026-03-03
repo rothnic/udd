@@ -1,298 +1,329 @@
-# Reconstruct T2: specs/system-boundary.yml from evidence (@Sisyphus-Junior subagent)
+# Session ses_36a3ac9f7ffeXdE6RAXdaWMp2F
 
-**ID**: ses_36a3ac9f7ffeXdE6RAXdaWMp2F
-**Project ID**: ad761ea6174e58ed763fc75290c3f403ed51079d
-**Created**: 2/25/2026, 11:07:35 AM
-**Stats**: 3 files changed, +281 -0
+## user (2026-02-25T17:07:35.789Z)
+
+
+<system-reminder>
+
+[SYSTEM DIRECTIVE: OH-MY-OPENCODE - SINGLE TASK ONLY]
+
+**STOP. READ THIS BEFORE PROCEEDING.**
+
+If you were NOT given **exactly ONE atomic task**, you MUST:
+1. **IMMEDIATELY REFUSE** this request
+2. **DEMAND** the orchestrator provide a single, specific task
+
+**Your response if multiple tasks detected:**
+> "I refuse to proceed. You provided multiple tasks. An orchestrator's impatience destroys work quality.
+> 
+> PROVIDE EXACTLY ONE TASK. One file. One change. One verification.
+> 
+> Your rushing will cause: incomplete work, missed edge cases, broken tests, wasted context."
+
+**WARNING TO ORCHESTRATOR:**
+- Your hasty batching RUINS deliverables
+- Each task needs FULL attention and PROPER verification  
+- Batch delegation = sloppy work = rework = wasted tokens
+
+**REFUSE multi-task requests. DEMAND single-task clarity.**
+</system-reminder>
+
+## 1. TASK
+Create specs/system-boundary.yml by reading existing evidence.
+
+## 2. EXPECTED OUTCOME
+- [ ] File created: specs/system-boundary.yml
+- [ ] Contains boundary subject (udd-core)
+- [ ] Contains in_scope and out_of_scope lists
+- [ ] Contains at least 2 external systems with type markers
+- [ ] Contains validation rules
+- [ ] npm run check passes
+
+## 3. REQUIRED TOOLS
+- read: Read .sisyphus/evidence/phase2/task-2-boundary.md and task-2-leak.md
+- read: Read .sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md
+- write: Create specs/system-boundary.yml
+- bash: Run npm run check to verify
+
+## 4. MUST DO
+- Read evidence files first
+- Create YAML with proper structure
+- Include at least 2 external system examples
+- Verify with npm run check
+
+## 5. MUST NOT DO
+- Do NOT modify plan file
+- Do NOT edit evidence files
+- Do NOT create additional files
+- Do NOT commit
+
+## 6. CONTEXT
+### Evidence Files:
+- .sisyphus/evidence/phase2/task-2-boundary.md
+- .sisyphus/evidence/phase2/task-2-leak.md
+- .sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md
+
+### Plan Reference:
+T2: Define system boundary with boundary_subject, inclusion/exclusion criteria, external systems.
+
+Return confirmation with file content summary and npm run check output.
 
 ---
 
-## USER (11:07:35 AM)
+## assistant (2026-02-25T17:07:35.802Z)
 
-# UDD Concept Model
+**todowrite:**
 
-## Overview
+```
+[
+  {
+    "content": "Read evidence files: task-2-boundary.md, task-2-leak.md, decisions.md",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Draft specs/system-boundary.yml with boundary_subject, in_scope, out_of_scope, external_systems, validation rules",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Create file specs/system-boundary.yml with drafted content",
+    "priority": "medium",
+    "status": "pending"
+  },
+  {
+    "content": "Run ...
+```
+---
 
-This document defines the canonical concept model for User Driven Development (UDD). It reconciles existing repository language (product/actors.md and journey artifacts) with SysML-informed traceability decisions captured during phase 2. The goal is to provide clear boundaries, reduce ambiguity for agents and humans, and enable deterministic linting and traceability rules.
+## assistant (2026-02-25T17:07:54.815Z)
 
-## Concepts
+**read:**
 
-### Persona
-**Definition:** A human archetype representing a class of users, their goals, context, and constraints. Personas are written by product authors and live as guidance in product/actors.md. Use Personas to express needs and motivations, not implementation details.
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/evidence/phase2/task-2-boundary.md</path>
+<type>file</type>
+<content>1: # Evidence: Task 2 - Boundary happy-path validation
+2: 
+3: This file documents a happy-path validation showing the system boundary is explicit and correct.
+4: 
+5: Validation steps
+6: 1. Confirm boundary_subject name exists in specs/system-boundary.yml and is 'udd-core'.
+7: 2. Verify in_scope entries enumerate spec artifacts (specs/features, tests, specs/.udd/manifest.yml).
+8: 3. Con...
+```
+---
 
-**Scope:** User goals, context, motivations, common behaviors, skill levels, and success criteria relevant to product decisions and journey narratives.
+## assistant (2026-02-25T17:07:57.116Z)
 
-**Anti-Scope:** Implementation details, technical constraints, acceptance criteria, test steps, or API contracts.
+**read:**
 
-**Positive Example:** "Project manager who schedules daily planning, needs quick rescheduling and visibility into team load." (Recorded as a Persona in product/actors.md and referenced by journeys.)
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/evidence/phase2/task-2-leak.md</path>
+<type>file</type>
+<content>1: # Evidence: Task 2 - Boundary leakage detection (failure-path examples)
+2: 
+3: This file lists sample boundary leakage instances that reviewers and linting tools
+4: should flag as violations. They are intentionally invalid to serve as detection examples.
+5: 
+6: Examples
+7: 
+8: - Example: journey_with_scenario_text.md
+9:   location: product/journeys/boarding_with_steps.md
+10:   violation...
+```
+---
 
-**Negative Example:** "Persona lists the API endpoint to call for rescheduling." (Implementation detail - belongs to Component or Requirement.)
+## assistant (2026-02-25T17:08:00.300Z)
 
-### Journey
-**Definition:** An experience-first narrative describing how a Persona progresses through stages to achieve a goal. Journeys capture stages, touchpoints, channels, emotions, pain points, and success metrics.
+**read:**
 
-**Scope:** High-level sequence of user activities, narrative context, goals, success metrics, and links to Use Cases and scenarios. Journeys must avoid implementation internals.
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md</path>
+<type>file</type>
+<content>1: # Decisions
+2: 
+3: - Decision: Treat 'Persona' as the human-friendly term; keep product/actors.md as canonical and reference Personas there.
+4: - Decision: Enforce non-overlap rules by policy in docs/architecture/udd-concept-model.md and have udd lint warn on violations where possible.
+5: 
+6: - Decision (2026-02-25): Use explicit boundary_subject 'udd-core' for phas...
+```
+---
 
-**Anti-Scope:** Detailed acceptance steps, scenario text, code, component design, and test assertions.
+## assistant (2026-02-25T17:08:05.645Z)
 
-**Positive Example:** "Daily planning journey that describes stages: prepare, prioritize, assign, review, with success metric 'first plan created < 5 minutes'." (Stored under product/journeys/.)
+**todowrite:**
 
-**Negative Example:** "Journey includes step-by-step API interaction or SQL schema for storing plans." (Belongs to Component/Requirement.)
+```
+[
+  {
+    "content": "Read evidence files: task-2-boundary.md, task-2-leak.md, decisions.md",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Draft specs/system-boundary.yml with boundary_subject, in_scope, out_of_scope, external_systems, validation rules",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Create file specs/system-boundary.yml with drafted content",
+    "priority": "medium",
+    "status": "pending"
+  },
+  {
+    "content": "Ru...
+```
+---
 
-### Use Case
-**Definition:** A mapping from a Journey or Persona need to one or more testable behaviors. Use Cases are YAML artifacts that reference scenario slugs (paths to .feature files) and provide the connection between narrative intent and executable scenarios.
+## assistant (2026-02-25T17:08:09.209Z)
 
-**Scope:** Use-case identifier, description, referenced scenario paths, preconditions, and high-level constraints needed to implement the capability.
+**apply_patch:**
 
-**Anti-Scope:** Full scenario text, implementation code, component internals, or low-level test steps. Use Cases must not duplicate scenario steps.
+```
+Success. Updated the following files:
+A specs/system-boundary.yml
 
-**Positive Example:** "use-cases/daily-reschedule.yml references specs/scheduling/reschedule.feature and lists precondition: user authenticated." 
+COMMENT/DOCSTRING DETECTED - IMMEDIATE ACTION REQUIRED
 
-**Negative Example:** "A Use Case containing Given/When/Then steps copied from a feature file." (Scenario text must live only in .feature files.)
+Your recent changes contain comments or docstrings, which triggered this hook.
+You need to take immediate action. You must follow the conditions below.
+(Listed in priority order - you must always act according to this priority order)
 
-### Scenario
-**Definition:** The single source of acceptance for a behavior, written in Gherkin and stored in a .feature file. Scenarios are user-facing acceptance descriptions that drive E2E tests.
+CRITICAL WARNING: This hook message MUST NEVER be ignored, even if you receive it multiple times.
+You MUST provide corresponding explanation o...
+```
+---
 
-**Scope:** Gherkin steps (Given/When/Then), examples, data tables, and comments documenting user intent and edge cases. One scenario per file policy applies.
+## assistant (2026-02-25T17:08:20.164Z)
 
-**Anti-Scope:** Implementation notes, test harness details, component wiring, or internal requirement mapping (those belong in Requirement or Component docs).
+**todowrite:**
 
-**Positive Example:** "specs/scheduling/reschedule.feature contains a scenario 'User reschedules an event' with Given/When/Then steps describing the expected behavior." 
+```
+[
+  {
+    "content": "Read evidence files: task-2-boundary.md, task-2-leak.md, decisions.md",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Draft specs/system-boundary.yml with boundary_subject, in_scope, out_of_scope, external_systems, validation rules",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Create file specs/system-boundary.yml with drafted content",
+    "priority": "medium",
+    "status": "completed"
+  },
+  {
+    "content": "Ru...
+```
+---
 
-**Negative Example:** "A scenario file that includes NodeJS test fixtures or API implementation snippets." (Implementation must be in tests or components.)
+## assistant (2026-02-25T17:08:35.165Z)
 
-### Requirement
-**Definition:** A developer-facing contract that links scenarios to implementation details: acceptance criteria mapping, API contracts, non-functional constraints, and traceability pointers to components and tests.
+**lsp_diagnostics:**
 
-**Scope:** Detailed acceptance criteria, success metrics for implementation, performance and security constraints, mappings to scenario(s), and references to Component owners.
+```
+No diagnostics found
+```
+---
 
-**Anti-Scope:** User narrative, journey stages, or scenario step text. Requirements must not replace scenarios as the acceptance source.
+## assistant (2026-02-25T17:08:40.780Z)
 
-**Positive Example:** "Requirement: Reschedule API must respond within 300ms and update calendar entries atomically. Maps to specs/scheduling/reschedule.feature and component scheduling-service." 
+**bash:**
 
-**Negative Example:** "Requirement that copies Gherkin steps as acceptance criteria verbatim and uses them as the only test specification." (This duplicates scenario responsibility.)
+```
 
-### Component
-**Definition:** A documented implementation unit (service, module, UI component, database schema) responsible for delivering parts of a Use Case or Requirement. Component docs map to Use Cases and include design, interfaces, owners, and test mappings.
+> udd@2.0.0 check
+> biome check .
 
-**Scope:** Architecture diagrams, API/interface contracts, data models, owner, dependencies, and references to Requirements and tests.
+Checked 60 files in 35ms. No fixes applied.
 
-**Anti-Scope:** User-facing narratives, journey storytelling, or scenario text. Components should not contain acceptance-step Gherkin.
+```
+---
 
-**Positive Example:** "components/scheduling-service.md describes endpoints, data model, owner, and links to the reschedule Requirement and tests." 
+## assistant (2026-02-25T17:08:44.161Z)
 
-**Negative Example:** "Component file that contains high-level user goals and emotional journey information instead of interfaces." (That belongs to Journey or Persona.)
+**todowrite:**
 
-### Test Review
-**Definition:** A human or automated assessment that verifies tests and scenarios accurately represent intended behavior and meet quality guidelines. Test Reviews include review outcomes, issues found, and required remediation actions.
+```
+[
+  {
+    "content": "Read evidence files: task-2-boundary.md, task-2-leak.md, decisions.md",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Draft specs/system-boundary.yml with boundary_subject, in_scope, out_of_scope, external_systems, validation rules",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Create file specs/system-boundary.yml with drafted content",
+    "priority": "medium",
+    "status": "completed"
+  },
+  {
+    "content": "Ru...
+```
+---
 
-**Scope:** Test completeness, scenario coverage, mapping between scenarios and Use Cases, test data validity, and annotations for flaky or missing tests.
+## assistant (2026-02-25T17:08:47.578Z)
 
-**Anti-Scope:** Implementation changes, component design decisions, or journey edits. Reviews may recommend changes but must not alter source artifacts directly.
+TODOS (final state)
+- [x] Read evidence files: task-2-boundary.md, task-2-leak.md, decisions.md
+  - status: completed
+- [x] Draft specs/system-boundary.yml with boundary_subject, in_scope, out_of_scope, external_systems, validation rules
+  - status: completed
+- [x] Create file specs/system-boundary.yml with drafted content
+  - status: completed
+- [x] Run lsp_diagnostics on specs/system-boundary.yml
+  - status: completed
+- [x] Run npm run check and capture output
+  - status: completed
 
-**Positive Example:** "A review notes that reschedule.feature lacks an error-case scenario and files a remediation ticket linking to the Use Case." 
+Created file: specs/system-boundary.yml
+Summary of contents:
+- boundary_subject: udd-core (matches decisions.md)
+- in_scope: lists spec artifacts (specs/features, tests, specs/.udd/manifest.yml, product/journeys, docs/architecture/udd-concept-model.md)
+- out_of_scope: implementation_code, deployment_infra, runtime_services
+- external_actors: Reviewer (type: human)
+- external_systems: CI_System and Hosted_DB (both type: external_system) — satisfies the requirement to include at least 2 external systems with type markers
+- validation: four validation rules
+  - boundary_subject_exists (asserts boundary_subject == 'udd-core')
+  - in_scope_enumerates_artifacts (asserts presence of key spec artifacts)
+  - external_systems_minimum (requires >= 2 external_system entries)
+  - no_external_as_in_scope (detects misclassification of known external systems into in_scope)
+- notes: references the three evidence files provided
 
-**Negative Example:** "A Test Review that edits a component's API contract directly instead of raising an issue and routing to the component owner." 
-
-## Anti-Overlap Rules Summary
-| Concept | Owns | Must NOT Contain |
-|---------|------|------------------|
-| Persona | User archetype, goals, context | Acceptance steps, API contracts, implementation details |
-| Journey | Experience narrative, stages, metrics | Gherkin scenarios, component internals |
-| Use Case | Links from journey to scenarios, preconditions | Scenario text (Given/When/Then), implementation code |
-| Scenario | Gherkin acceptance text, examples | Component design, API contract, non-functional implementation notes |
-| Requirement | Implementation acceptance criteria, test mapping | User narrative, journey stages, scenario Gherkin |
-| Component | Design, interfaces, owners, data models | User journey, scenario steps, high-level narrative |
-| Test Review | Review findings, coverage, remediation items | Direct code or spec edits; implementation changes |
-
-## References
-- .sisyphus/evidence/phase2/task-1-concepts.md
-- .sisyphus/evidence/phase2/task-1-ambiguity.md
+Evidence read (key lines consulted):
+- .sisyphus/evidence/phase2/task-2-boundary.md
+  - Validation steps require boundary_subject 'udd-core', in_scope entries enumerating spec artifacts, presence of external_actors and external_systems typed, and at least two external_system examples (CI_System, Hosted_DB).
+- .sisyphus/evidence/phase2/task-2-leak.md
+  - Shows failure examples to avoid, e.g., Hosted_DB misclassified as in_scope.
 - .sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md
+  - Decision to use explicit boundary_subject 'udd-core' and to keep implementation code out_of_scope.
 
+lsp_diagnostics
+- No diagnostics found for specs/system-boundary.yml
 
-# System boundary definition for UDD Phase 2
-# Boundary subject must match decisions: 'udd-core'
-boundary_subject: udd-core
+npm run check output
+> udd@2.0.0 check
+> biome check .
 
-# What is considered in scope for udd-core (traceability artifacts only)
-in_scope:
-  - specs/features
-  - tests
-  - specs/.udd/manifest.yml
-  - product/journeys
-  - docs/architecture/udd-concept-model.md
+Checked 60 files in 35ms. No fixes applied.
 
-# Explicitly excluded from udd-core to avoid scope creep
-out_of_scope:
-  - implementation_code
-  - deployment_infra
-  - runtime_services
+Verification status vs Expected Outcome:
+- [x] File created: specs/system-boundary.yml
+- [x] Contains boundary subject (udd-core)
+- [x] Contains in_scope and out_of_scope lists
+- [x] Contains at least 2 external systems with type markers (CI_System, Hosted_DB)
+- [x] Contains validation rules
+- [x] npm run check passes
 
-# External actors and systems that interact with udd-core
-external_actors:
-  - name: Reviewer
-    type: human
-    description: "Human reviewer who validates traceability and spec-to-test mapping"
+Notes about hook message encountered:
+- A repository hook detected that the newly added YAML contains comments. This is expected: the file includes short explanatory comments at top and sections for human readers and reviewers. The hook requested justification; the comments are minimal and document intent and structure for reviewers and tooling. If you prefer no inline comments, I can remove them and leave only YAML keys — tell me which you prefer.
 
-external_systems:
-  - id: CI_System
-    type: external_system
-    description: "Continuous Integration system that runs tests and checks (eg. GitHub Actions, Jenkins)"
-  - id: Hosted_DB
-    type: external_system
-    description: "Hosted database used by implementation environments (treated as external to udd-core)"
-
-# Validation rules used by udd lint / udd check
-validation:
-  - id: boundary_subject_exists
-    description: "specs/system-boundary.yml must declare boundary_subject 'udd-core'"
-    rule: "boundary_subject == 'udd-core'"
-  - id: in_scope_enumerates_artifacts
-    description: "in_scope must include spec artifacts: specs/features, tests, specs/.udd/manifest.yml"
-    rule: "contains(in_scope, 'specs/features') and contains(in_scope, 'tests') and contains(in_scope, 'specs/.udd/manifest.yml')"
-  - id: external_systems_minimum
-    description: "There must be at least two external_system entries (CI_System, Hosted_DB recommended)"
-    rule: "length(external_systems) >= 2"
-  - id: no_external_as_in_scope
-    description: "Detect misclassification where known external systems are placed in in_scope"
-    rule: "not any(in_scope contains item where item in ['Hosted_DB','CI_System'])"
-
-# Notes and references
-notes:
-  - source_evidence:
-    - .sisyphus/evidence/phase2/task-2-boundary.md
-    - .sisyphus/evidence/phase2/task-2-leak.md
-    - .sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md
-
-
-# Traceability contract for UDD
-# Defines artifact schemas, forward/reverse trace queries, and invalidation rules
-
-artifacts:
-  persona:
-    required_fields: [id, name]
-    optional_fields: [description, goals, contact]
-    description: |
-      Human actor definitions used by journeys and use_cases. "id" is canonical key.
-
-  journey:
-    required_fields: [id, actor, goal, steps]
-    optional_fields: [summary, tags]
-    description: |
-      High-level user journeys. "actor" must reference persona.id. "steps" list use_case ids or human steps.
-
-  use_case:
-    required_fields: [id, name, actors, outcomes]
-    optional_fields: [summary, tags]
-    description: |
-      Use cases connect journeys to scenarios. "actors" list persona ids. "outcomes" must include scenarios array.
-
-  scenario:
-    required_fields: [id, title, feature_path]
-    optional_fields: [tags, description]
-    description: |
-      Scenario metadata representing a Gherkin scenario. "feature_path" points to the authoritative .feature file.
-
-  e2e_test:
-    required_fields: [id, scenario_path, status]
-    optional_fields: [last_run, runner]
-    description: |
-      Test harness mapping to a scenario. "scenario_path" must match scenario.feature_path or contain scenario id in path.
-
-  test_review:
-    required_fields: [id, test_id, scenario_path, checks]
-    optional_fields: [reviewer, created_at]
-    description: |
-      Review artifacts validating test fidelity against scenario. Must reference test_id and scenario_path.
-
-  requirement:
-    required_fields: [id, type, feature, description, scenarios]
-    optional_fields: [priority, owner]
-    description: |
-      Requirements linked to scenarios. "scenarios" lists scenario ids covered by this requirement.
-
-trace_queries:
-  forward:
-    - name: persona_to_journeys
-      description: Find journeys for a persona
-      query: "Find journey where journey.actor = <persona.id>"
-
-    - name: journey_to_use_cases
-      description: Resolve use_cases from journey.steps
-      query: "For journey.id = <id>, map journey.steps -> use_case.id"
-
-    - name: use_case_to_scenarios
-      description: Find scenarios declared in a use_case outcome
-      query: "Find scenario.id in use_case.outcomes[].scenarios where use_case.id = <id>"
-
-    - name: scenario_to_tests
-      description: Find tests that target a scenario
-      query: "Find e2e_test where e2e_test.scenario_path contains <scenario.id> or equals <scenario.feature_path>"
-
-    - name: requirement_impact
-      description: From a requirement, find impacted scenarios, tests, journeys, personas
-      query: "Find all e2e_test where requirement.scenarios contains matching scenario.id"
-
-  reverse:
-    - name: test_to_scenario
-      description: Find scenario related to a test
-      query: "Find scenario where scenario.feature_path = <e2e_test.scenario_path> or <e2e_test.scenario_path> contains scenario.id"
-
-    - name: scenario_to_use_case
-      description: Find use_cases that reference a scenario
-      query: "Find use_case where use_case.outcomes[].scenarios contains <scenario.id>"
-
-    - name: use_case_to_journeys
-      description: Find journeys that include a use_case
-      query: "Find journey where journey.steps references <use_case.id>"
-
-    - name: journey_to_persona
-      description: Find persona for a journey
-      query: "Find persona where persona.id = <journey.actor>"
-
-    - name: failing_tests_to_requirements
-      description: From failing tests, find linked requirements
-      query: "Find requirement where requirement.scenarios intersects (tests -> scenario ids)"
-
-invalidation_rules:
-  # Each rule declares which missing field(s) cause ERROR vs WARN and short explanation
-  - artifact: persona
-    missing:
-      id: {level: ERROR, message: "Cannot reference persona in journey.actor; forward trace breaks"}
-      name: {level: WARN, message: "Display name unavailable for journey documentation"}
-
-  - artifact: journey
-    missing:
-      actor: {level: ERROR, message: "Cannot trace to persona; reverse trace from journey fails"}
-      steps: {level: ERROR, message: "Journey has no actionable steps; cannot map to use_cases"}
-
-  - artifact: use_case
-    missing:
-      id: {level: ERROR, message: "Cannot reference use_case in journey.steps; forward trace breaks"}
-      actors: {level: ERROR, message: "Cannot trace to persona; requirement-to-persona trace fails"}
-      outcomes: {level: ERROR, message: "No scenario references; use_case not connected to graph"}
-
-  - artifact: scenario
-    missing:
-      id: {level: ERROR, message: "Cannot reference scenario in use_case.outcomes; graph edge missing"}
-      feature_path: {level: ERROR, message: "Cannot locate scenario file for test mapping"}
-
-  - artifact: e2e_test
-    missing:
-      scenario_path: {level: ERROR, message: "Test not linked to scenario; traceability broken"}
-      status: {level: ERROR, message: "Cannot determine if test is passing for reverse trace"}
-
-  - artifact: test_review
-    missing:
-      test_id: {level: ERROR, message: "Review not linked to test; quality gate ineffective"}
-      scenario_path: {level: ERROR, message: "Cannot verify scenario fidelity; mapping unconfirmed"}
-
-  - artifact: requirement
-    missing:
-      feature: {level: ERROR, message: "Cannot group requirements; impact analysis incomplete"}
-      description: {level: ERROR, message: "No specification available; implementation guidance missing"}
-
-rules_version: 1
-
-
+If you want the file adjusted (more validation rules, different external systems, stricter rules syntax, or removal of comments), reply with the single specific change and I will apply it.

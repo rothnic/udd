@@ -369,7 +369,12 @@ export function createReviewRecord(
 
 	const now = isoNow();
 
-	let validation = { passed: true, failed: [], missing: [] } as any;
+	// validation should conform to the shape returned by validateChecklist
+	let validation: { passed: boolean; failed: string[]; missing: string[] } = {
+		passed: true,
+		failed: [],
+		missing: [],
+	};
 	if (checklistObj) validation = validateChecklist(checklistObj, answers);
 
 	const status: TestStatus = validation.passed ? "clean" : "dirty";
@@ -552,12 +557,18 @@ export async function buildTestManifest(
 					path: path.relative(rootDir, testPath),
 					feature: feature ?? undefined,
 					status: "dirty",
-					dependencies: deps,
+					lastReviewed: null,
+					reviewCount: 0,
 					dirtyReason: "Initial scan - requires review",
-				} as any;
+				};
 
 				entries.push(entry);
-			} catch (err) {}
+			} catch (err) {
+				// Log the error for visibility but continue scanning other files.
+				// Swallowing silently made debugging difficult; prefer terse log.
+				// Use console.debug so normal output remains clean.
+				console.debug(`buildTestManifest: failed to analyze ${rel}:`, err);
+			}
 		}
 
 		return entries;

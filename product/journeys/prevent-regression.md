@@ -13,9 +13,9 @@ what needs attention.
 
 ## Steps
 
-1. Developer changes a feature file → `specs/test-governance/feature-change-detection.feature`
-2. System marks affected tests as dirty → `specs/test-governance/dirty-marking.feature`
-3. Sync command reports dirty tests → `specs/test-governance/sync-dirty-marking.feature`
+1. Developer changes a feature file → `specs/features/udd/test-governance/feature-change-detection.feature`
+2. System marks affected tests as dirty → `specs/features/udd/test-governance/dirty-marking.feature`
+3. Sync command reports dirty tests → `specs/features/udd/test-governance/sync-dirty-marking.feature`
 
 ## Success Criteria
 

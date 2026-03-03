@@ -1,0 +1,17 @@
+id: prevent_regression
+name: Prevent Regression
+summary: "Detect and block regressions by linking tests to features and enforcing lightweight diff-based test runs"
+phase: 3
+actors:
+  - developer
+  - agent
+outcomes:
+  - description: "Changed features trigger targeted tests"
+    scenarios:
+      - "udd/test-governance/feature-change-detection"
+  - description: "Pull requests run regression checks"
+    scenarios:
+      - "udd/test-governance/ci-validation"
+  - description: "Support for marking dirty tests when relevant files change"
+    scenarios:
+      - "udd/test-governance/dirty-marking"

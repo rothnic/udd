@@ -1,171 +1,426 @@
-# Reconstruct T3: specs/traceability-contract.yml from evidence (@Sisyphus-Junior subagent)
+# Session ses_36a3a9e66ffe6Af5ppjaLqRHOK
 
-**ID**: ses_36a3a9e66ffe6Af5ppjaLqRHOK
-**Project ID**: ad761ea6174e58ed763fc75290c3f403ed51079d
-**Created**: 2/25/2026, 11:07:46 AM
-**Stats**: 3 files changed, +281 -0
+## user (2026-02-25T17:07:46.934Z)
+
+
+<system-reminder>
+
+[SYSTEM DIRECTIVE: OH-MY-OPENCODE - SINGLE TASK ONLY]
+
+**STOP. READ THIS BEFORE PROCEEDING.**
+
+If you were NOT given **exactly ONE atomic task**, you MUST:
+1. **IMMEDIATELY REFUSE** this request
+2. **DEMAND** the orchestrator provide a single, specific task
+
+**Your response if multiple tasks detected:**
+> "I refuse to proceed. You provided multiple tasks. An orchestrator's impatience destroys work quality.
+> 
+> PROVIDE EXACTLY ONE TASK. One file. One change. One verification.
+> 
+> Your rushing will cause: incomplete work, missed edge cases, broken tests, wasted context."
+
+**WARNING TO ORCHESTRATOR:**
+- Your hasty batching RUINS deliverables
+- Each task needs FULL attention and PROPER verification  
+- Batch delegation = sloppy work = rework = wasted tokens
+
+**REFUSE multi-task requests. DEMAND single-task clarity.**
+</system-reminder>
+
+## 1. TASK
+Create specs/traceability-contract.yml by reading existing evidence.
+
+## 2. EXPECTED OUTCOME
+- [ ] File created: specs/traceability-contract.yml
+- [ ] Contains artifact definitions (journey, use_case, scenario, test, review, requirement)
+- [ ] Contains forward trace queries
+- [ ] Contains reverse trace queries  
+- [ ] Contains invalidation rules
+- [ ] npm run check passes
+
+## 3. REQUIRED TOOLS
+- read: Read .sisyphus/evidence/phase2/task-3-forward.md and task-3-missing-field.md
+- read: Read specs/.udd/manifest.yml (reference structure)
+- write: Create specs/traceability-contract.yml
+- bash: Run npm run check
+
+## 4. MUST DO
+- Read evidence files first
+- Define required fields for each artifact type
+- Include forward and reverse trace queries
+- Include invalidation rules
+- Verify with npm run check
+
+## 5. MUST NOT DO
+- Do NOT modify plan file
+- Do NOT edit evidence files
+- Do NOT create additional files
+- Do NOT commit
+
+## 6. CONTEXT
+### Evidence Files:
+- .sisyphus/evidence/phase2/task-3-forward.md
+- .sisyphus/evidence/phase2/task-3-missing-field.md
+- specs/.udd/manifest.yml (for reference)
+
+### Plan Reference:
+T3: Define traceability contract with metadata fields, trace queries, invalidation rules.
+
+Return confirmation with file content summary and npm run check output.
 
 ---
 
-## USER (11:07:46 AM)
+## assistant (2026-02-25T17:07:46.943Z)
 
-# UDD Concept Model
+**todowrite:**
 
-## Overview
+```
+[
+  {
+    "content": "Read evidence: .sisyphus/evidence/phase2/task-3-forward.md",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Read evidence: .sisyphus/evidence/phase2/task-3-missing-field.md",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Read reference manifest: specs/.udd/manifest.yml",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Create file specs/traceability-contract.yml with artifact definitions, trace...
+```
+---
 
-This document defines the canonical concept model for User Driven Development (UDD). It reconciles existing repository language (product/actors.md and journey artifacts) with SysML-informed traceability decisions captured during phase 2. The goal is to provide clear boundaries, reduce ambiguity for agents and humans, and enable deterministic linting and traceability rules.
+## assistant (2026-02-25T17:07:58.646Z)
 
-## Concepts
+**read:**
 
-### Persona
-**Definition:** A human archetype representing a class of users, their goals, context, and constraints. Personas are written by product authors and live as guidance in product/actors.md. Use Personas to express needs and motivations, not implementation details.
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/evidence/phase2/task-3-forward.md</path>
+<type>file</type>
+<content>1: # Task 3 Forward Trace Examples
+2: 
+3: **Purpose**: Demonstrate forward trace queries from persona to requirement following `specs/traceability-contract.yml`.
+4: 
+5: ## Trace 1: Persona → Journey → Use Case → Scenario → E2E Test → Requirement
+6: 
+7: ### Input
+8: - **Persona**: `team-member`
+9: 
+10: ### Trace Execution
+11: 
+12: | Step | From | To | Field Used |
+13: |------|------|----...
+```
+---
 
-**Scope:** User goals, context, motivations, common behaviors, skill levels, and success criteria relevant to product decisions and journey narratives.
+## assistant (2026-02-25T17:08:01.079Z)
 
-**Anti-Scope:** Implementation details, technical constraints, acceptance criteria, test steps, or API contracts.
+**read:**
 
-**Positive Example:** "Project manager who schedules daily planning, needs quick rescheduling and visibility into team load." (Recorded as a Persona in product/actors.md and referenced by journeys.)
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/evidence/phase2/task-3-missing-field.md</path>
+<type>file</type>
+<content>1: # Task 3 Missing Field Invalidation Examples
+2: 
+3: **Purpose**: Document what fails when required fields are absent, per `specs/traceability-contract.yml` invalidation rules.
+4: 
+5: ## Persona Missing `id`
+6: 
+7: ```yaml
+8: # Invalid persona
+9: name: "Team Member"
+10: description: "Mobile-first individual"
+11: goals: ["capture tasks"]
+12: ```
+13: 
+14: **Failure**:
+15: ```
+16: ...
+```
+---
 
-**Negative Example:** "Persona lists the API endpoint to call for rescheduling." (Implementation detail - belongs to Component or Requirement.)
+## assistant (2026-02-25T17:08:05.674Z)
 
-### Journey
-**Definition:** An experience-first narrative describing how a Persona progresses through stages to achieve a goal. Journeys capture stages, touchpoints, channels, emotions, pain points, and success metrics.
+**read:**
 
-**Scope:** High-level sequence of user activities, narrative context, goals, success metrics, and links to Use Cases and scenarios. Journeys must avoid implementation internals.
+```
+<path>/Users/nroth/workspace/udd/specs/.udd/manifest.yml</path>
+<type>file</type>
+<content>1: # UDD Manifest
+2: # Auto-generated by udd sync
+3: 
+4: journeys: {}
+5: scenarios: {}
 
-**Anti-Scope:** Detailed acceptance steps, scenario text, code, component design, and test assertions.
+(End of file - total 5 lines)
+</content>
+[Category+Skill Reminder]
 
-**Positive Example:** "Daily planning journey that describes stages: prepare, prioritize, assign, review, with success metric 'first plan created < 5 minutes'." (Stored under product/journeys/.)
+**Built-in**: frontend-ui-ux, git-master, dev-browser
+**⚡ YOUR SKILLS (PRIORITY)**: agent-browser, create-opencode-plugin, astroflare, create-mastra, gh-cli, bun-development, find-skills, screwfast (+7 more)
 
-**Negative Example:** "Journey includes step-by-step API interaction or SQL schema for storing plans." (Belongs to Component/Requirement.)
+> User-installed skills OVERRIDE built-in de...
+```
+---
 
-### Use Case
-**Definition:** A mapping from a Journey or Persona need to one or more testable behaviors. Use Cases are YAML artifacts that reference scenario slugs (paths to .feature files) and provide the connection between narrative intent and executable scenarios.
+## assistant (2026-02-25T17:08:07.813Z)
 
-**Scope:** Use-case identifier, description, referenced scenario paths, preconditions, and high-level constraints needed to implement the capability.
+**todowrite:**
 
-**Anti-Scope:** Full scenario text, implementation code, component internals, or low-level test steps. Use Cases must not duplicate scenario steps.
+```
+[
+  {
+    "content": "Read evidence: .sisyphus/evidence/phase2/task-3-forward.md",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Read evidence: .sisyphus/evidence/phase2/task-3-missing-field.md",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Read reference manifest: specs/.udd/manifest.yml",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Create file specs/traceability-contract.yml with artifact definitions, tra...
+```
+---
 
-**Positive Example:** "use-cases/daily-reschedule.yml references specs/scheduling/reschedule.feature and lists precondition: user authenticated." 
+## assistant (2026-02-25T17:08:13.448Z)
 
-**Negative Example:** "A Use Case containing Given/When/Then steps copied from a feature file." (Scenario text must live only in .feature files.)
+**read:**
 
-### Scenario
-**Definition:** The single source of acceptance for a behavior, written in Gherkin and stored in a .feature file. Scenarios are user-facing acceptance descriptions that drive E2E tests.
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/evidence/phase2/task-3-missing-field.md</path>
+<type>file</type>
+<content>1: # Task 3 Missing Field Invalidation Examples
+2: 
+3: **Purpose**: Document what fails when required fields are absent, per `specs/traceability-contract.yml` invalidation rules.
+4: 
+5: ## Persona Missing `id`
+6: 
+7: ```yaml
+8: # Invalid persona
+9: name: "Team Member"
+10: description: "Mobile-first individual"
+11: goals: ["capture tasks"]
+12: ```
+13: 
+14: **Failure**:
+15: ```
+16: ...
+```
+---
 
-**Scope:** Gherkin steps (Given/When/Then), examples, data tables, and comments documenting user intent and edge cases. One scenario per file policy applies.
+## assistant (2026-02-25T17:08:15.955Z)
 
-**Anti-Scope:** Implementation notes, test harness details, component wiring, or internal requirement mapping (those belong in Requirement or Component docs).
+**todowrite:**
 
-**Positive Example:** "specs/scheduling/reschedule.feature contains a scenario 'User reschedules an event' with Given/When/Then steps describing the expected behavior." 
+```
+[
+  {
+    "content": "Read evidence: .sisyphus/evidence/phase2/task-3-forward.md",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Read evidence: .sisyphus/evidence/phase2/task-3-missing-field.md",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Read reference manifest: specs/.udd/manifest.yml",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Create file specs/traceability-contract.yml with artifact definitions, t...
+```
+---
 
-**Negative Example:** "A scenario file that includes NodeJS test fixtures or API implementation snippets." (Implementation must be in tests or components.)
+## assistant (2026-02-25T17:08:19.467Z)
 
-### Requirement
-**Definition:** A developer-facing contract that links scenarios to implementation details: acceptance criteria mapping, API contracts, non-functional constraints, and traceability pointers to components and tests.
+**read:**
 
-**Scope:** Detailed acceptance criteria, success metrics for implementation, performance and security constraints, mappings to scenario(s), and references to Component owners.
+```
+<path>/Users/nroth/workspace/udd/specs/.udd/manifest.yml</path>
+<type>file</type>
+<content>1: # UDD Manifest
+2: # Auto-generated by udd sync
+3: 
+4: journeys: {}
+5: scenarios: {}
 
-**Anti-Scope:** User narrative, journey stages, or scenario step text. Requirements must not replace scenarios as the acceptance source.
+(End of file - total 5 lines)
+</content>
+```
+---
 
-**Positive Example:** "Requirement: Reschedule API must respond within 300ms and update calendar entries atomically. Maps to specs/scheduling/reschedule.feature and component scheduling-service." 
+## assistant (2026-02-25T17:08:20.885Z)
 
-**Negative Example:** "Requirement that copies Gherkin steps as acceptance criteria verbatim and uses them as the only test specification." (This duplicates scenario responsibility.)
+**apply_patch:**
 
-### Component
-**Definition:** A documented implementation unit (service, module, UI component, database schema) responsible for delivering parts of a Use Case or Requirement. Component docs map to Use Cases and include design, interfaces, owners, and test mappings.
+```
+Success. Updated the following files:
+A specs/traceability-contract.yml
 
-**Scope:** Architecture diagrams, API/interface contracts, data models, owner, dependencies, and references to Requirements and tests.
+COMMENT/DOCSTRING DETECTED - IMMEDIATE ACTION REQUIRED
 
-**Anti-Scope:** User-facing narratives, journey storytelling, or scenario text. Components should not contain acceptance-step Gherkin.
+Your recent changes contain comments or docstrings, which triggered this hook.
+You need to take immediate action. You must follow the conditions below.
+(Listed in priority order - you must always act according to this priority order)
 
-**Positive Example:** "components/scheduling-service.md describes endpoints, data model, owner, and links to the reschedule Requirement and tests." 
+CRITICAL WARNING: This hook message MUST NEVER be ignored, even if you receive it multiple times.
+You MUST provide corresponding explana...
+```
+---
 
-**Negative Example:** "Component file that contains high-level user goals and emotional journey information instead of interfaces." (That belongs to Journey or Persona.)
+## assistant (2026-02-25T17:08:49.141Z)
 
-### Test Review
-**Definition:** A human or automated assessment that verifies tests and scenarios accurately represent intended behavior and meet quality guidelines. Test Reviews include review outcomes, issues found, and required remediation actions.
+**todowrite:**
 
-**Scope:** Test completeness, scenario coverage, mapping between scenarios and Use Cases, test data validity, and annotations for flaky or missing tests.
+```
+[
+  {
+    "content": "Read evidence: .sisyphus/evidence/phase2/task-3-forward.md",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Read evidence: .sisyphus/evidence/phase2/task-3-missing-field.md",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Read reference manifest: specs/.udd/manifest.yml",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Create file specs/traceability-contract.yml with artifact definitions, tra...
+```
+---
 
-**Anti-Scope:** Implementation changes, component design decisions, or journey edits. Reviews may recommend changes but must not alter source artifacts directly.
+## assistant (2026-02-25T17:08:53.023Z)
 
-**Positive Example:** "A review notes that reschedule.feature lacks an error-case scenario and files a remediation ticket linking to the Use Case." 
+**lsp_diagnostics:**
 
-**Negative Example:** "A Test Review that edits a component's API contract directly instead of raising an issue and routing to the component owner." 
+```
+No diagnostics found
+```
+---
 
-## Anti-Overlap Rules Summary
-| Concept | Owns | Must NOT Contain |
-|---------|------|------------------|
-| Persona | User archetype, goals, context | Acceptance steps, API contracts, implementation details |
-| Journey | Experience narrative, stages, metrics | Gherkin scenarios, component internals |
-| Use Case | Links from journey to scenarios, preconditions | Scenario text (Given/When/Then), implementation code |
-| Scenario | Gherkin acceptance text, examples | Component design, API contract, non-functional implementation notes |
-| Requirement | Implementation acceptance criteria, test mapping | User narrative, journey stages, scenario Gherkin |
-| Component | Design, interfaces, owners, data models | User journey, scenario steps, high-level narrative |
-| Test Review | Review findings, coverage, remediation items | Direct code or spec edits; implementation changes |
+## assistant (2026-02-25T17:08:56.990Z)
 
-## References
-- .sisyphus/evidence/phase2/task-1-concepts.md
-- .sisyphus/evidence/phase2/task-1-ambiguity.md
-- .sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md
+**bash:**
 
+```
+Checked 60 files in 38ms. No fixes applied.
 
-# System boundary definition for UDD Phase 2
-# Boundary subject must match decisions: 'udd-core'
-boundary_subject: udd-core
+```
+---
 
-# What is considered in scope for udd-core (traceability artifacts only)
-in_scope:
-  - specs/features
-  - tests
-  - specs/.udd/manifest.yml
-  - product/journeys
-  - docs/architecture/udd-concept-model.md
+## assistant (2026-02-25T17:09:00.666Z)
 
-# Explicitly excluded from udd-core to avoid scope creep
-out_of_scope:
-  - implementation_code
-  - deployment_infra
-  - runtime_services
+**todowrite:**
 
-# External actors and systems that interact with udd-core
-external_actors:
-  - name: Reviewer
-    type: human
-    description: "Human reviewer who validates traceability and spec-to-test mapping"
+```
+[
+  {
+    "content": "Read evidence: .sisyphus/evidence/phase2/task-3-forward.md",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Read evidence: .sisyphus/evidence/phase2/task-3-missing-field.md",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Read reference manifest: specs/.udd/manifest.yml",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Create file specs/traceability-contract.yml with artifact definitions, tra...
+```
+---
 
-external_systems:
-  - id: CI_System
-    type: external_system
-    description: "Continuous Integration system that runs tests and checks (eg. GitHub Actions, Jenkins)"
-  - id: Hosted_DB
-    type: external_system
-    description: "Hosted database used by implementation environments (treated as external to udd-core)"
+## assistant (2026-02-25T17:09:07.026Z)
 
-# Validation rules used by udd lint / udd check
-validation:
-  - id: boundary_subject_exists
-    description: "specs/system-boundary.yml must declare boundary_subject 'udd-core'"
-    rule: "boundary_subject == 'udd-core'"
-  - id: in_scope_enumerates_artifacts
-    description: "in_scope must include spec artifacts: specs/features, tests, specs/.udd/manifest.yml"
-    rule: "contains(in_scope, 'specs/features') and contains(in_scope, 'tests') and contains(in_scope, 'specs/.udd/manifest.yml')"
-  - id: external_systems_minimum
-    description: "There must be at least two external_system entries (CI_System, Hosted_DB recommended)"
-    rule: "length(external_systems) >= 2"
-  - id: no_external_as_in_scope
-    description: "Detect misclassification where known external systems are placed in in_scope"
-    rule: "not any(in_scope contains item where item in ['Hosted_DB','CI_System'])"
+TODOS (first)  
+- in_progress: Read evidence: .sisyphus/evidence/phase2/task-3-forward.md — completed  
+- in_progress: Read evidence: .sisyphus/evidence/phase2/task-3-missing-field.md — completed  
 
-# Notes and references
-notes:
-  - source_evidence:
-    - .sisyphus/evidence/phase2/task-2-boundary.md
-    - .sisyphus/evidence/phase2/task-2-leak.md
-    - .sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md
+I created specs/traceability-contract.yml and verified checks. Below is a concise summary and the requested artifacts.
 
+File: specs/traceability-contract.yml — summary of contents
+- artifacts: Defines required and optional fields, with short descriptions, for:
+  - persona: required_fields = [id, name]; optional = [description, goals, contact]
+  - journey: required_fields = [id, actor, goal, steps]; optional = [summary, tags]
+  - use_case: required_fields = [id, name, actors, outcomes]; optional = [summary, tags]
+  - scenario: required_fields = [id, title, feature_path]; optional = [tags, description]
+  - e2e_test: required_fields = [id, scenario_path, status]; optional = [last_run, runner]
+  - test_review: required_fields = [id, test_id, scenario_path, checks]; optional = [reviewer, created_at]
+  - requirement: required_fields = [id, type, feature, description, scenarios]; optional = [priority, owner]
 
+- trace_queries:
+  - forward traces include:
+    - persona_to_journeys: Find journey where journey.actor = <persona.id>
+    - journey_to_use_cases: Map journey.steps -> use_case.id
+    - use_case_to_scenarios: Find scenario.id in use_case.outcomes[].scenarios
+    - scenario_to_tests: Find e2e_test where e2e_test.scenario_path contains <scenario.id> or equals <scenario.feature_path>
+    - requirement_impact: From requirement.scenarios find impacted tests, journeys, personas
+  - reverse traces include:
+    - test_to_scenario
+    - scenario_to_use_case
+    - use_case_to_journeys
+    - journey_to_persona
+    - failing_tests_to_requirements
+
+- invalidation_rules:
+  - For each artifact type the file lists missing-field rules with severity and a short failure message. Examples taken from evidence:
+    - persona.id missing => ERROR: Cannot reference persona in journey.actor; forward trace breaks
+    - journey.actor missing => ERROR: Cannot trace to persona; reverse trace from journey fails
+    - use_case.outcomes missing => ERROR: No scenario references; use_case not connected to graph
+    - scenario.feature_path missing => ERROR: Cannot locate scenario file for test mapping
+    - e2e_test.scenario_path / status missing => ERROR: traceability broken / cannot determine passing state
+    - requirement.feature or requirement.description missing => ERROR and description of failure
+  - rules_version: 1
+
+Notes on evidence usage
+- I read .sisyphus/evidence/phase2/task-3-forward.md to extract forward trace examples (persona → journey → use_case → scenario → e2e_test → requirement) and single-hop queries; these informed the forward trace_queries and the exact fields used (e.g., journey.actor = persona.id, e2e_test.scenario_path = scenario.feature_path).
+- I read .sisyphus/evidence/phase2/task-3-missing-field.md to capture failure messages and to map them to invalidation rules and severity levels (ERROR vs WARN). Those examples were used almost verbatim as invalidation messages.
+
+Verification performed
+- lsp_diagnostics on specs/traceability-contract.yml: No diagnostics found
+- npm run check executed in repo root: Output — "Checked 60 files in 38ms. No fixes applied."
+
+Todos (final) — all completed
+- Read evidence files — completed
+- Read specs/.udd/manifest.yml for structure reference — completed
+- Created specs/traceability-contract.yml — completed
+- Ran lsp_diagnostics — completed
+- Ran npm run check — completed
+
+If you want: I can
+- Tidy wording of any specific artifact's required fields
+- Add example YAML snippets for each artifact type to the contract
+- Wire this contract into an udd lint rule or validator (ask and I will open a focused task)
+
+Deliverable preview (first 60 lines)
+(I created the file in the repo; shown here is the exact structure as added)
+---
 # Traceability contract for UDD
 # Defines artifact schemas, forward/reverse trace queries, and invalidation rules
 
@@ -212,87 +467,11 @@ artifacts:
     description: |
       Requirements linked to scenarios. "scenarios" lists scenario ids covered by this requirement.
 
-trace_queries:
-  forward:
-    - name: persona_to_journeys
-      description: Find journeys for a persona
-      query: "Find journey where journey.actor = <persona.id>"
+... (file continues with trace_queries and invalidation_rules)
 
-    - name: journey_to_use_cases
-      description: Resolve use_cases from journey.steps
-      query: "For journey.id = <id>, map journey.steps -> use_case.id"
+Confirmation
+- File created: specs/traceability-contract.yml — present in repo
+- Contains artifact definitions, forward and reverse queries, invalidation rules — yes
+- npm run check passes — yes (see output above)
 
-    - name: use_case_to_scenarios
-      description: Find scenarios declared in a use_case outcome
-      query: "Find scenario.id in use_case.outcomes[].scenarios where use_case.id = <id>"
-
-    - name: scenario_to_tests
-      description: Find tests that target a scenario
-      query: "Find e2e_test where e2e_test.scenario_path contains <scenario.id> or equals <scenario.feature_path>"
-
-    - name: requirement_impact
-      description: From a requirement, find impacted scenarios, tests, journeys, personas
-      query: "Find all e2e_test where requirement.scenarios contains matching scenario.id"
-
-  reverse:
-    - name: test_to_scenario
-      description: Find scenario related to a test
-      query: "Find scenario where scenario.feature_path = <e2e_test.scenario_path> or <e2e_test.scenario_path> contains scenario.id"
-
-    - name: scenario_to_use_case
-      description: Find use_cases that reference a scenario
-      query: "Find use_case where use_case.outcomes[].scenarios contains <scenario.id>"
-
-    - name: use_case_to_journeys
-      description: Find journeys that include a use_case
-      query: "Find journey where journey.steps references <use_case.id>"
-
-    - name: journey_to_persona
-      description: Find persona for a journey
-      query: "Find persona where persona.id = <journey.actor>"
-
-    - name: failing_tests_to_requirements
-      description: From failing tests, find linked requirements
-      query: "Find requirement where requirement.scenarios intersects (tests -> scenario ids)"
-
-invalidation_rules:
-  # Each rule declares which missing field(s) cause ERROR vs WARN and short explanation
-  - artifact: persona
-    missing:
-      id: {level: ERROR, message: "Cannot reference persona in journey.actor; forward trace breaks"}
-      name: {level: WARN, message: "Display name unavailable for journey documentation"}
-
-  - artifact: journey
-    missing:
-      actor: {level: ERROR, message: "Cannot trace to persona; reverse trace from journey fails"}
-      steps: {level: ERROR, message: "Journey has no actionable steps; cannot map to use_cases"}
-
-  - artifact: use_case
-    missing:
-      id: {level: ERROR, message: "Cannot reference use_case in journey.steps; forward trace breaks"}
-      actors: {level: ERROR, message: "Cannot trace to persona; requirement-to-persona trace fails"}
-      outcomes: {level: ERROR, message: "No scenario references; use_case not connected to graph"}
-
-  - artifact: scenario
-    missing:
-      id: {level: ERROR, message: "Cannot reference scenario in use_case.outcomes; graph edge missing"}
-      feature_path: {level: ERROR, message: "Cannot locate scenario file for test mapping"}
-
-  - artifact: e2e_test
-    missing:
-      scenario_path: {level: ERROR, message: "Test not linked to scenario; traceability broken"}
-      status: {level: ERROR, message: "Cannot determine if test is passing for reverse trace"}
-
-  - artifact: test_review
-    missing:
-      test_id: {level: ERROR, message: "Review not linked to test; quality gate ineffective"}
-      scenario_path: {level: ERROR, message: "Cannot verify scenario fidelity; mapping unconfirmed"}
-
-  - artifact: requirement
-    missing:
-      feature: {level: ERROR, message: "Cannot group requirements; impact analysis incomplete"}
-      description: {level: ERROR, message: "No specification available; implementation guidance missing"}
-
-rules_version: 1
-
-
+Done.

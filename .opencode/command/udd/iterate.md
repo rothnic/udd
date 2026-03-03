@@ -12,6 +12,28 @@ Autonomous iteration loop for UDD projects. Use this to drive continuous progres
 ### Status (JSON)
 !`./bin/udd status --json`
 
+## Current Project Status (injection)
+
+The command above injects the live UDD status. Before you begin any iteration work run `udd doctor` to validate environment and dependencies. If you see drift or errors run `udd doctor --fix`.
+
+Display guidance (derived from the status JSON):
+
+- **Phase**: `current_phase` (show numeric phase and name from roadmap)
+- **Roadmap**: list next 2-3 milestones for the current phase
+- **Dirty Tests**: If `dirty_tests_count` > 0 show count and advise running `udd test`
+- **Drift Status**: If any `drift` or `issues` keys exist show a short warning and link to remediation below
+
+Example injection (rendered from JSON):
+
+```
+## Current Project Status
+
+**Phase**: 3 - OpenCode Integration
+**Roadmap (next steps)**: sync journeys → generate scenarios → implement failing scenarios
+**Dirty Tests**: 46 (run `udd test` to refresh results)
+**Drift Status**: ⚠️ 31 issues detected (run `udd doctor` for diagnostics or `udd doctor --fix` to attempt automated remediation)
+```
+
 ### Git State
 !`git status --short`
 
@@ -27,6 +49,8 @@ From the JSON status above, identify:
 3. Any `missing` scenarios - these need test files
 4. Any `stale` scenarios - run `/udd/test` first
 5. Git state - commit completed work before continuing
+
+Before making code changes run `udd status` again and `udd doctor` to ensure the environment is healthy. If `udd status` shows drift between journeys/specs/tests, follow remediation guidance (see below) before implementing new behavior.
 
 ### Step 2: Check Completion
 
@@ -68,6 +92,15 @@ If not COMPLETE or ERROR, execute exactly ONE of these (priority order):
 5. **Missing spec**: Create the scenario spec
 
 After completing the action, the orchestrator should call `/udd/iterate` again.
+
+### Remediation guidance (when drift detected)
+
+- If `journeys` changed but `specs` not in sync: run `udd sync` to generate/update feature files, then run `udd status`.
+- If specs exist but tests failing due to environment or dependencies: run `udd doctor` and then `udd doctor --fix` if appropriate.
+- If tests are stale: run `udd test` to refresh results before implementing code changes.
+- If many failing tests across unrelated journeys: pause iteration and request human review.
+
+Link: Use `udd doctor --fix` as the automated first-step remediation for environment and simple drift fixes. For semantic drift (spec changed, tests failing), prefer `udd sync` then `udd test`.
 
 ### Step 5: Report Progress
 

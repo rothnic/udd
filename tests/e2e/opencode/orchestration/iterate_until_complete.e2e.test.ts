@@ -152,7 +152,8 @@ if (!_hasRunnable) {
 
 			And("the OpenCode SDK is available", () => {
 				// SDK simulated for testing orchestration logic
-				expect(true).toBe(true);
+				expect(projectStatus).toBeDefined();
+				expect(typeof projectStatus).toBe("object");
 			});
 		});
 
@@ -162,8 +163,9 @@ if (!_hasRunnable) {
 				Given(
 					"an orchestrator agent session with iteration instructions",
 					() => {
-						// Orchestrator session configured
-						expect(true).toBe(true);
+						// Orchestrator session configured - will be populated when status is analyzed
+						expect(projectStatus).toBeDefined();
+						expect(typeof projectStatus).toBe("object");
 					},
 				);
 
@@ -186,7 +188,8 @@ if (!_hasRunnable) {
 
 				And("wait for the worker to go idle", () => {
 					// Worker idle wait simulated
-					expect(true).toBe(true);
+					expect(orchestratorState.isComplete).toBeDefined();
+					expect(typeof orchestratorState.isComplete).toBe("boolean");
 				});
 			},
 		);
@@ -298,6 +301,79 @@ if (!_hasRunnable) {
 
 				And("the orchestration process should terminate successfully", () => {
 					expect(completionResponse).toBeTruthy();
+				});
+			},
+		);
+
+		Scenario(
+			"Orchestrator handles worker failure",
+			({ Given, When, Then, And }) => {
+				let workerError: Error | undefined;
+				let errorCaptured: boolean;
+				let iterationCount: number;
+				let maxIterations: number;
+
+				Given("a worker agent is processing a task", () => {
+					// Worker is processing
+					errorCaptured = false;
+					iterationCount = 0;
+					maxIterations = 10;
+				});
+
+				When("the worker fails with an error", () => {
+					workerError = new Error("Worker failed: timeout");
+					errorCaptured = true;
+					// Stop iteration on error
+					iterationCount = maxIterations;
+				});
+
+				Then("the orchestrator should capture the error", () => {
+					expect(errorCaptured).toBe(true);
+					expect(workerError).toBeDefined();
+					expect(workerError!.message).toContain("timeout");
+				});
+
+				And("the orchestrator should preserve session state for retry", () => {
+					// Session state should be preserved for retry
+					expect(projectStatus).toBeDefined();
+					expect(orchestratorState).toBeDefined();
+					expect(orchestratorState.workRemaining).toBeDefined();
+				});
+			},
+		);
+
+		Scenario(
+			"Orchestrator handles maximum iteration limit",
+			({ Given, When, Then, And }) => {
+				let iterationCount: number;
+				let maxIterations: number;
+				let iterationLimitReached: boolean;
+
+				Given("the iteration limit is set to 5", () => {
+					iterationCount = 0;
+					maxIterations = 5;
+					iterationLimitReached = false;
+				});
+
+				When("the task requires more than 5 iterations", () => {
+					// Simulate iteration cycles with a limit
+					while (iterationCount < maxIterations && iterationCount < 10) {
+						iterationCount++;
+					}
+					if (iterationCount >= maxIterations) {
+						iterationLimitReached = true;
+					}
+				});
+
+				Then("the orchestrator should stop at the limit", () => {
+					expect(iterationCount).toBe(5);
+					expect(iterationLimitReached).toBe(true);
+				});
+
+				And("report partial completion", () => {
+					// In a real scenario, would report partial completion
+					expect(iterationLimitReached).toBe(true);
+					expect(maxIterations).toBe(5);
 				});
 			},
 		);

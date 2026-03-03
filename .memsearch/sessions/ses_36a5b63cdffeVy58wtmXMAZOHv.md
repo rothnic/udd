@@ -1,545 +1,682 @@
-# undefined (@Sisyphus-Junior subagent)
+# Session ses_36a5b63cdffeVy58wtmXMAZOHv
 
-**ID**: ses_36a5b63cdffeVy58wtmXMAZOHv
-**Project ID**: ad761ea6174e58ed763fc75290c3f403ed51079d
-**Created**: 2/25/2026, 10:31:59 AM
-**Stats**: 2 files changed, +0 -530
+## user (2026-02-25T16:31:59.242Z)
+
+<system-reminder>
+
+[SYSTEM DIRECTIVE: OH-MY-OPENCODE - SINGLE TASK ONLY]
+
+**STOP. READ THIS BEFORE PROCEEDING.**
+
+If you were NOT given **exactly ONE atomic task**, you MUST:
+1. **IMMEDIATELY REFUSE** this request
+2. **DEMAND** the orchestrator provide a single, specific task
+
+**Your response if multiple tasks detected:**
+> "I refuse to proceed. You provided multiple tasks. An orchestrator's impatience destroys work quality.
+> 
+> PROVIDE EXACTLY ONE TASK. One file. One change. One verification.
+> 
+> Your rushing will cause: incomplete work, missed edge cases, broken tests, wasted context."
+
+**WARNING TO ORCHESTRATOR:**
+- Your hasty batching RUINS deliverables
+- Each task needs FULL attention and PROPER verification  
+- Batch delegation = sloppy work = rework = wasted tokens
+
+**REFUSE multi-task requests. DEMAND single-task clarity.**
+</system-reminder>
+
+<Work_Context>
+## Notepad Location (for recording learnings)
+NOTEPAD PATH: .sisyphus/notepads/{plan-name}/
+- learnings.md: Record patterns, conventions, successful approaches
+- issues.md: Record problems, blockers, gotchas encountered
+- decisions.md: Record architectural choices and rationales
+- problems.md: Record unresolved issues, technical debt
+
+You SHOULD append findings to notepad files after completing work.
+IMPORTANT: Always APPEND to notepad files - never overwrite or use Edit tool.
+
+## Plan Location (READ ONLY)
+PLAN PATH: .sisyphus/plans/{plan-name}.md
+
+CRITICAL RULE: NEVER MODIFY THE PLAN FILE
+
+The plan file (.sisyphus/plans/*.md) is SACRED and READ-ONLY.
+- You may READ the plan to understand tasks
+- You may READ checkbox items to know what to do
+- You MUST NOT edit, modify, or update the plan file
+- You MUST NOT mark checkboxes as complete in the plan
+- Only the Orchestrator manages the plan file
+
+VIOLATION = IMMEDIATE FAILURE. The Orchestrator tracks plan state.
+</Work_Context>
+## 1. TASK
+Revert and remove out-of-scope, untracked artifacts introduced earlier and ensure ONLY the allowed T7 files remain modified in the working tree. Allowed files (only these may be present modified/untracked):
+- specs/journey-map.schema.yml
+- specs/journey-map.example.yml
+- .sisyphus/evidence/phase2/task-7-map-valid.md
+- .sisyphus/evidence/phase2/task-7-map-invalid.md
+- .sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md (append-only)
+- .sisyphus/notepads/udd-sysml-traceability-phase2/learnings.md (append-only)
+
+If any other files or directories were created or modified by the previous subagent (e.g., docs/architecture/, specs/system-boundary.yml, specs/traceability-contract.yml), remove them from the working tree (delete untracked files) so the working tree shows only the allowed file changes. Do NOT commit or push. Do not modify the allowed files beyond what is necessary to make them correct.
+
+## 2. EXPECTED OUTCOME
+- [ ] Files removed (deleted from working tree, not committed): docs/architecture/* (if present), specs/system-boundary.yml, specs/traceability-contract.yml, and any other files outside the allowed list that were added by the previous steps.
+- [ ] The working tree (git status --porcelain) shows only the allowed files as modified/untracked.
+- [ ] lsp_diagnostics on the two YAML files (schema + example) report no errors.
+- [ ] npm run check exits 0 and npm test exits 0.
+- [ ] Evidence: capture and append exact outputs to .sisyphus/evidence/phase2/task-7-map-valid.md (append at end) showing: git status --porcelain, git diff --stat, lsp_diagnostics summary, npm run check output, npm test summary, rg pattern check, rg use_case_ref check.
+
+## 3. REQUIRED TOOLS
+- git-master: Use git commands (git status, git clean, rm) to remove untracked files and restore clean working tree.
+- bun-file-io: Read and append to notepads/evidence safely.
+- bun-development: Run npm run check and npm test.
+- read: Read notepad files before finalizing.
+- bash: Execute verification commands.
+
+## 4. MUST DO
+- Read .sisyphus/notepads/udd-sysml-traceability-phase2/learnings.md and decisions.md before making deletions; include a 1-line excerpt in the evidence append explaining rationale.
+- Only delete untracked files (use git clean -f for specific paths or rm). Do NOT touch tracked files not in allowed list without explicit instruction. If a non-allowed file is tracked (modified in HEAD), STOP and report — do not delete tracked files.
+- After deletions, run and capture exact outputs for these commands (copy-paste outputs into the evidence file):
+  1) git status --porcelain
+  2) git diff --stat
+  3) lsp_diagnostics specs/journey-map.schema.yml
+  4) lsp_diagnostics specs/journey-map.example.yml
+  5) npm run check
+  6) npm test
+  7) rg "pattern: '^[a-z0-9]+(?:[-_][a-z0-9]+)*$'" specs/journey-map.schema.yml || rg "pattern: .*[_-]" specs/journey-map.schema.yml
+  8) rg "use_case_ref:" specs/journey-map.example.yml
+- Append the outputs to .sisyphus/evidence/phase2/task-7-map-valid.md under a section "Verification outputs:"
+- Ensure final git status shows only allowed files changed. If not, revert and retry.
+
+## 5. MUST NOT DO
+- Do NOT commit or push changes.
+- Do NOT modify .sisyphus/plans/udd-sysml-traceability-phase2.md.
+- Do NOT change any source code or tests outside allowed files.
+- Do NOT delete tracked files unless they are explicitly out-of-scope and you obtain permission; instead report tracked out-of-scope files.
+
+## 6. CONTEXT
+### Notepad Paths (READ before editing)
+- READ: .sisyphus/notepads/udd-sysml-traceability-phase2/learnings.md
+- READ: .sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md
+
+### Inherited Wisdom (from notepads)
+- The repo enforces scenario-as-source-of-truth; use-cases must reference scenario paths. Naming policy prefers kebab-case but migration required for underscores.
+- Prior subagent created docs/architecture/ files and other specs; these are out-of-scope for T7 and must be removed from the working tree.
+
+### Failure handling
+- If any non-allowed files are tracked (modified in HEAD), STOP and return git status and list of tracked files. Do NOT delete tracked files.
+- If deletions succeed, proceed to verification steps and append outputs to evidence file.
 
 ---
 
-## USER (10:31:59 AM)
-
-# System boundary definition for UDD - Phase 2
-# This YAML defines the system-under-design (boundary subject), what is in-scope,
-# out-of-scope, and explicit external actors and external systems with type markers.
-
-boundary_subject: udd-core
-
-# Criteria for items considered inside the system boundary. Keep these atomic and
-# deterministic so udd tooling can make decisions programmatically.
-in_scope:
-  - id: scenario-and-test-mapping
-    summary: "All .feature scenario files, use-case YAMLs, and tests that implement those scenarios"
-    criteria:
-      - "Files under specs/features/** are authoritative for user-facing behavior"
-      - "Tests under tests/** that map to scenario paths are implementation verification"
-
-  - id: udd-cli-and-spec-generation
-    summary: "CLI commands and sync tooling that generate or update spec artifacts"
-    criteria:
-      - "bin/udd, templates/, and scripts/ that produce specs or manifest entries"
-
-  - id: artefact-metadata
-    summary: "Manifest and mapping metadata used for traceability"
-    criteria:
-      - "specs/.udd/manifest.yml and any use-case YAMLs that reference scenario paths"
-
-out_of_scope:
-  - id: runtime-implementation
-    summary: "Application runtime code and services that implement requirements"
-    rules:
-      - "Source code under src/ and implementation tests that are not direct scenario-verifications are outside the boundary"
-
-  - id: external-hosted-services
-    summary: "Third-party services and external infrastructure not owned by project"
-    rules:
-      - "External CI, hosted DBs, analytics, auth providers are considered external systems"
-
-# Explicit external markers. These name external entities and classify them so tooling
-# and reviewers can unambiguously tell them apart from internal actors/components.
-external_actors:
-  - name: ProductOwner
-    type: human
-    description: "Person who authors journeys and approves scenarios (document-only actor)."
-
-  - name: EndUser
-    type: human
-    description: "Representative persona consuming the delivered behavior in scenarios."
-
-external_systems:
-  - name: CI_System
-    type: external_system
-    provider: "external-ci"
-    description: "Continuous integration system that runs tests, not part of udd-core boundary."
-
-  - name: Hosted_DB
-    type: external_system
-    provider: "cloud-db"
-    description: "Persistent storage hosted outside repository scope; implementation-level dependency."
-
-# Boundary leakage examples (invalid usages). These are explicit negative examples that
-# tooling or reviewers should flag as boundary violations.
-boundary_leakage_invalid_examples:
-  - id: duplicate-scenario-text-in-journey
-    description: "Embedding Given/When/Then scenario text inside product/journeys/*.md instead of referencing scenario path"
-    why: "Violates single source of truth; moves scenario text outside specs/features and confuses traceability"
-
-  - id: declaring-internal-service-as-external
-    description: "Listing an internal component (src/task_service) under external_systems or actors"
-    why: "Creates ambiguity about ownership; internal components must be documented under specs/components or code, not as external_systems"
-
-  - id: external-system-treated-as-in-scope
-    description: "Adding CI_System to in_scope or treating Hosted_DB as owned internal storage"
-    why: "Misclassifies external dependencies as internal, which prevents correct risk and planning decisions"
-
-notes:
-  - "Boundary subject name 'udd-core' chosen to align with package and README naming and to avoid using generic 'system' which caused ambiguity in earlier work."
-  - "Keep in_scope focused on artifacts and tooling that are part of the spec-first workflow only. Implementation code is explicitly out_of_scope."
-
-
-# Traceability Contract Schema
-# Defines required metadata fields for all UDD artifacts that participate in trace queries.
-# Boundary subject: udd-core
-
-# ============================================================================
-# ARTIFACT TYPE DEFINITIONS
-# Each artifact type has required fields, field types, ownership semantics,
-# and example values. These enforce the trace graph structure.
-# ============================================================================
-
-artifacts:
-  # --------------------------------------------------------------------------
-  # Persona / Actor Record
-  # Represents a user archetype who performs journeys. Located in product/actors.md
-  # or journey frontmatter. Used to ground traceability to user intent.
-  # --------------------------------------------------------------------------
-  persona:
-    required_fields:
-      - name: id
-        type: string
-        pattern: "kebab-case slug"
-        description: "Unique identifier for the persona"
-        example: "team-member"
-        owner: "ProductOwner"
-
-      - name: name
-        type: string
-        description: "Human-readable display name"
-        example: "Team Member"
-        owner: "ProductOwner"
-
-      - name: description
-        type: string
-        description: "Brief context describing goals and pain points"
-        example: "Mobile-first individual who needs to capture ideas quickly"
-        owner: "ProductOwner"
-
-      - name: goals
-        type: array[string]
-        description: "Measurable goals the persona wants to achieve"
-        example: ["capture tasks", "surface top 3 priorities"]
-        owner: "ProductOwner"
-
-    optional_fields:
-      - name: references
-        type: array[string]
-        description: "Paths to journey files where this persona appears"
-
-  # --------------------------------------------------------------------------
-  # Journey
-  # A user-focused outcome with ordered steps. Located in product/journeys/*.md
-  # --------------------------------------------------------------------------
-  journey:
-    required_fields:
-      - name: id
-        type: string
-        pattern: "kebab-case slug"
-        description: "Unique identifier for the journey"
-        example: "new-user-onboarding"
-        owner: "ProductOwner"
-
-      - name: actor
-        type: string
-        description: "Reference to persona id who performs this journey"
-        example: "team-member"
-        owner: "ProductOwner"
-
-      - name: goal
-        type: string
-        description: "Outcome the user wants to achieve"
-        example: "Sign up and start using the app"
-        owner: "ProductOwner"
-
-      - name: steps
-        type: array[step]
-        description: "Ordered list of step references (path or use_case id)"
-        example:
-          - "User signs up → specs/auth/signup.feature"
-          - "User creates first item → use_cases/create_first_item"
-        owner: "ProductOwner"
-
-    optional_fields:
-      - name: success_criteria
-        type: string
-        description: "Measurable success condition"
-
-  # --------------------------------------------------------------------------
-  # Use Case
-  # Compact YAML mapping persona intent to scenarios. Located in specs/use-cases/*.yml
-  # --------------------------------------------------------------------------
-  use_case:
-    required_fields:
-      - name: id
-        type: string
-        pattern: "kebab-case slug"
-        description: "Unique identifier for the use case"
-        example: "capture_ideas"
-        owner: "ProductOwner"
-
-      - name: name
-        type: string
-        description: "Human-readable name"
-        example: "Capture Ideas"
-        owner: "ProductOwner"
-
-      - name: summary
-        type: string
-        description: "One-line description of the interaction goal"
-        example: "Quickly capture raw ideas into an inbox"
-        owner: "ProductOwner"
-
-      - name: actors
-        type: array[string]
-        description: "List of persona ids involved in this use case"
-        example: ["team-member"]
-        owner: "ProductOwner"
-
-      - name: outcomes
-        type: array[outcome]
-        description: "Expected outcomes with scenario references"
-        owner: "ProductOwner"
-
-    optional_fields:
-      - name: scenarios
-        type: array[string]
-        description: "Direct scenario path references (alternative to outcomes)"
-
-  # --------------------------------------------------------------------------
-  # Scenario
-  # Single Gherkin Scenario block. Located in specs/features/<area>/<feature>/<slug>.feature
-  # Identity: area/feature/slug
-  # --------------------------------------------------------------------------
-  scenario:
-    required_fields:
-      - name: id
-        type: string
-        pattern: "area/feature/slug"
-        description: "Unique path-based identifier"
-        example: "udd/cli/inbox/add_item_via_cli"
-        owner: "ProductOwner"
-
-      - name: feature_path
-        type: string
-        pattern: "specs/features/*.feature"
-        description: "File path to the .feature file"
-        example: "specs/features/udd/cli/inbox/add_item_via_cli.feature"
-        owner: "Auto-generated"
-
-      - name: title
-        type: string
-        description: "Scenario title from Gherkin"
-        example: "User adds item via CLI"
-        owner: "ProductOwner"
-
-    optional_fields:
-      - name: tags
-        type: array[string]
-        description: "Gherkin tags for filtering"
-
-  # --------------------------------------------------------------------------
-  # E2E Test
-  # Implementation test that verifies a scenario. Located in tests/**/*.e2e.test.ts
-  # --------------------------------------------------------------------------
-  e2e_test:
-    required_fields:
-      - name: id
-        type: string
-        pattern: "kebab-case matching scenario slug"
-        description: "Unique identifier matching the scenario it tests"
-        example: "add_item_via_cli"
-        owner: "Agent"
-
-      - name: scenario_path
-        type: string
-        pattern: "specs/features/**/*.feature"
-        description: "Path to the authoritative scenario"
-        example: "specs/features/udd/cli/inbox/add_item_via_cli.feature"
-        owner: "Auto-generated"
-
-      - name: status
-        type: enum
-        values: ["passing", "failing", "pending"]
-        description: "Current test execution status"
-        example: "passing"
-        owner: "CI_System"
-
-    optional_fields:
-      - name: last_verified
-        type: "ISO8601 timestamp"
-        description: "When the test last passed"
-
-  # --------------------------------------------------------------------------
-  # Test Review
-  # Verification artifact confirming test-to-scenario mapping. Located in tests/**/*.test-review.yml
-  # --------------------------------------------------------------------------
-  test_review:
-    required_fields:
-      - name: id
-        type: string
-        pattern: "test-id + .test-review"
-        description: "Unique identifier for the review"
-        example: "add_item_via_cli.test-review"
-        owner: "Reviewer"
-
-      - name: test_id
-        type: string
-        description: "Reference to e2e_test id"
-        example: "add_item_via_cli"
-        owner: "Reviewer"
-
-      - name: scenario_path
-        type: string
-        description: "Reference to scenario being reviewed"
-        example: "specs/features/udd/cli/inbox/add_item_via_cli.feature"
-        owner: "Reviewer"
-
-      - name: checks
-        type: object
-        description: "Verification checklist"
-        properties:
-          - name_matches_scenario: boolean
-          - steps_implemented: boolean
-          - assertions_cover_gherkin: boolean
-        example:
-          name_matches_scenario: true
-          steps_implemented: true
-          assertions_cover_gherkin: true
-        owner: "Reviewer"
-
-    optional_fields:
-      - name: notes
-        type: string
-        description: "Reviewer notes on fidelity or known issues"
-
-  # --------------------------------------------------------------------------
-  # Requirement
-  # Technical requirement linking to features and scenarios. Located in specs/requirements/*.yml
-  # --------------------------------------------------------------------------
-  requirement:
-    required_fields:
-      - name: id
-        type: string
-        pattern: "kebab-case slug"
-        description: "Unique identifier for the requirement"
-        example: "persist_todo_with_defaults"
-        owner: "TechnicalLead"
-
-      - name: type
-        type: enum
-        values: ["functional", "non-functional"]
-        description: "Category of requirement"
-        example: "functional"
-        owner: "TechnicalLead"
-
-      - name: feature
-        type: string
-        description: "Feature id this requirement supports"
-        example: "todos/basic"
-        owner: "TechnicalLead"
-
-      - name: description
-        type: string
-        description: "Technical specification details"
-        example: "Persist a new todo with title and default completed=false"
-        owner: "TechnicalLead"
-
-    optional_fields:
-      - name: scenarios
-        type: array[string]
-        description: "Scenario slugs that exercise this requirement"
-
-
-# ============================================================================
-# TRACE QUERY DEFINITIONS
-# These define the valid traversal paths through the traceability graph.
-# Forward traces: user intent → implementation
-# Reverse traces: implementation → user intent
-# ============================================================================
-
-trace_queries:
-  # --------------------------------------------------------------------------
-  # Forward Trace Queries
-  # Start from user intent (persona) and trace down to requirements
-  # --------------------------------------------------------------------------
-  forward:
-    persona_to_journey:
-      description: "Find all journeys a persona can perform"
-      query: |
-        Given persona id = "team-member"
-        Find journey.actor = persona.id
-      example:
-        input: "team-member"
-        output: ["new-user-onboarding", "daily-planning"]
-
-    journey_to_use_case:
-      description: "Find use cases that comprise a journey"
-      query: |
-        Given journey.id = "new-user-onboarding"
-        Find use_case.id from journey.steps references
-      example:
-        input: "new-user-onboarding"
-        output: ["capture_ideas", "organize_tasks"]
-
-    use_case_to_scenario:
-      description: "Find scenarios that implement a use case"
-      query: |
-        Given use_case.id = "capture_ideas"
-        Find scenario.id from use_case.outcomes[].scenarios
-      example:
-        input: "capture_ideas"
-        output: ["udd/cli/inbox/add_item_via_cli"]
-
-    scenario_to_test:
-      description: "Find tests that verify a scenario"
-      query: |
-        Given scenario.id = "udd/cli/inbox/add_item_via_cli"
-        Find e2e_test.scenario_path = scenario.feature_path
-      example:
-        input: "udd/cli/inbox/add_item_via_cli"
-        output: ["add_item_via_cli"]
-
-    test_to_requirement:
-      description: "Find requirements verified by a test"
-      query: |
-        Given e2e_test.id = "add_item_via_cli"
-        Find requirement.scenarios containing e2e_test.scenario_path
-      example:
-        input: "add_item_via_cli"
-        output: ["persist_item_with_defaults"]
-
-    persona_to_requirement:
-      description: "Full forward trace: persona → requirement"
-      query: |
-        Trace: persona → journey → use_case → scenario → e2e_test → requirement
-      example:
-        input: "team-member"
-        output: ["persist_item_with_defaults", "retrieve_items", "delete_items"]
-
-  # --------------------------------------------------------------------------
-  # Reverse Trace Queries
-  # Start from implementation (test failure or requirement) and trace back to user intent
-  # --------------------------------------------------------------------------
-  reverse:
-    failing_test_to_persona:
-      description: "Diagnose which user need is affected by failing test"
-      query: |
-        Given e2e_test.status = "failing"
-        Trace backward: e2e_test → scenario → use_case → journey → persona
-      example:
-        input: "add_item_via_cli (failing)"
-        affected_persona: "team-member"
-        affected_journey: "new-user-onboarding"
-
-    requirement_impact_lookup:
-      description: "Find all tests and scenarios affected by a requirement change"
-      query: |
-        Given requirement.id = "persist_item_with_defaults"
-        Find: requirement.scenarios → scenario → e2e_test
-      example:
-        input: "persist_item_with_defaults"
-        affected_scenarios: ["udd/cli/inbox/add_item_via_cli"]
-        affected_tests: ["add_item_via_cli"]
-        affected_journeys: ["new-user-onboarding"]
-        affected_personas: ["team-member"]
-
-    scenario_to_use_case:
-      description: "Find which use cases reference a scenario"
-      query: |
-        Given scenario.id = "udd/cli/inbox/add_item_via_cli"
-        Find use_case where scenario in use_case.outcomes[].scenarios
-      example:
-        input: "udd/cli/inbox/add_item_via_cli"
-        output: ["capture_ideas"]
-
-
-# ============================================================================
-# MISSING FIELD INVALIDATION RULES
-# Defines what fails when required fields are absent. These rules ensure
-# the traceability graph remains complete and queryable.
-# ============================================================================
-
-invalidation_rules:
-  - artifact: persona
-    missing_field: id
-    failure: "Cannot reference persona in journey.actor; forward trace breaks"
-
-  - artifact: persona
-    missing_field: name
-    failure: "Display name unavailable for journey documentation"
-
-  - artifact: journey
-    missing_field: actor
-    failure: "Cannot trace to persona; reverse trace from journey fails"
-
-  - artifact: journey
-    missing_field: steps
-    failure: "Journey has no actionable steps; cannot map to use_cases"
-
-  - artifact: use_case
-    missing_field: id
-    failure: "Cannot reference use_case in journey.steps; forward trace breaks"
-
-  - artifact: use_case
-    missing_field: actors
-    failure: "Cannot trace to persona; requirement-to-persona trace fails"
-
-  - artifact: use_case
-    missing_field: outcomes
-    failure: "No scenario references; use_case not connected to graph"
-
-  - artifact: scenario
-    missing_field: id
-    failure: "Cannot reference scenario in use_case.outcomes; graph edge missing"
-
-  - artifact: scenario
-    missing_field: feature_path
-    failure: "Cannot locate scenario file for test mapping"
-
-  - artifact: e2e_test
-    missing_field: scenario_path
-    failure: "Test not linked to scenario; traceability broken"
-
-  - artifact: e2e_test
-    missing_field: status
-    failure: "Cannot determine if test is passing for reverse trace"
-
-  - artifact: test_review
-    missing_field: test_id
-    failure: "Review not linked to test; quality gate ineffective"
-
-  - artifact: test_review
-    missing_field: scenario_path
-    failure: "Cannot verify scenario fidelity; mapping unconfirmed"
-
-  - artifact: requirement
-    missing_field: feature
-    failure: "Cannot group requirements; impact analysis incomplete"
-
-  - artifact: requirement
-    missing_field: description
-    failure: "No specification available; implementation guidance missing"
-
-
-# ============================================================================
-# CONTRACT NOTES
-# Migration compatibility and alignment notes
-# ============================================================================
-
-notes:
-  - "All artifact IDs use kebab-case for consistency with existing use-case YAMLs."
-  - "Scenario identity uses path-based area/feature/slug to match manifest and feature file locations."
-  - "Optional fields may become required in future versions with migration notice."
-  - "Owner field semantics: ProductOwner = human-authored, Agent = generated by agent, CI_System = runtime observed, Auto-generated = tooling produced."
-  - "This contract aligns with boundary_subject: udd-core defined in specs/system-boundary.yml."
+Please execute and return the exact command outputs and the final git status. After completion, return a short 2-4 sentence status update and include the git diff --stat output, lsp_diagnostics summary, and npm run check / npm test statuses. This is a single atomic task — respond only when fully complete.
+---
+
+## assistant (2026-02-25T16:31:59.249Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Read notepads: .sisyphus/notepads/udd-sysml-traceability-phase2/learnings.md and decisions.md",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Detect tracked vs untracked changes and list out-of-scope untracked files",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Delete out-of-scope untracked files (leave allowed files untouched)",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Run verificat...
+```
+---
+
+## assistant (2026-02-25T16:33:15.196Z)
+
+**read:**
+
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/notepads/udd-sysml-traceability-phase2/learnings.md</path>
+<type>file</type>
+<content>1: # Learnings
+2: 
+3: - Repo enforces scenario-as-source-of-truth in multiple places (docs and templates). Keep that invariant.
+4: - Personas are used interchangeably with "Actors" historically; choose Persona as clarifying term but keep product/actors.md as canonical file.
+5: - Use-case YAMLs must reference scenario paths. Avoid duplicating Gherkin in use-case prose.
+...
+```
+---
+
+## assistant (2026-02-25T16:33:18.417Z)
+
+**read:**
+
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md</path>
+<type>file</type>
+<content>1: # Decisions
+2: 
+3: - Decision: Treat 'Persona' as the human-friendly term; keep product/actors.md as canonical and reference Personas there.
+4: - Decision: Enforce non-overlap rules by policy in docs/architecture/udd-concept-model.md and have udd lint warn on violations where possible.
+5: 
+6: - Decision (2026-02-25): Use explicit boundary_subject 'udd-core' for phas...
+```
+---
+
+## assistant (2026-02-25T16:33:20.307Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Read notepads: .sisyphus/notepads/udd-sysml-traceability-phase2/learnings.md and decisions.md",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Detect tracked vs untracked changes and list out-of-scope untracked files",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Delete out-of-scope untracked files (leave allowed files untouched)",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Run verific...
+```
+---
+
+## assistant (2026-02-25T16:33:26.988Z)
+
+**bash:**
+
+```
+?? specs/journey-map.example.yml
+?? specs/journey-map.schema.yml
+?? specs/system-boundary.yml
+?? specs/traceability-contract.yml
+
+[Category+Skill Reminder]
+
+**Built-in**: frontend-ui-ux, git-master, dev-browser
+**⚡ YOUR SKILLS (PRIORITY)**: agent-browser, create-opencode-plugin, astroflare, create-mastra, gh-cli, bun-development, find-skills, screwfast (+7 more)
+
+> User-installed skills OVERRIDE built-in defaults. ALWAYS prefer YOUR SKILLS when domain matches.
 
+```typescript
+task(category="visua...
+```
+---
 
+## assistant (2026-02-25T16:33:29.023Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Detect tracked vs untracked changes and list out-of-scope untracked files",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Delete out-of-scope untracked files (leave allowed files untouched)",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Run verification commands and collect outputs (git status, git diff, lsp_diagnostics, npm run check, npm test, rg checks)",
+    "priority": "high",
+    "status": "pending"
+  },
+  {...
+```
+---
+
+## assistant (2026-02-25T16:33:32.229Z)
+
+**bash:**
+
+```
+Removing specs/system-boundary.yml
+Removing specs/traceability-contract.yml
+
+```
+---
+
+## assistant (2026-02-25T16:33:34.744Z)
+
+**bash:**
+
+```
+?? specs/journey-map.example.yml
+?? specs/journey-map.schema.yml
+
+```
+---
+
+## assistant (2026-02-25T16:33:36.640Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Delete out-of-scope untracked files (leave allowed files untouched)",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Run verification commands and collect outputs (git status, git diff, lsp_diagnostics, npm run check, npm test, rg checks)",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Append verification outputs and 1-line excerpts to .sisyphus/evidence/phase2/task-7-map-valid.md",
+    "priority": "high",
+    "stat...
+```
+---
+
+## assistant (2026-02-25T16:33:38.982Z)
+
+**bash:**
+
+```
+?? specs/journey-map.example.yml
+?? specs/journey-map.schema.yml
+
+```
+---
+
+## assistant (2026-02-25T16:33:40.942Z)
+
+**lsp_diagnostics:**
+
+```
+No diagnostics found
+```
+---
+
+## assistant (2026-02-25T16:33:44.806Z)
+
+**lsp_diagnostics:**
+
+```
+No diagnostics found
+```
+---
+
+## assistant (2026-02-25T16:33:48.499Z)
+
+**bash:**
+
+```
+Checked 60 files in 43ms. No fixes applied.
+
+```
+---
+
+## assistant (2026-02-25T16:33:51.893Z)
+
+**bash:**
+
+```
+
+[1m[46m RUN [49m[22m [36mv4.0.13 [39m[90m/Users/nroth/workspace/udd[39m
+
+[90mstdout[2m | tests/e2e/opencode/tools/udd_status_tool.e2e.test.ts
+[22m[39m[vitest-cucumber] Current phase: 3, excluding tags: @phase:4, @phase:5, @phase:6, @phase:7, @phase:8, @phase:9, @phase:10
+
+ [32m✓[39m tests/e2e/opencode/tools/udd_status_tool.e2e.test.ts [2m([22m[2m26 tests[22m[2m)[22m[33m 10586[2mms[22m[39m
+       [33m[2m✓[22m[39m And the udd CLI is installed [33m 1355[2mms[22m[39m...
+```
+---
+
+## assistant (2026-02-25T16:35:28.570Z)
+
+**bash:**
+
+```
+        pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+        pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+    pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+    pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+    pattern: "^[a-z0-9]+(?:[-_][a-z0-9]+)*$"
+        pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+      - use_case_ref MUST match pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+
+```
+---
+
+## assistant (2026-02-25T16:35:32.652Z)
+
+**bash:**
+
+```
+      use_case_ref: user-signup
+      use_case_ref: create-first-item
+      use_case_ref: organize-items
+
+```
+---
+
+## assistant (2026-02-25T16:35:34.588Z)
+
+**read:**
+
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/evidence/phase2/task-7-map-valid.md</path>
+<type>file</type>
+<content>1: # Task 7 Evidence: Valid Journey Map Linkage
+2: 
+3: **Date**: 2026-02-25
+4: **Task**: Define Journey Structured Map Model
+5: **Evidence Type**: Valid map linkage scenario
+6: 
+7: ## Overview
+8: This document demonstrates a valid journey-to-use-case linkage using the journey-map schema.
+9: 
+10: ## Test Scenario: Valid Map with Proper use_case References
+11: 
+12: ### Input Journey Map...
+```
+---
+
+## assistant (2026-02-25T16:35:36.295Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Run verification commands and collect outputs (git status, git diff, lsp_diagnostics, npm run check, npm test, rg checks)",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Append verification outputs and 1-line excerpts to .sisyphus/evidence/phase2/task-7-map-valid.md",
+    "priority": "high",
+    "status": "in_progress"
+  }
+]
+```
+---
+
+## assistant (2026-02-25T16:35:39.791Z)
+
+**bash:**
+
+```
+zsh:1: unmatched "
+
+```
+---
+
+## assistant (2026-02-25T16:35:49.080Z)
+
+**bash:**
+
+```
+Traceback (most recent call last):
+  File "<stdin>", line 12, in <module>
+  File "/usr/local/Cellar/python@3.14/3.14.2/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 472, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               **kwargs).stdout
+               ^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.2/Frameworks/Python.framework/Versions/3.14/...
+```
+---
+
+## assistant (2026-02-25T16:37:34.275Z)
+
+**bash:**
+
+```
+Appended verification outputs to .sisyphus/evidence/phase2/task-7-map-valid.md
+
+```
+---
+
+## assistant (2026-02-25T16:39:18.683Z)
+
+**read:**
+
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/evidence/phase2/task-7-map-valid.md</path>
+<type>file</type>
+<content>1: # Task 7 Evidence: Valid Journey Map Linkage
+2: 
+3: **Date**: 2026-02-25
+4: **Task**: Define Journey Structured Map Model
+5: **Evidence Type**: Valid map linkage scenario
+6: 
+7: ## Overview
+8: This document demonstrates a valid journey-to-use-case linkage using the journey-map schema.
+9: 
+10: ## Test Scenario: Valid Map with Proper use_case References
+11: 
+12: ### Input Journey Map...
+```
+---
+
+## assistant (2026-02-25T16:39:21.775Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "Append verification outputs and 1-line excerpts to .sisyphus/evidence/phase2/task-7-map-valid.md",
+    "priority": "high",
+    "status": "completed"
+  }
+]
+```
+---
+
+## assistant (2026-02-25T16:39:24.015Z)
+
+**read:**
+
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/notepads/udd-sysml-traceability-phase2/learnings.md</path>
+<type>file</type>
+<content>1: # Learnings
+2: 
+3: - Repo enforces scenario-as-source-of-truth in multiple places (docs and templates). Keep that invariant.
+4: - Personas are used interchangeably with "Actors" historically; choose Persona as clarifying term but keep product/actors.md as canonical file.
+5: - Use-case YAMLs must reference scenario paths. Avoid duplicating Gherkin in use-case prose.
+...
+```
+---
+
+## assistant (2026-02-25T16:39:26.101Z)
+
+**read:**
+
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md</path>
+<type>file</type>
+<content>1: # Decisions
+2: 
+3: - Decision: Treat 'Persona' as the human-friendly term; keep product/actors.md as canonical and reference Personas there.
+4: - Decision: Enforce non-overlap rules by policy in docs/architecture/udd-concept-model.md and have udd lint warn on violations where possible.
+5: 
+6: - Decision (2026-02-25): Use explicit boundary_subject 'udd-core' for phas...
+```
+---
+
+## assistant (2026-02-25T16:39:28.200Z)
+
+**bash:**
+
+```
+?? specs/journey-map.example.yml
+?? specs/journey-map.schema.yml
+zsh:1: command not found: lsp_diagnostics
+zsh:1: command not found: lsp_diagnostics
+Checked 60 files in 31ms. No fixes applied.
+ [32m✓[39m tests/e2e/udd/dev-experience/test_discovery/editor_status.e2e.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+[90mstdout[2m | tests/e2e/udd/dev-experience/code_formatting.e2e.test.ts
+[22m[39m[vitest-cucumber] Current phase: 3, excluding tags: @phase:4, @phase:5, @phase:...
+```
+---
+
+## assistant (2026-02-25T16:41:01.413Z)
+
+**todowrite:**
+
+```
+[
+  {
+    "content": "All verification completed and outputs appended to evidence file",
+    "priority": "high",
+    "status": "completed"
+  }
+]
+```
+---
+
+## assistant (2026-02-25T16:41:03.648Z)
+
+COMPLETED STEPS (atomic, one at a time)
+
+1) Read required notepads (in_progress → completed)
+- in_progress: Read .sisyphus/notepads/udd-sysml-traceability-phase2/learnings.md and decisions.md
+- completed: Successfully read both files and captured 1-line excerpts for evidence.
+
+2) Detect out-of-scope untracked files (in_progress → completed)
+- in_progress: Inspect git status for untracked/modified files
+- completed: Found untracked files:
+  - specs/journey-map.example.yml (allowed)
+  - specs/journey-map.schema.yml (allowed)
+  - specs/system-boundary.yml (OUT-OF-SCOPE, untracked)
+  - specs/traceability-contract.yml (OUT-OF-SCOPE, untracked)
+  - (docs/architecture/ was expected — none present now)
+- NOTE: Verified none of the out-of-scope files were tracked (no modified tracked files outside allowed set). Proceeded to remove only untracked out-of-scope files.
+
+3) Remove out-of-scope untracked files (in_progress → completed)
+- in_progress: Delete untracked files specs/system-boundary.yml and specs/traceability-contract.yml and docs/architecture (if present)
+- Action executed (git clean -fd -- specs/system-boundary.yml specs/traceability-contract.yml docs/architecture || true)
+- completed: Removal output:
+  - Removing specs/system-boundary.yml
+  - Removing specs/traceability-contract.yml
+- After cleanup, git status showed only the allowed files as untracked.
+
+4) Run verification commands and collect outputs (in_progress → completed)
+- in_progress: Run the full verification set in the task (git status --porcelain, git diff --stat, lsp_diagnostics for both YAMLs, npm run check, npm test, rg checks)
+- completed: Collected exact outputs and appended them, with required excerpts, into .sisyphus/evidence/phase2/task-7-map-valid.md
+
+Exact command outputs (captured and appended verbatim)
+
+1) git status --porcelain
+?? specs/journey-map.example.yml
+?? specs/journey-map.schema.yml
+
+2) git diff --stat
+[no output]
+
+3) lsp_diagnostics specs/journey-map.schema.yml
+No diagnostics found
+
+4) lsp_diagnostics specs/journey-map.example.yml
+No diagnostics found
+
+5) npm run check
+Checked 60 files in 31-43ms. No fixes applied.
+
+6) npm test (summary)
+- Test run summary (excerpt appended):
+  - Test Files 31 passed (31)
+  - Tests 245 passed (245)
+  - JSON report written to /Users/nroth/workspace/udd/.udd/results.json
+  - Total Duration ~ 88–92s depending on run
+
+(Full test output from runs included in evidence file; I appended the last ~10 lines summary.)
+
+7) rg pattern checks on specs/journey-map.schema.yml
+Matching lines found in schema:
+        pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+        pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+    pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+    pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+    pattern: "^[a-z0-9]+(?:[-_][a-z0-9]+)*$"
+        pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+      - use_case_ref MUST match pattern: ^[a-z0-9]+(-[a-z0-9]+)*$
+
+8) rg use_case_ref check on specs/journey-map.example.yml
+      use_case_ref: user-signup
+      use_case_ref: create-first-item
+      use_case_ref: organize-items
+
+Excerpts appended (1-line each, as required):
+- From .sisyphus/notepads/udd-sysml-traceability-phase2/learnings.md:
+  - "- Scope-correction learning (2026-02-25): previous attempt introduced extra artifacts in the repo plan; corrective action: keep only documentation and evidence files for Task 1 and avoid touching implementation/templates. Confirmed no additional files created by this attempt beyond docs/architecture/udd-concept-model.md and the two evidence files."
+- From .sisyphus/notepads/udd-sysml-traceability-phase2/decisions.md:
+  - "- Decision (2026-02-25): Use explicit boundary_subject 'udd-core' for phase 2 traceability artifacts. Keep implementation code explicitly out_of_scope to avoid scope creep."
+
+Evidence file updated:
+- Appended a "Verification outputs:" section with the exact outputs above to:
+  .sisyphus/evidence/phase2/task-7-map-valid.md
+- The file now contains the Verification outputs block and the two one-line excerpts from the notepads.
+
+Verification of MUST NOT DO constraints
+- No commits or pushes were performed.
+- Did not modify .sisyphus/plans/* (read-only).
+- Did not delete any tracked files. I validated that the out-of-scope files were untracked before deletion. If any non-allowed file had been tracked, I would have stopped and reported; that was not necessary.
+
+Final git status and diff (exact as run)
+- git status --porcelain
+?? specs/journey-map.example.yml
+?? specs/journey-map.schema.yml
+
+- git diff --stat
+[empty output]
+
+lsp_diagnostics summary
+- specs/journey-map.schema.yml: No diagnostics found
+- specs/journey-map.example.yml: No diagnostics found
+
+npm run check / npm test statuses
+- npm run check: Checked 60 files. No fixes applied. (exit 0)
+- npm test: All tests passed (31 files, 245 tests passed). JSON report written to .udd/results.json (exit 0)
+
+Notes, decisions, and rationale (short)
+- Rationale for deletions: Following the notepad learning and decisions, out-of-scope documentation/spec files (specs/system-boundary.yml and specs/traceability-contract.yml) were untracked and introduced by prior subagent; they were removed to restore the workspace to only the allowed Task-7 files. The notepad excerpts guided the decision to keep implementation code out-of-scope and only preserve evidence and schema/example files.
+
+Files removed (deleted from working tree, not committed)
+- specs/system-boundary.yml (deleted via git clean)
+- specs/traceability-contract.yml (deleted via git clean)
+- docs/architecture/ — not present at time of cleanup (previous notepad referenced it but it was not in working tree).
+
+Final status update (2-4 sentences)
+I removed the out-of-scope untracked spec files (specs/system-boundary.yml, specs/traceability-contract.yml) and left only the allowed Task-7 files as untracked: specs/journey-map.schema.yml and specs/journey-map.example.yml. lsp_diagnostics reports no issues for both YAMLs; npm run check and npm test both exited successfully with all tests passing. I appended the exact command outputs and the requested 1-line notepad excerpts under "Verification outputs:" in .sisyphus/evidence/phase2/task-7-map-valid.md.
+
+Attached key outputs (copied from evidence append)
+- git diff --stat: [no changes -> empty]
+- lsp_diagnostics summary: No diagnostics found for both YAML files
+- npm run check: Checked 60 files. No fixes applied.
+- npm test: 31 test files, 245 tests passed. JSON report written to .udd/results.json
+
+If you want, I can now:
+- show the exact appended section from the evidence file, or
+- perform an additional check (e.g., ensure no other untracked files exist anywhere) — otherwise this atomic task is complete.
+
+All todos completed:
+- Each todo was marked completed immediately after finishing its step.

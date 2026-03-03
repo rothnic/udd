@@ -1,109 +1,590 @@
-# Collect official traceability metadata best practices (@librarian subagent)
+# Session ses_36ace50cbffeaA0nEaoSZSxjy3
 
-**ID**: ses_36ace50cbffeaA0nEaoSZSxjy3
-**Project ID**: ad761ea6174e58ed763fc75290c3f403ed51079d
-**Created**: 2/25/2026, 8:26:27 AM
-**Stats**: 1 files changed, +96 -0
+## user (2026-02-25T14:26:27.484Z)
 
+<system-reminder>
+
+[SYSTEM DIRECTIVE: OH-MY-OPENCODE - SINGLE TASK ONLY]
+
+**STOP. READ THIS BEFORE PROCEEDING.**
+
+If you were NOT given **exactly ONE atomic task**, you MUST:
+1. **IMMEDIATELY REFUSE** this request
+2. **DEMAND** the orchestrator provide a single, specific task
+
+**Your response if multiple tasks detected:**
+> "I refuse to proceed. You provided multiple tasks. An orchestrator's impatience destroys work quality.
+> 
+> PROVIDE EXACTLY ONE TASK. One file. One change. One verification.
+> 
+> Your rushing will cause: incomplete work, missed edge cases, broken tests, wasted context."
+
+**WARNING TO ORCHESTRATOR:**
+- Your hasty batching RUINS deliverables
+- Each task needs FULL attention and PROPER verification  
+- Batch delegation = sloppy work = rework = wasted tokens
+
+**REFUSE multi-task requests. DEMAND single-task clarity.**
+</system-reminder>
+
+<Work_Context>
+## Notepad Location (for recording learnings)
+NOTEPAD PATH: .sisyphus/notepads/{plan-name}/
+- learnings.md: Record patterns, conventions, successful approaches
+- issues.md: Record problems, blockers, gotchas encountered
+- decisions.md: Record architectural choices and rationales
+- problems.md: Record unresolved issues, technical debt
+
+You SHOULD append findings to notepad files after completing work.
+IMPORTANT: Always APPEND to notepad files - never overwrite or use Edit tool.
+
+## Plan Location (READ ONLY)
+PLAN PATH: .sisyphus/plans/{plan-name}.md
+
+CRITICAL RULE: NEVER MODIFY THE PLAN FILE
+
+The plan file (.sisyphus/plans/*.md) is SACRED and READ-ONLY.
+- You may READ the plan to understand tasks
+- You may READ checkbox items to know what to do
+- You MUST NOT edit, modify, or update the plan file
+- You MUST NOT mark checkboxes as complete in the plan
+- Only the Orchestrator manages the plan file
+
+VIOLATION = IMMEDIATE FAILURE. The Orchestrator tracks plan state.
+</Work_Context>
+Research official docs and high-quality references for traceability contracts in BDD/test governance.
+Focus on required metadata fields, ownership semantics, forward/reverse trace queries, and stale-state governance.
+Return concise, implementation-ready recommendations with citations and examples applicable to this repo’s structure.
+Read-only research only.
 ---
 
-## USER (8:26:27 AM)
+## assistant (2026-02-25T14:26:27.499Z)
 
-# UDD Concept Model: Canonical Taxonomy and Non-Overlap Rules
+Classifying request: TYPE A (CONCEPTUAL — research + doc discovery). I'll search the web for 2026-era guidance and search GitHub for concrete examples (feature/test metadata, owner labels, scripts that build trace matrices). I'll return concise, implementation-ready recommendations with links (including GitHub permalinks) as evidence. Running searches now.
 
-Purpose: provide concise, canonical definitions for the UDD artifacts that stakeholders and agents rely on. Make boundaries explicit so automation (udd tooling) can make deterministic decisions and flag misuses.
+**search_searxng_1mcp_searxng_web_search** (input): {"query":"BDD traceability contracts 2026 traceability metadata tags Gherkin owner requirement \"traceability contract\"","language":"en","pageno":1,"safesearch":0}
 
-Scope: Persona, Journey, Use Case, Scenario, Requirement, Component, Test Review.
+**search_searxng_1mcp_searxng_web_search** (input): {"query":"living documentation BDD 2026 Pickles Cucumber living documentation traceability matrix","language":"en","pageno":1,"safesearch":0}
 
-Principles
-- Keep scenario text only in .feature files. Use cases reference scenario paths, they do not restate scenario steps.
-- One scenario per .feature file. Scenario identity equals area/feature/slug path.
-- Requirements reference scenarios and features; they do not contain user-facing scenario text.
+**search_grep_1mcp_searchGitHub:**
 
-1. Persona
-- Definition: A concise human archetype describing who acts in the system, their context, goals, and pain points. Persona entries are short, testable, and used to guide journey language.
-- Location: product/actors.md (or product/journeys frontmatter). Personas are human descriptions, not actors in tests.
-- Positive example: "Team Member: mobile-first individual who needs to capture ideas quickly while away from desk. Goals: capture tasks, surface top 3 priorities." (short, measurable goals)
-- Negative example: "User: wants things." (vague, no context or measurable goals)
+```
+Repository: hamed-shirbandi/TaskoMask
+Path: src/5-Tests/Acceptance/Tests.Acceptance.Specs/Features/RegiserOwner.feature
+URL: https://github.com/hamed-shirbandi/TaskoMask/blob/master/src/5-Tests/Acceptance/Tests.Acceptance.Specs/Features/RegiserOwner.feature
+License: MIT
 
-Boundary rule: Persona describes motivations and context only. Do not include scenarios, steps, or technical requirements inside persona docs.
+Snippets:
+--- Snippet 1 (Line 2) ---
 
-2. Journey
-- Definition: A short, ordered list of user-focused steps that describe an outcome the persona wants to achieve. Journeys map to one or more use cases and point to scenario files where behaviors are specified.
-- Location: product/journeys/*.md
-- Positive example: Daily Planning journey listing steps: Review inbox -> Prioritize -> Commit to today, each step mapping to use case or scenario references.
-- Negative example: A journey that contains full Gherkin Given/When/Then blocks inside the journey markdown.
+In order to manage the tasks
+As an Owner
+John wants to register an account
 
-Boundary rule: Journey explains intent and outcome. Steps may include pointers to use cases or scenario paths, but must not duplicate scenario text.
+@OwnerScenarios
+@UI-Level
+Scenario: Registering online for a new owner account
+	Given John is not a registered mem...
+```
 
-3. Use Case
-- Definition: A compact YAML document capturing an interaction goal, expected outcomes, the persona(s) involved, and an explicit list of scenario path references that exercise the use case.
-- Location: specs/use-cases/*.yml
-- Positive example: capture_task.yml with id, summary, actors: [Team Member], outcomes and scenarios: [tasks/quick_capture/mobile_widget]
-- Negative example: A use-case that embeds Gherkin scenarios or repeats long scenario steps in prose.
+**search_grep_1mcp_searchGitHub:**
 
-Boundary rule: Use cases reference scenarios by path (area/feature/slug). They must not restate scenario steps or become the primary source of truth for behavior.
+```
+Repository: radish-bdd/radish
+Path: tests/exploratory/tags/features/SumNumbers.feature
+URL: https://github.com/radish-bdd/radish/blob/main/tests/exploratory/tags/features/SumNumbers.feature
+License: MIT
 
-4. Scenario
-- Definition: A single Gherkin Scenario block stored in a .feature file. Scenarios are the single source of truth for user-facing behavior and acceptance criteria.
-- Location: specs/features/<area>/<feature>/<slug>.feature
-- Identity rule: path area/feature/slug uniquely identifies the scenario.
-- Positive example: specs/features/todos/basic/add_todo_with_title.feature with one Scenario block describing Given/When/Then.
-- Negative example: A .feature file containing multiple Scenario blocks or scenario text duplicated in a use-case YAML.
+Snippets:
+--- Snippet 1 (Line 3) ---
+  In order to test the basic
+  features of radish I test
+  to sum numbers.
 
-Boundary rule: Scenario text belongs only in .feature files. Tests map to scenarios; scenario edits should trigger stale detection of tests.
+  @FooBar
+  @author tuxtimo @reviewer l33tname @date Sun, 26 Feb 2023 17:52:52 +0100 @requirements 1,2
+  Scenario: Sum two numbers
+    Given I have the number 5
+      And I have the n...
+```
 
-5. Requirement
-- Definition: A technical requirement (functional or non-functional) that links to feature ids and scenario slugs it supports. Requirements describe implementation expectations and test mapping but do not replace scenario text.
-- Location: specs/requirements/<key>.yml
-- Positive example: store_new_todo.yml type: functional feature: todos/basic scenarios: [add_todo_with_title] description: Persist a new todo with title and default completed=false
-- Negative example: A requirement that repeats full user-facing steps or includes acceptance Gherkin instead of referencing scenario slugs.
+**search_grep_1mcp_searchGitHub:**
 
-Boundary rule: Requirements may reference scenarios and list tests but must remain implementation-facing. They can include details that are outside Gherkin scope (performance budgets, error codes), but must not contradict scenario text.
+```
+Repository: akeneo/pim-community-dev
+Path: tests/legacy/features/pim/enrichment/product/import/import_products_with_invalid_headers.feature
+URL: https://github.com/akeneo/pim-community-dev/blob/main/tests/legacy/features/pim/enrichment/product/import/import_products_with_invalid_headers.feature
+License: Unknown
 
-6. Component
-- Definition: A logical implementation unit (service, module, UI widget) that lists the responsibilities, public interfaces, and the set of use cases or scenarios it supports. Components map to implementation boundaries, not user-behavior artifacts.
-- Location: specs/components/*.md or specs/components/*.yml
-- Positive example: task_service.md describing API endpoints, supported use cases: capture_task, and scenarios it supports: mobile_widget, voice_input
-- Negative example: A component doc that contains user-facing scenarios or rephrases the scenario steps as requirement-level prose.
+Snippets:
+--- Snippet 1 (Line 6) ---
 
-Boundary rule: Component documentation focuses on implementation surface and mapping to requirements/use cases. It must not host scenario text.
+  Background:
+    Given the "footwear" catalog configuration
+    And I am logged in as "Julia"
 
-7. Test Review
-- Definition: A short, reviewable artifact describing that a test maps correctly to a scenario, includes a checklist (name matches scenario, steps correspond to Gherkin steps), and documents any overrides or known staleness.
-- Location: tests/**/*.test-review.yml or tests/**/*.test-review.md
-- Positive example: mobile_widget.test-review.yml containing checks: name_matches_scenario: true; steps_implemented: true; notes: none
-- Negative example: A test-review that attempts to re-specify behavior or contains new user-facing steps absent from the scenario.
+  # @jira https://akeneo.atlassian.net/browse/PIM-33...
+```
 
-Boundary rule: Test reviews validate mapping and quality of test implementations; they must not be used to change the scenario meaning. Any test-driven clarifications must go back into the scenario file via a spec change.
+**search_grep_1mcp_searchGitHub:**
 
-Anti-Overlap Rules (summary)
-- Persona vs Journey: Persona explains who; Journey explains what they do. Do not put steps in Persona.
-- Journey vs Use Case: Journey is user-centered flow; Use Case is a machine-friendly mapping that references scenarios implementing steps. Use cases must not restate full scenario text.
-- Use Case vs Scenario: Use Case references scenario paths. Scenario contains the authoritative behavior text. Never duplicate scenario steps in use case.
-- Scenario vs Requirement: Scenario is user-facing acceptance text. Requirement is implementation-facing and may reference scenarios but must not replace scenario text.
-- Requirement vs Component: Requirement says what must be true. Component says who implements it. Keep requirements independent of component design where possible; map via references.
-- Component vs Scenario: Component documents implementation boundaries and which scenarios it supports. Do not write Gherkin in component documentation.
-- Test Review vs Scenario/Requirement: Reviews check fidelity. They must not define behavior.
+```
+Repository: rails3book/ticketee
+Path: features/hidden_links.feature
+URL: https://github.com/rails3book/ticketee/blob/master/features/hidden_links.feature
+License: Unknown
 
-Decision table: When to put content where
-- User intent, readable by humans and product owners -> Journey or Persona
-- Executable acceptance criteria -> Scenario (.feature)
-- Implementation contract, tests -> Requirement (.yml)
-- Mapping from user intent to scenarios -> Use Case (.yml)
-- Implementation notes, API surface -> Component docs
-- Test-to-scenario verification -> Test Review
+Snippets:
+--- Snippet 1 (Line 6) ---
+  Background:
+    Given there are the following users:
+      | email              | password | admin |
+      | user@ticketee.com  | password | false | 
+      | admin@ticketee.com | password | true  |
+    And there is a project called "TextMate 2"
+    And "user@ticketee.com" has created a ti...
+```
+---
 
-Concept boundary examples (short)
-- Scenario->Requirement boundary: A scenario says "Then I see my task in the list". The requirement adds "persist in tasks table, return 201, eventual consistency within 2s".
-- Use Case->Scenario boundary: Use case "Capture Task" lists scenarios [mobile_widget, voice_input]; it does not include the Given/When/Then content.
+## assistant (2026-02-25T14:26:41.363Z)
 
-Change management note
-- If a scenario edit changes user-observable steps, update related use cases and requirements to avoid contradiction. Tooling should flag stale tests and stale requirements.
+**bash:**
 
-Appendix: Examples matrix
-- For each concept, one positive and one negative example (see above within each section).
+```
+9e51654cc27f17669a7e52caa115f64b3ee1c6da
 
-Contact: Update this file via normal PR process. If you need to relax a rule, propose a spec change under specs/changes/ referencing affected artifacts.
+```
+---
+
+## assistant (2026-02-25T14:26:54.283Z)
+
+**webfetch** (input): {"url":"https://raw.githubusercontent.com/cucumber/cucumber/main/CHANGELOG.md","format":"text"}
+---
+
+## assistant (2026-02-25T14:26:56.057Z)
+
+**webfetch** (input): {"url":"https://cucumber.io/docs/cucumber/tag-expressions/","format":"markdown"}
+---
+
+## assistant (2026-02-25T14:27:02.430Z)
+
+**search_searxng_1mcp_searxng_web_search** (input): {"query":"traceability matrix BDD living documentation \"2026\"","language":"en","pageno":1,"safesearch":0}
+---
+
+## assistant (2026-02-25T14:27:04.973Z)
+
+**bash:**
+
+```
+3a6320d129f123e2decb2a8485264c2f08bf83e7
+
+```
+---
+
+## assistant (2026-02-25T14:27:13.378Z)
+
+**bash:**
+
+```
+c07caae8b5fadaf535d0074db948911b62bae6f9
+
+```
+---
+
+## assistant (2026-02-25T14:27:23.547Z)
+
+**webfetch** (input): {"url":"https://docs.getgauge.io/latest/concepts/specifications.html","format":"markdown"}
+---
+
+## assistant (2026-02-25T14:27:25.316Z)
+
+**bash:**
+
+```
+a5f58d1e035a054afa2ae6d43050647f2818e6a8
+
+```
+---
+
+## assistant (2026-02-25T14:27:31.981Z)
+
+**webfetch:**
+
+```
+@Foo
+Feature: Test summing numbers
+  In order to test the basic
+  features of radish I test
+  to sum numbers.
+
+  @FooBar
+  @author tuxtimo @reviewer l33tname @date Sun, 26 Feb 2023 17:52:52 +0100 @requirements 1,2
+  Scenario: Sum two numbers
+    Given I have the number 5
+      And I have the number 3
+    When I sum them
+    Then I expect the result to be 8
+
+  @author(tuxtimo) @reviewer(l33tname) @date(Sun, 26 Feb 2023 17:52:52 +0100) @requirements(1,2)
+  Scenario: Sum three numbers
+    Given I h...
+```
+---
+
+## assistant (2026-02-25T14:27:41.298Z)
+
+**webfetch:**
+
+```
+@labels @core @epic:v1.2 @owner:JohnDoe
+Feature: Labels
+
+  @passed @ui @story:accounting @123 @tms:234 @tag1
+  Scenario: [v1.2 accounting] [ui.core] Selenium test 1
+
+  @passed @api @blocker @567 @999999
+  Scenario: [v1.2] [api.core] Api test 1
+
+  @passed @api @create @link:http://example.org
+  Scenario: [v1.2] [api.core.create] Api test 2
+
+  @passed @api @update
+  Scenario: [v1.2] [api.core.update] Api test 3
+
+  @passed @update @story:accounting
+  Scenario: [v1.2 accounting] [core.update] Update...
+```
+---
+
+## assistant (2026-02-25T14:27:49.436Z)
+
+**search_grep_1mcp_searchGitHub:**
+
+```
+Repository: kunwarVivek/mcp-github-project-manager
+Path: src/infrastructure/tools/ai-tasks/CreateTraceabilityMatrixTool.ts
+URL: https://github.com/kunwarVivek/mcp-github-project-manager/blob/main/src/infrastructure/tools/ai-tasks/CreateTraceabilityMatrixTool.ts
+License: MIT
+
+Snippets:
+--- Snippet 1 (Line 7) ---
+import { ANNOTATION_PATTERNS } from '../annotations/tool-annotations.js';
+import { TraceabilityMatrixOutputSchema } from '../schemas/ai-schemas.js';
+
+// Schema for create_traceability_mat...
+```
+---
+
+## assistant (2026-02-25T14:27:55.465Z)
+
+**webfetch:**
+
+```
+Feature: cusotm tags test
+
+@first
+@requirement=CALC-2
+@test_key=CALC-2
+Scenario: xray simple scenario
+  * print 'xray simple example'
+
+@second
+@requirement=CALC-3
+Scenario: xray link to requirement
+  * print 'xray simple requirement'
 
 
+@third
+@test=CALC-4
+Scenario: xray link to test
+  * print 'xray simple test'
+
+@fourth
+Scenario: no tags
+  * print 'without additional tags'
+
+
+
+[Agent Usage Reminder]
+
+You called a search/fetch tool directly without leveraging specialized agents.
+
+RECOMMENDED: Use ...
+```
+---
+
+## assistant (2026-02-25T14:28:12.858Z)
+
+**bash:**
+
+```
+radish: 3a6320d129f123e2decb2a8485264c2f08bf83e7
+allure-csharp: 9e51654cc27f17669a7e52caa115f64b3ee1c6da
+karate: c07caae8b5fadaf535d0074db948911b62bae6f9
+kunwarVivek: 1672d4e081bb23661ca959491a2f1873a5b36bd0
+doorstop: cda3009808e0a1466fb212e5a942a2395e70f909
+
+```
+---
+
+## assistant (2026-02-25T14:28:24.195Z)
+
+**bash:**
+
+```
+     1	@Foo
+     2	Feature: Test summing numbers
+     3	  In order to test the basic
+     4	  features of radish I test
+     5	  to sum numbers.
+     6	
+     7	  @FooBar
+     8	  @author tuxtimo @reviewer l33tname @date Sun, 26 Feb 2023 17:52:52 +0100 @requirements 1,2
+     9	  Scenario: Sum two numbers
+    10	    Given I have the number 5
+    11	      And I have the number 3
+    12	    When I sum them
+    13	    Then I expect the result to be 8
+    14	
+    15	  @author(tuxtimo) @reviewer(l33tna...
+```
+---
+
+## assistant (2026-02-25T14:28:36.785Z)
+
+**webfetch:**
+
+```
+[![test-go](https://github.com/cucumber/tag-expressions/actions/workflows/test-go.yml/badge.svg)](https://github.com/cucumber/tag-expressions/actions/workflows/test-go.yml)
+[![test-java](https://github.com/cucumber/tag-expressions/actions/workflows/test-java.yml/badge.svg)](https://github.com/cucumber/tag-expressions/actions/workflows/test-java.yml)
+[![test-javascript](https://github.com/cucumber/tag-expressions/actions/workflows/test-javascript.yml/badge.svg)](https://github.com/cucumber/tag-ex...
+```
+---
+
+## assistant (2026-02-25T14:28:46.126Z)
+
+**bash:**
+
+```
+983b0a176fed1c84fed1e67301fa2fb5be82d411
+
+```
+---
+
+## assistant (2026-02-25T14:28:54.008Z)
+
+TYPE: TYPE A (Conceptual — documentation & patterns research).  
+Current date: 2026-02-25 (using 2026 in searches and recommendations).
+
+Summary (one line)
+- Practical, repo-ready traceability contract for BDD: (1) add a small, consistent metadata set (tags + optional companion JSON/YAML), (2) enforce ownership & stale rules, (3) generate a machine-readable forward/reverse trace map in CI and surface it as a traceability artifact. Evidence and minimal examples follow.
+
+1) Canonical metadata fields (minimum viable contract)
+- id: canonical requirement or ticket key (e.g., CALC-2 / CYP-111) — used to map to upstream requirement tracker.
+- title: short human title (feature file Feature: line or companion metadata).
+- owner: person/team responsible for acceptance & upkeep.
+- steward/team: owning team or code owner (for triage).
+- requirement-links: list of requirement IDs (one or more).
+- test-id(s): automated test case IDs or external test-management IDs (e.g., tms:234).
+- status: expected values {implemented, in-review, automated, flaky, waived}.
+- last-run / last-passed: ISO timestamp(s) from CI.
+- stale-since / stale-reason: when tests went unexercised or requirement changed.
+- rationale/waiver: text when requirement is intentionally not covered.
+
+Why: these map to concrete, widely-used tag practices seen in real projects (examples below show the same fields used as feature tags).
+
+Evidence (feature-file examples)
+- Karate uses @requirement tags (shows requirement key in feature tags):
+  Evidence (Karate feature file):
+  https://github.com/karatelabs/karate/blob/c07caae8b5fadaf535d0074db948911b62bae6f9/karate-junit5/src/test/java/karate/customTags.feature#L1-L7
+
+  ```text
+  @first
+  @requirement=CALC-2
+  @test_key=CALC-2
+  Feature: cusotm tags test
+  ```
+
+- Allure examples show owner and multiple label styles (owner, story, epic, tms):
+  Evidence (Allure labels feature):
+  https://github.com/allure-framework/allure-csharp/blob/9e51654cc27f17669a7e52caa115f64b3ee1c6da/tests/Allure.Reqnroll.Tests.Samples/Features/Labels.feature#L1-L6
+
+  ```text
+  @labels @core @epic:v1.2 @owner:JohnDoe
+  Feature: Labels
+  ...
+  @passed @ui @story:accounting @123 @tms:234 @tag1
+  ```
+
+- Radish example with author/reviewer/requirements metadata:
+  Evidence (Radish feature):
+  https://github.com/radish-bdd/radish/blob/3a6320d129f123e2decb2a8485264c2f08bf83e7/tests/exploratory/tags/features/SumNumbers.feature#L7-L9
+
+  ```text
+  @author tuxtimo @reviewer l33tname @date Sun, 26 Feb 2023 17:52:52 +0100 @requirements 1,2
+  Scenario: Sum two numbers
+  ```
+
+Recommendation (contract): Always put canonical keys in tags (prefer key=value style where agent/tooling expects it) and mirror them to a companion metadata file if you need richer structured fields (owner contact, steward, rationale).
+
+2) Ownership semantics (how to assign & enforce)
+- Per-scenario owner tag: owner is the person/team that must triage failures and keep scenario current — use @owner:<username> or @owner="<email>".
+  Evidence (Allure owner usage):
+  https://github.com/allure-framework/allure-csharp/blob/9e51654cc27f17669a7e52caa115f64b3ee1c6da/tests/Allure.Reqnroll.Tests.Samples/Features/Labels.feature#L1-L2
+
+  ```text
+  @labels @core @epic:v1.2 @owner:JohnDoe
+  ```
+
+- Team steward (optional): link to CODEOWNERS or a team tag so repo routing and triage are obvious.
+- Ownership lifecycle:
+  - Owner must be present on the feature/scenario tag.
+  - When owner changes, update the tag and add a short commit message "trace: owner -> <new>".
+  - CI check: fail pipeline (or raise warning) if feature has no owner tag.
+
+Evidence / pattern (policy + tooling example)
+- Tools that produce traceability matrices often add metadata (aiMetadata/updatedAt) to generated artifacts — useful reference for including owner + provenance in machine output:
+  https://github.com/kunwarVivek/mcp-github-project-manager/blob/1672d4e081bb23661ca959491a2f1873a5b36bd0/src/infrastructure/tools/ai-tasks/CreateTraceabilityMatrixTool.ts#L56-L74
+
+  ```ts
+  aiMetadata: {
+    generatedBy: 'create-traceability-matrix',
+    generatedAt: new Date().toISOString(),
+    prompt: 'Extract PRD elements for traceability matrix',
+    confidence: 0.8,
+    version: '1.0.0'
+  }
+  ```
+
+Recommendation (ownership rules):
+- Required: every scenario must have @owner or a companion metadata file entry.
+- CI enforcement: small script that fails when owner missing (see Implementation below).
+
+3) Forward and reverse trace queries (practical query patterns)
+- Tag-expression filtering (Cucumber style): use tag expressions to select scenarios by requirement id or owner.
+  - Example to run only scenarios for requirement CALC-2:
+    --tags "@requirement=CALC-2"
+  Evidence (Cucumber tag expressions README):
+  https://github.com/cucumber/tag-expressions/blob/a5f58d1e035a054afa2ae6d43050647f2818e6a8/README.md#examples
+
+  ```text
+  --tags "@smoke and not @ui"
+  ```
+
+- Forward trace (requirement -> scenarios -> tests):
+  - Query by requirement tag to list scenarios: grep for @requirement=KEY across .feature files (shown in Karate examples).
+  Evidence (Karate feature showing requirement):
+  https://github.com/karatelabs/karate/blob/c07caae8b5fadaf535d0074db948911b62bae6f9/karate-junit5/src/test/java/karate/customTags.feature#L1-L7
+
+- Reverse trace (test result -> impacted requirements):
+  - From failing test id(s) in CI, map test-id -> feature scenario -> requirement tag(s). Many projects encode test-management ids (tms:) as tags (see Allure example @tms:234).
+  Evidence (Allure tms tag example):
+  https://github.com/allure-framework/allure-csharp/blob/9e51654cc27f17669a7e52caa115f64b3ee1c6da/tests/Allure.Reqnroll.Tests.Samples/Features/Labels.feature#L6-L8
+
+  ```text
+  @passed @ui @story:accounting @123 @tms:234 @tag1
+  ```
+
+Implementation-ready query patterns (examples to adopt)
+- Simple grep (CI step) to list scenario → requirement pairs:
+  - grep -R --line-number --perl-regexp "@requirement(=|:)\\S+" tests/ | sort | uniq
+  - Evidence of such tagging patterns across OSS:
+    - Karate uses @requirement=...: https://github.com/karatelabs/karate/blob/c07caae8b5fadaf535d0074db948911b62bae6f9/karate-junit5/src/test/java/karate/customTags.feature#L1-L7
+    - Radish uses @requirements: https://github.com/radish-bdd/radish/blob/3a6320d129f123e2decb2a8485264c2f08bf83e7/tests/exploratory/tags/features/SumNumbers.feature#L7-L9
+
+4) Stale-state governance (policy + automation)
+- Detection signals (automatable):
+  - last-run > threshold (e.g., 90 days) OR test never executed in CI for recent releases.
+  - last successful run > threshold while failures persist.
+  - requirement edited (PR merged changing requirements docs) and no scenario updated afterwards.
+- Governance actions (automated & human):
+  - Auto-tag scenario with @stale:<date> and notify owner + create a triage issue.
+  - If owner does not respond within X days (e.g., 14 days), escalate to steward/team.
+  - If permanently waived, set status=waived with rationale (keeps traceability intact).
+- Artifact & matrix lifecycle:
+  - Keep a generated traceability matrix (CSV/HTML/JSON) in docs/ or .sisyphus/traceability/ and update each CI run.
+  - Use tools to export traceability artifacts (Doorstop shows matrix creation & trace endpoints as an example).
+
+Evidence (matrix generation example)
+- Doorstop creates a traceability matrix and exposes a /traceability endpoint — a model for automated matrix creation & serving:
+  https://github.com/doorstop-dev/doorstop/blob/cda3009808e0a1466fb212e5a942a2395e70f909/doorstop/core/publishers/html.py#L136-L180
+
+  ```python
+  def create_matrix(self, directory):
+      """Create a traceability matrix for all the items. This will create a .csv and .html file.
+      ...
+  ```
+
+Recommendation (stale policy, concise)
+- Thresholds: start with 90d for "stale" detection, 14d owner response window, 30d for auto-archive if waived.
+- CI job: generate matrix + produce two artifacts:
+  - traceability.json (machine) in .sisyphus/traceability/
+  - REQUIREMENTS_TRACEABILITY_MATRIX.md (human) in repo root or docs/
+- Auto-open triage Issue if any scenario marked stale.
+
+5) Minimal implementation plan for this repo (step-by-step)
+1. Tags in BDD artifacts
+   - Require feature/scenario tags: @requirement=<id>, @owner:<user>, optionally @tms:<id> and @epic:<name>.
+   - Example source to mirror (Karate, Allure, Radish) above prove tag style accepted across tools.
+
+2. Companion metadata (optional, recommended)
+   - Add specs/<domain>/*.meta.yaml or tests/meta/*.json for richer fields (owner-email, steward, rationale).
+   - Store generated trace JSON to .sisyphus/traceability/trace.json (keeps working area separated per your notepad/layout rules).
+
+3. Extraction script (CI)
+   - Create tools/traceability/extract-tags.js (or Python) that:
+     - Parses .feature files for tags (requirement, owner, tms, story, epic).
+     - Runs grep/regex or uses a Gherkin parser to be robust.
+     - Emits forward map { requirement -> [scenarios/tests] } and reverse map { test_id -> [requirements] } into trace.json.
+   - Fail CI if:
+     - Any scenario missing owner; OR
+     - Orphan requirement detected (requirement referenced nowhere in tests) — treat as WARN first then FAIL after adoption window.
+
+   Evidence & pattern to follow:
+   - See project tool that generates a traceability matrix and adds provenance metadata (kunwarVivek CreateTraceabilityMatrixTool):
+     https://github.com/kunwarVivek/mcp-github-project-manager/blob/1672d4e081bb23661ca959491a2f1873a5b36bd0/src/infrastructure/tools/ai-tasks/CreateTraceabilityMatrixTool.ts#L1-L20
+
+4. CI integration
+   - Add a job traceability:run that:
+     - Runs extract script.
+     - Uploads artifacts (trace.json, md/html matrix).
+     - Runs stale detection and posts Results summary (console + GitHub Check).
+   - If tests fail but trace shows no owner or no test->requirement mapping, mark as blocker (policy configurable).
+
+5. Dashboard / Living docs
+   - Publish the generated matrix as HTML under docs/traceability.html or serve from CI artifacts.
+   - Use Doorstop-style exports (CSV/HTML) for auditors:
+     https://github.com/doorstop-dev/doorstop/blob/cda3009808e0a1466fb212e5a942a2395e70f909/doorstop/core/publishers/html.py#L140-L152
+
+6) Quick adoption checklist (minimal first-cut)
+- [ ] Add @requirement and @owner tags in new/changed scenarios (start with a small team).
+- [ ] Add tools/traceability/extract script (parse tags → trace.json).
+- [ ] CI job that runs extract + stale detector + emits artifacts.
+- [ ] Add REQUIREMENTS_TRACEABILITY_MATRIX.md generator step (CSV/HTML).
+- [ ] Enforce owner presence via CI (soft fail/warning for first 2 weeks, then hard fail).
+
+7) Useful OSS patterns & evidence (links useful for implementers)
+- Tag expressions (how to query tags when running BDD):
+  https://github.com/cucumber/tag-expressions/blob/a5f58d1e035a054afa2ae6d43050647f2818e6a8/README.md
+- Karate example of requirement tag (practical tag format):
+  https://github.com/karatelabs/karate/blob/c07caae8b5fadaf535d0074db948911b62bae6f9/karate-junit5/src/test/java/karate/customTags.feature#L1-L7
+- Allure example (owner, story, tms labels used in practice):
+  https://github.com/allure-framework/allure-csharp/blob/9e51654cc27f17669a7e52caa115f64b3ee1c6da/tests/Allure.Reqnroll.Tests.Samples/Features/Labels.feature#L1-L8
+- Radish example (author/reviewer/requirements metadata in tags):
+  https://github.com/radish-bdd/radish/blob/3a6320d129f123e2decb2a8485264c2f08bf83e7/tests/exploratory/tags/features/SumNumbers.feature#L7-L16
+- Doorstop (traceability matrix exporter + server example):
+  https://github.com/doorstop-dev/doorstop/blob/cda3009808e0a1466fb212e5a942a2395e70f909/doorstop/core/publishers/html.py#L136-L180
+- Example of a project tool that auto-creates a traceability matrix artifact with provenance:
+  https://github.com/kunwarVivek/mcp-github-project-manager/blob/1672d4e081bb23661ca959491a2f1873a5b36bd0/src/infrastructure/tools/ai-tasks/CreateTraceabilityMatrixTool.ts#L56-L74
+- Example requirement/test APIs & trace use-cases (SmartBear / QMetry patterns):
+  https://github.com/SmartBear/smartbear-mcp/blob/983b0a176fed1c84fed1e67301fa2fb5be82d411/src/qmetry/client/tools/requirement-tools.ts#L295-L304
+
+Closing, actionable next steps (pick one)
+- I can produce the extraction script (node/python) that:
+  - Parses .feature files under tests/ and specs/
+  - Emits .sisyphus/traceability/trace.json and a human README/CSV
+  - Implements the stale detection thresholds above
+  — OR —
+- I can produce the CI job snippet (GitHub Actions) plus the small enforcer script that checks for missing owners and orphan requirements.
+
+Pick exactly one of those next steps and I will produce the code + CI snippet with tests and an example run.

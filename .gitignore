@@ -11,3 +11,4 @@ specs/features/test_domain/
 
 # Memory search sessions
 .memsearch/sessions/
+repos/

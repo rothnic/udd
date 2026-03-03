@@ -18,13 +18,13 @@ Quality gates prevent this by catching problems at commit time, before they infe
 
 ## Steps
 
-1. Install hooks → `specs/test-governance/hooks-installation.feature`  
+1. Install hooks → `specs/features/udd/test-governance/hooks-installation.feature`  
    Set up pre-commit and pre-push hooks that validate test quality before allowing commits
 
-2. Pre-commit validation → `specs/test-governance/pre-commit-validation.feature`  
+2. Pre-commit validation → `specs/features/udd/test-governance/pre-commit-validation.feature`  
    Run quick quality checks locally that block commits with dirty tests, warnings, or unlinked tests
 
-3. CI integration → `specs/test-governance/ci-validation.feature`  
+3. CI integration → `specs/features/udd/test-governance/ci-validation.feature`  
    Enforce quality gates in CI to catch anything that bypassed local hooks
 
 ## Success Criteria

@@ -1,430 +1,327 @@
-# Reconstruct T5: docs/architecture/glossary-naming-policy.md (@Sisyphus-Junior subagent)
+# Session ses_36a3889b3ffeQZyavJTGkx360n
 
-**ID**: ses_36a3889b3ffeQZyavJTGkx360n
-**Project ID**: ad761ea6174e58ed763fc75290c3f403ed51079d
-**Created**: 2/25/2026, 11:10:03 AM
-**Stats**: 3 files changed, +413 -0
-
----
-
-## USER (11:10:03 AM)
-
-# Canonical Derivation Model
-
-This document defines the canonical derivation chain used across UDD: how high-level product intent is turned into testable artifacts and, ultimately, implementation requirements. It codifies the required hop sequence used by trace queries in specs/traceability-contract.yml.
-
-## Derivation Chain
-
-Persona → Journey → Use Case → Scenario → E2E Test → Component → Requirement
-
-Each arrow is a required hop. Tools and validation rules rely on these fields and ids to build forward and reverse trace graphs.
-
-## Layer Definitions
-
-- Persona
-  - Role: Human archetype and source of user goals and context.
-  - Location: product/actors.md (or journey frontmatter)
-  - Key fields: id, name, description, goals
-  - Must not contain implementation details.
-
-- Journey
-  - Role: Experience narrative that maps a Persona to one or more Use Cases.
-  - Location: product/journeys/*.md
-  - Key fields: id, actor (persona.id), goal, steps (list of use_case ids)
-  - Steps must reference Use Case ids, not scenario files.
-
-- Use Case
-  - Role: Connects Journey intent to executable scenarios. Declares outcomes and referenced scenarios.
-  - Location: specs/use-cases/*.yml
-  - Key fields: id, name, actors, outcomes (with scenarios[])
-  - Must not duplicate Gherkin scenario text.
-
-- Scenario
-  - Role: Single source of acceptance, expressed in Gherkin (.feature).
-  - Location: specs/features/**/*.feature
-  - Key fields: id (slug), title, feature_path
-  - Drives E2E tests.
-
-- E2E Test
-  - Role: Test harness mapping that implements Scenario steps and verifies behavior.
-  - Location: tests/e2e/**/*.e2e.test.ts
-  - Key fields: id, scenario_path, status
-  - Must reference scenario by id or feature_path.
-
-- Component
-  - Role: Implementation unit(s) responsible for delivering Use Cases and Requirements.
-  - Location: specs/components/*.md or .yml
-  - Key fields: id, name, responsibilities, public_interfaces, supported_use_cases, supported_scenarios
-  - Components map to Requirements and E2E tests for impact analysis.
-
-- Requirement
-  - Role: Developer-facing contract that specifies acceptance criteria, implementation notes, and links to scenarios and components.
-  - Location: specs/requirements/*.yml
-  - Key fields: id, type, feature, description, scenarios, components
-
-## How Validation Uses the Chain
-
-The traceability contract (specs/traceability-contract.yml) defines forward and reverse queries that assume the canonical hop sequence. Validation rules mark missing fields as ERROR or WARN when a hop is broken. Tools must not accept direct references that skip layers unless a documented, approved exception exists.
-
-## Worked Example (Happy Path)
-
-Example: Team Member captures a task via CLI.
-
-1) Persona
-
-   - product/actors.md
-   - id: "team-member"
-
-2) Journey
-
-   - product/journeys/daily-capture.md
-   - id: "daily-capture-workflow"
-   - actor: "team-member"
-   - steps: ["capture_task"]
-
-3) Use Case
-
-   - specs/use-cases/capture_task.yml
-   - id: "capture_task"
-   - outcomes.scenarios: ["udd/cli/inbox/add_item_via_cli"]
-
-4) Scenario
-
-   - specs/features/udd/cli/inbox/add_item_via_cli.feature
-   - id: "udd/cli/inbox/add_item_via_cli"
-
-5) E2E Test
-
-   - tests/e2e/udd/cli/inbox/add_item_via_cli.e2e.test.ts
-   - scenario_path points to feature file
-
-6) Component
-
-   - specs/components/cli-command-service.md
-   - id: "cli-command-service"
-   - supported_scenarios: ["udd/cli/inbox/add_item_via_cli"]
-
-7) Requirement
-
-   - specs/requirements/persist_item_with_defaults.yml
-   - id: "persist_item_with_defaults"
-   - scenarios: ["udd/cli/inbox/add_item_via_cli"]
-   - components: ["cli-command-service", "item-repository"]
-
-This chain is also recorded as evidence in .sisyphus/evidence/phase2/task-4-chain.md. Each link is validated by the trace queries in specs/traceability-contract.yml.
-
-## Anti-Example (Skipped Layer)
-
-Invalid pattern: Journey directly references a Scenario path, skipping Use Case.
-
-Example (invalid):
-
-product/journeys/direct-capture.md
-
-```yaml
-id: "direct-capture-workflow"
-actor: "team-member"
-steps:
-  - "specs/features/udd/cli/inbox/add_item_via_cli.feature"  # INVALID: direct scenario reference
-```
-
-Why this is rejected:
-
-- The forward trace query journey_to_use_cases expects use_case ids in journey.steps. A direct scenario path returns no use_case, causing the trace to fail.
-- Skipping Use Case removes the mapping between narrative intent and scenario scopes, creating semantic ambiguity when a scenario serves multiple use cases.
-- Validation rules in specs/traceability-contract.yml flag this as ERROR: journey.steps missing use_case id.
-
-Alternative: update journey.steps to include the use_case id (e.g., "capture_task") and ensure the Use Case lists the scenario.
-
-Another invalid skip: E2E Test → Requirement (Component skipped). Every test must map to a Component before linking to Requirements to preserve ownership and impact analysis.
-
-## Exception Policy
-
-Only documented exceptions are allowed and must be approved and recorded in the evidence directory. Automatic validation rejects skips as described above. See .sisyphus/evidence/phase2/task-4-skipped-layer.md for the anti-example evidence and corrective actions.
-
-## Traceability Queries
-
-Use the trace queries in specs/traceability-contract.yml. Common queries:
-
-- persona_to_journeys: find journeys where journey.actor = <persona.id>
-- journey_to_use_cases: map journey.steps -> use_case.id
-- use_case_to_scenarios: read use_case.outcomes[].scenarios
-- scenario_to_tests: find e2e_test where scenario_path contains scenario.id
-- requirement_impact: find e2e_tests and personas impacted by a requirement via scenario links
-
-For automated checks, tools should call these trace queries and treat missing hops per invalidation_rules in the contract.
-
-## References
-
-- docs/architecture/udd-concept-model.md
-- specs/traceability-contract.yml
-- .sisyphus/evidence/phase2/task-4-chain.md
-- .sisyphus/evidence/phase2/task-4-skipped-layer.md
+## user (2026-02-25T17:10:03.307Z)
 
 
+<system-reminder>
+
+[SYSTEM DIRECTIVE: OH-MY-OPENCODE - SINGLE TASK ONLY]
+
+**STOP. READ THIS BEFORE PROCEEDING.**
+
+If you were NOT given **exactly ONE atomic task**, you MUST:
+1. **IMMEDIATELY REFUSE** this request
+2. **DEMAND** the orchestrator provide a single, specific task
+
+**Your response if multiple tasks detected:**
+> "I refuse to proceed. You provided multiple tasks. An orchestrator's impatience destroys work quality.
+> 
+> PROVIDE EXACTLY ONE TASK. One file. One change. One verification.
+> 
+> Your rushing will cause: incomplete work, missed edge cases, broken tests, wasted context."
+
+**WARNING TO ORCHESTRATOR:**
+- Your hasty batching RUINS deliverables
+- Each task needs FULL attention and PROPER verification  
+- Batch delegation = sloppy work = rework = wasted tokens
+
+**REFUSE multi-task requests. DEMAND single-task clarity.**
+</system-reminder>
+
+## 1. TASK
+Create docs/architecture/glossary-naming-policy.md defining approved/disallowed terms and naming patterns.
+
+## 2. EXPECTED OUTCOME
+- [ ] File created: docs/architecture/glossary-naming-policy.md
+- [ ] Contains glossary of approved terms
+- [ ] Contains list of disallowed ambiguous terms with replacements
+- [ ] Contains naming patterns for all concept files
+- [ ] npm run check passes
+
+## 3. REQUIRED TOOLS
+- read: .sisyphus/evidence/phase2/task-5-naming.md and task-5-ambiguous.md
+- read: docs/architecture/udd-concept-model.md (for concept reference)
+- write: Create glossary doc
+- bash: npm run check
+
+## 4. MUST DO
+- Read evidence files for naming decisions
+- Define approved terms (Persona, Journey, Use Case, etc.)
+- Define disallowed terms (Story, Epic, Ticket, ambiguous Feature/Test)
+- Provide naming patterns: kebab-case IDs, file naming conventions
+- Include examples for each concept file type
+- Verify with npm run check
+
+## 5. MUST NOT DO
+- Do NOT modify plan file
+- Do NOT edit evidence files
+- Do NOT create additional files
+- Do NOT commit
+
+## 6. CONTEXT
+T5 depends on T1 (complete). This establishes the naming policy to prevent ambiguous terminology.
+
+Structure:
+```markdown
 # Glossary and Naming Policy
-
-This document records the approved terminology and naming patterns used across the UDD repository. The goal: remove ambiguity, make traceability deterministic, and provide concrete file/name examples authors and agents can follow.
 
 ## Approved Terms
 | Term | Definition | Usage |
 |------|------------|-------|
-| Persona | A human archetype representing a class of users, their goals, context, and constraints. | Recorded in product/actors.md and referenced by journeys. Use when describing who benefits from a capability. |
-| Journey | An experience-first narrative describing stages a Persona goes through to achieve a goal. | Stored under product/journeys/{kebab-id}.md. Link to Use Cases, not scenario steps. |
-| Use Case | Mapping from a Journey need to testable behaviors. | YAML artifacts in specs/use-cases/{kebab-id}.yml referencing scenario paths. |
-| Scenario | Single source of acceptance written in Gherkin and stored in .feature files. One scenario per file policy applies. | specs/<domain>/{kebab-id}.feature or specs/features/<domain>/<feature-name>/<kebab-id>.feature |
-| Requirement | Developer-facing contract linking scenarios to implementation details and non-functional constraints. | docs/requirements/{kebab-id}.md or specs/requirements/{kebab-id}.yml. Use for API contracts, performance constraints. |
-| Component | Documented implementation unit (service, module, UI component, schema). | components/{kebab-id}.md. Include owners, interfaces, tests mapping. |
-| E2E Test | The executable test that verifies a Scenario (Vitest + Gherkin). | tests/<domain>/{kebab-id}.e2e.test.ts. Distinguish from Test Review. |
-| Test Review | Human or automated assessment of tests and scenarios quality. | docs/test-reviews/{kebab-id}.md or as PR review artifacts. |
+| Persona | ... | ... |
+...
 
-## Disallowed / Ambiguous Terms
-These terms have caused confusion in the repo. Avoid them; use the replacements below.
+## Disallowed Terms
 | Term | Why Disallowed | Replacement |
 |------|----------------|-------------|
-| Actor | Ambiguous with Persona and product/actors.md naming. | Persona (use in prose), keep product/actors.md filename unchanged for historical reasons. |
-| Feature | Overloaded: BDD feature file vs high-level product feature. | Scenario (single behavior) or Feature container (directory) — prefer Scenario for acceptance text, Feature directory only as container. |
-| Story, Epic, Ticket | Agile terms overloaded in trace fields and cause non-deterministic mapping. | Use Journey, Use Case, or Requirement depending on scope. |
-| Test | Vague: may mean E2E test, unit test, or Test Review. | E2E Test (executable) or Test Review (assessment). Be explicit. |
-| Task / Job | Implementation-level labels, ambiguous in product prose. | Requirement or Component task lists. |
-
-Guidance: do not use disallowed terms in trace fields, IDs, or YAML keys. If you see them in historical artifacts, migrate the reference to an approved term when updating the file.
+| Story | ... | Use Case + Scenario |
+...
 
 ## Naming Patterns
-This section defines the canonical patterns for IDs and file names. Follow these strictly to make linting and tracing deterministic.
-
 ### IDs
-- kebab-case (lowercase, numbers allowed): ^[a-z0-9]+(-[a-z0-9]+)*$
-- No spaces, underscores, or camelCase in ids
-- IDs must be human-meaningful and short (prefer <= 4 segments)
-- Examples:
-  - persona: project-manager
-  - journey: daily-planning
-  - use-case: daily-reschedule
-  - scenario: reschedule-event
+- kebab-case: `^[a-z0-9]+(-[a-z0-9]+)*$`
+...
 
-### File Names (by concept)
-- Journeys: product/journeys/{kebab-id}.md
-  - Example: product/journeys/daily-planning.md
-- Personas (actors): product/actors.md (centralized list) and product/personas/{kebab-id}.md for long-form persona docs
-  - Example: product/personas/project-manager.md
-- Use Cases: specs/use-cases/{kebab-id}.yml
-  - Example: specs/use-cases/daily-reschedule.yml
-- Scenarios (Gherkin): specs/<domain>/{kebab-id}.feature
-  - Flat scenarios: specs/scheduling/reschedule-event.feature
-  - Template-based features (container): specs/features/<domain>/<feature-name>/<kebab-id>.feature
-    - Example: specs/features/reporting/export_csv/export_csv.feature
-- Requirements: specs/requirements/{kebab-id}.yml or docs/requirements/{kebab-id}.md
-  - Example: specs/requirements/reschedule-api.yml
-- Components: components/{kebab-id}.md
-  - Example: components/scheduling-service.md
-- Tests: tests/<domain>/{kebab-id}.e2e.test.ts
-  - Example: tests/scheduling/reschedule-event.e2e.test.ts
-- Test Reviews: docs/test-reviews/{kebab-id}.md
+### File Names
+- Journeys: `product/journeys/{kebab-id}.md`
+- Use Cases: `specs/use-cases/{kebab-id}.yml`
+...
+```
 
-### Tagging and Relationship Keys
-- Use explicit keys in YAML and manifest files: persona_id, journey_id, use_case_id, scenario_path, requirement_id, component_id
-- Do not use generic keys like "feature", "story", or "ticket" in trace YAML
-
-## Examples (Concrete)
-- Journey file: product/journeys/daily-planning.md
-  - Frontmatter/heading: # Journey: daily-planning
-  - Link to use case: Use Case: specs/use-cases/daily-reschedule.yml
-
-- Use Case YAML (specs/use-cases/daily-reschedule.yml):
-  ```yaml
-  id: daily-reschedule
-  title: Daily reschedule
-  persona_id: project-manager
-  scenario_paths:
-    - specs/scheduling/reschedule-event.feature
-  preconditions:
-    - user_authenticated: true
-  ```
-
-- Scenario file path: specs/scheduling/reschedule-event.feature
-  - Scenario name: "User reschedules an event"
-
-- Requirement file: specs/requirements/reschedule-api.yml
-  - Contains requirement_id: reschedule-api
-  - Maps to scenario: specs/scheduling/reschedule-event.feature
-
-## Migration and Enforcement
-- When editing existing artifacts, update IDs and references to follow kebab-case and approved terms.
-- Linting: the repo's lint/check step enforces many style rules. Use `npm run check` locally. If check fails, fix naming to match patterns.
-- Backwards compatibility: historical filenames (product/actors.md) may remain, but in-document terminology must use Persona instead of Actor.
-
-## Quick Reference Cheat Sheet
-- Use Persona, Journey, Use Case, Scenario, Requirement, Component, E2E Test, Test Review
-- Avoid Story, Epic, Ticket, Feature (ambiguous), Actor (in prose: use Persona)
-- IDs: kebab-case only
-- Scenario files: one scenario per file, stored under specs/
+Return confirmation with file summary and npm run check output.
 
 ---
 
-Policy authored from Phase 2 evidence: .sisyphus/evidence/phase2/task-5-naming.md and .sisyphus/evidence/phase2/task-5-ambiguous.md and concept model docs.
+## assistant (2026-02-25T17:10:03.317Z)
 
+**todowrite:**
 
-# Journey Narrative Model
+```
+[
+  {
+    "content": "Read evidence files and udd-concept-model.md to gather naming decisions",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Create docs/architecture/glossary-naming-policy.md with approved/disallowed terms and naming patterns",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Run npm run check and capture output",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "content": "Run lsp_diagnostics on changed file to ens...
+```
+---
 
-## Overview
+## assistant (2026-02-25T17:10:24.439Z)
 
-Journey narratives describe the user's experience as a timeline of observable events and outcomes. They belong to the experience layer and must not include implementation or capability internals (APIs, method names, infra, feature flags, storage details, service calls, etc.). Journeys are human-facing artifacts used by product, design, QA, and writers to define what users feel and do, not how the system achieves it.
+**read:**
 
-This document defines the canonical schema for journey narratives, gives field definitions, provides a full example with an emotional trajectory, and describes capability-leak detection rules authors and lint tooling should apply.
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/evidence/phase2/task-5-naming.md</path>
+<type>file</type>
+<content>1: # Evidence: Task 5 — Glossary and Naming Policy
+2: 
+3: This file records the artifacts produced for Task 5: Align Glossary and Naming Policy.
+4: 
+5: Files created:
+6: - docs/architecture/glossary-naming-policy.md
+7: 
+8: Summary of contents:
+9: - Approved terms and definitions: Persona, Journey, Use Case, Scenario, Requirement, Component, E2E Test, Test Review.
+10: - Disallowed ambiguo...
+```
+---
 
-## Schema
+## assistant (2026-02-25T17:10:28.893Z)
 
-A Journey Narrative is a single markdown document with these required top-level fields and sections:
+**read:**
 
-Required fields
-- id: string (unique slug, e.g., `onboarding-quick-start`)
-- title: string (human-friendly title)
-- actor: string (who the journey is about)
-- goal: string (what success looks like for the actor)
-- stages: ordered array of Stage objects
-- touchpoints: array of Touchpoint objects (derived from stages, optional if described inline)
-- channels: array of channels involved (e.g., web, mobile, email)
-- emotions: array describing predominant emotions per stage (see Stage.emotions)
-- pain_points: array of known pain points (mapped to stages)
-- success_metrics: array of measurable outcome metrics
-- references: array of related use_case ids or docs (implementation artifacts only via reference)
+```
+<path>/Users/nroth/workspace/udd/.sisyphus/evidence/phase2/task-5-ambiguous.md</path>
+<type>file</type>
+<content>1: # Evidence: Task 5 — Ambiguous / Disallowed Terms
+2: 
+3: This evidence file lists ambiguous or overloaded labels found in the repo and the policy replacement we enforce.
+4: 
+5: Found ambiguous labels (examples):
+6: - "actor" used in docs/templates historically. Replacement: use Persona in docs; keep product/actors.md as canonical file name.
+7: - "feature" ambiguous between BDD feat...
+```
+---
 
-Stage object
-- name: string (stage label, ordered)
-- description: string (what the user is doing/experiencing)
-- touchpoints: array of touchpoint ids or descriptions
-- channels: subset of journey channels active in this stage
-- emotions: ordered list showing emotional trajectory within the stage (e.g., ["curious", "cautious", "delighted"]). Each emotion may include intensity (low|medium|high) optionally.
-- success_criteria: optional short statement of what success looks like for the stage
+## assistant (2026-02-25T17:10:31.324Z)
 
-Touchpoint object
-- id: string (local id)
-- label: string (short label like "signup form" or "welcome email")
-- description: string (what the user sees or does)
-- observable_outcome: string (user-observable signal, e.g., "confirmation email received")
+**read:**
 
-Success Metric object
-- id: string (metric id or analytics id)
-- name: string (human name)
-- description: string (what it measures, must be outcome-focused)
-- target: optional numeric or relative target (e.g., ">50% within 5 minutes")
+```
+<path>/Users/nroth/workspace/udd/docs/architecture/udd-concept-model.md</path>
+<type>file</type>
+<content>1: # UDD Concept Model
+2: 
+3: ## Overview
+4: 
+5: This document defines the canonical concept model for User Driven Development (UDD). It reconciles existing repository language (product/actors.md and journey artifacts) with SysML-informed traceability decisions captured during phase 2. The goal is to provide clear boundaries, reduce ambiguity for agents and humans, and enable deterministic l...
+```
+---
 
-## Field Definitions and Rules
+## assistant (2026-02-25T17:10:34.029Z)
 
-- stages: Ordered timeline. Each stage must describe user-observable behavior and outcomes. Keep stage names short and outcome oriented (Discover, Evaluate, Decide, Use, Recover).
-- touchpoints: Concrete moments where the user interacts with the product or receives a communication. Touchpoints should be phrased in user language ("user sees pricing page") not implementer language ("server renders /pricing route").
-- channels: Channels are modes of delivery. Use canonical names: web, mobile_app, email, sms, phone_support, in_product_tooltip.
-- emotions: Capture how the user feels. Emotions are adjectives or short phrases. You may provide intensity and a one-sentence rationale for each.
-- pain_points: Specific user problems encountered, mapped to stages when possible. Avoid including root-cause system internals; state observable symptom and user impact.
-- success_metrics: Outcome focused, tied to stages where relevant. Metrics must reference analytics ids or business metrics, not implementation counters.
-- references: If an implementation detail is required, reference a Use Case or Component doc by id. Do not embed code or API details in the journey body.
+**read:**
 
-Policy: No capability internals
+```
+<path>/Users/nroth/workspace/udd/package.json</path>
+<type>file</type>
+<content>1: {
+2: 	"name": "udd",
+3: 	"version": "2.0.0",
+4: 	"description": "User Driven Development - spec-first CLI where journeys are requirements and BDD scenarios are tests",
+5: 	"type": "module",
+6: 	"bin": {
+7: 		"udd": "bin/udd"
+8: 	},
+9: 	"files": [
+10: 		"bin/",
+11: 		"src/",
+12: 		"templates/",
+13: 		"README.md"
+14: 	],
+15: 	"repository": {
+16: 		"type": "git",
+17: 		"url": "https://github.com/rothnic/udd"
+18: 	},
+...
+```
+---
 
-Journey narratives MUST NOT contain:
-- API paths, HTTP methods, SDK calls, code snippets, or service/method names (e.g., `POST /api/users`, `userService.createUser()`).
-- Infra, storage, logs, or vendor names that reveal implementation (e.g., "store in S3", "CloudWatch").
-- Feature flag names, rollout stages, or experiment ids (e.g., "enable myfeature_v2").
+## assistant (2026-02-25T17:10:45.121Z)
 
-If a narrative needs implementation context, add a reference to a Use Case, Component, or Architecture doc. Keep the journey focused on what the user does and feels.
+**apply_patch:**
 
-## Full Example: onboarding-quick-start
+```
+Success. Updated the following files:
+A docs/architecture/glossary-naming-policy.md
+```
+---
 
-id: onboarding-quick-start
-title: New user quick start
-actor: New user
-goal: Sign up and create their first task within 5 minutes
-channels: [web, email]
+## assistant (2026-02-25T17:11:18.653Z)
 
-stages:
-- name: Discover
-  description: User finds the product via search or referral and views the landing page.
-  touchpoints: [landing_page]
-  channels: [web]
-  emotions: [{emotion: "curious", intensity: "medium"}]
-  success_criteria: "User is interested enough to click Sign up"
+**todowrite:**
 
-- name: Sign up
-  description: User completes an email sign up form and confirms account via email.
-  touchpoints: [signup_form, confirmation_email]
-  channels: [web, email]
-  emotions: [{emotion: "cautious", intensity: "medium"}, {emotion: "relieved", intensity: "low"}]
-  success_criteria: "Account created and confirmed"
+```
+[
+  {
+    "content": "Read evidence files and udd-concept-model.md to gather naming decisions",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Create docs/architecture/glossary-naming-policy.md with approved/disallowed terms and naming patterns",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Run npm run check and capture output",
+    "priority": "high",
+    "status": "in_progress"
+  },
+  {
+    "content": "Run lsp_diagnostics on changed fil...
+```
+---
 
-- name: First task
-  description: User creates their first task via the in-product flow and sees it listed in their dashboard.
-  touchpoints: [create_task_modal, dashboard_list]
-  channels: [web]
-  emotions: [{emotion: "delighted", intensity: "high"}]
-  success_criteria: "First task visible on dashboard"
+## assistant (2026-02-25T17:11:21.156Z)
 
-touchpoints:
-- id: landing_page
-  label: Landing page
-  description: "User views the product landing page with value proposition and call-to-action"
-  observable_outcome: "Clicks Sign up"
+**bash:**
 
-- id: signup_form
-  label: Signup form
-  description: "User fills email and password and submits"
-  observable_outcome: "Form submitted"
+```
 
-- id: confirmation_email
-  label: Confirmation email
-  description: "User receives an email with confirm link"
-  observable_outcome: "Email delivered and link clicked"
+> udd@2.0.0 check
+> biome check .
 
-- id: create_task_modal
-  label: Create task modal
-  description: "User enters task details and saves"
-  observable_outcome: "Task appears on dashboard"
+Checked 60 files in 33ms. No fixes applied.
 
-pain_points:
-- stage: Sign up
-  problem: "Email delivery delays cause confusion"
-  impact: "Users abandon before confirming"
+```
+---
 
-success_metrics:
-- id: analytics.signup_confirm_rate
-  name: Signup confirm rate
-  description: Percentage of signups that confirm within 1 hour
-  target: ">= 70%"
+## assistant (2026-02-25T17:11:24.356Z)
 
-- id: analytics.first_task_time
-  name: Time to first task
-  description: Median time from account creation to first task
-  target: "<= 5 minutes"
+**lsp_diagnostics** (input): {"filePath":"docs/architecture/glossary-naming-policy.md","severity":"all"}
+---
 
-Emotional trajectory
+## assistant (2026-02-25T17:11:25.933Z)
 
-Across stages the user's emotional curve is: curious (landing) -> cautious (signup) -> relieved (confirmation) -> delighted (first task). This trajectory helps prioritize pain_points and success_metrics: high-intensity delight at First task indicates the biggest opportunity to convert new users into active users.
+**todowrite:**
 
-## Capability-leak detection rules
+```
+[
+  {
+    "content": "Run npm run check and capture output",
+    "priority": "high",
+    "status": "completed"
+  },
+  {
+    "content": "Run lsp_diagnostics on changed file to ensure no diagnostics",
+    "priority": "high",
+    "status": "completed"
+  }
+]
+```
+---
 
-Linting and human review should apply these detection rules. If any rule triggers, the narrative should be returned to the author for revision.
+## assistant (2026-02-25T17:11:27.980Z)
 
-1) Code-like tokens
-- Regex: any token matching /\b([a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*\(|POST\s+\/)\b/ — catches method calls and obvious HTTP mentions.
+COMMIT DISCIPLINE / TODOS
 
-2) Infra/vendor identifiers
-- Regex: /\b(S3|CloudWatch|BigQuery|RDS|DynamoDB|SQS|Kafka|GCS)\b/i
+- in_progress: Run npm run check and capture output
+- completed: Read evidence files and udd-concept-model.md
+- completed: Create docs/architecture/glossary-naming-policy.md
+- in_progress → completed: Run npm run check and capture output
+- completed: Run lsp_diagnostics on changed file (no MD LSP configured; considered as checked)
 
-3) Feature-flag or experiment ids
-- Regex: /\b(myfeature_[0-9a-zA-Z_-]+|experiment_[0-9]+|flag_[0-9a-zA-Z_-]+)\b/i
+FILE CREATED
+- docs/architecture/glossary-naming-policy.md
 
-4) Storage/persistence verbs with resource hints
-- Regex: /\b(store to|persist to|write to|save to)\b/i
+FILE SUMMARY (first lines)
+- Title: Glossary and Naming Policy
+- Contains:
+  - Approved terms and definitions (Persona, Journey, Use Case, Scenario, Requirement, Component, E2E Test, Test Review)
+  - Disallowed / ambiguous terms with replacements (Actor, Feature, Story, Epic, Ticket, Test)
+  - Naming patterns and strict ID/file name rules (kebab-case regex, file path patterns)
+  - Concrete examples for journeys, use-cases, scenarios, requirements, components, tests
+  - Migration and enforcement guidance
+  - Quick reference cheat sheet
+- Source evidence referenced: .sisyphus/evidence/phase2/task-5-naming.md, .sisyphus/evidence/phase2/task-5-ambiguous.md, docs/architecture/udd-concept-model.md
 
-5) Hard rule: If any field contains a match from rules 1-4, the narrative fails validation.
-
-Remediation guidance
-- Replace matched text with user-observable phrasing. Example: change "POST /api/users" to "User submits the sign up form".
-- Move implementation details to a Use Case or Component doc and add an entry to references: [use_case:create-account]
-
-## References
+EVIDENCE FILES READ (per task)
+- .sisyphus/evidence/phase2/task-5-naming.md
+- .sisyphus/evidence/phase2/task-5-ambiguous.md
 - docs/architecture/udd-concept-model.md
-- .sisyphus/evidence/phase2/task-6-journey-narrative.md
-- .sisyphus/evidence/phase2/task-6-leak.md
 
+LINT / CHECK OUTPUT
+- Command: npm run check
+- Output:
+  > udd@2.0.0 check
+  > biome check .
+  
+  Checked 60 files in 33ms. No fixes applied.
 
+LSP DIAGNOSTICS
+- Ran lsp_diagnostics on docs/architecture/glossary-naming-policy.md
+- Result: No MD LSP configured. (Information only; markdown files are not covered by configured language servers.)
+  - This is expected; no code diagnostics apply to the new markdown file.
+
+TODOS (final)
+- completed: Read evidence files and udd-concept-model.md to gather naming decisions
+- completed: Create docs/architecture/glossary-naming-policy.md with approved/disallowed terms and naming patterns
+- completed: Run npm run check and capture output
+- completed: Run lsp_diagnostics on changed file to ensure no diagnostics
+
+If you want:
+- I can update any wording, add more examples, or add check rules to the linter to enforce these naming patterns.
+- I can create a lightweight Biome/ custom lint rule or script that validates kebab-case IDs across YAML/feature headers, and add it to npm run check (would be a separate task).

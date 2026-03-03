@@ -154,3 +154,82 @@ A healthy UDD project has:
 | 2025-11-24 | Duplicate .spec.ts files cause issues | Added cleanup to iterate prompt |
 | 2025-11-24 | Large uncommitted changesets are risky | iterate prompt auto-commits in chunks |
 | 2025-11-24 | ANSI codes break test assertions | Added stripping pattern to tests |
+
+
+---
+
+## 📋 Test Implementation: detect_and_categorize.e2e.test.ts
+
+**Date**: 2025-03-02
+
+### Implementation Summary
+
+Created comprehensive E2E test suite at `tests/e2e/udd/recovery/detect_and_categorize.e2e.test.ts` implementing all Phase 3 scenarios from `specs/features/udd/recovery/detect_and_categorize.feature`:
+
+1. **Run comprehensive drift detection** - Tests `udd doctor --json` output format, verifying JSON structure with proper fields (id, severity, type, file, message, autoFixable, requiresUserInput)
+
+2. **Categorize issues by severity** - Validates critical/warning/info issue types including journey_stale, scenario_orphan, test_failing, test_missing, low_coverage
+
+3. **Count issues by severity** - Verifies summary contains counts for each severity level and calculates total issue count
+
+4. **Identify auto-fixable issues** - Checks autoFixable flag on issues like test_missing, journey_stale, manifest_corrupt
+
+5. **Identify issues requiring user input** - Validates requiresUserInput flag for scenario_orphan, test_failing, validation_error
+
+### Test Patterns Used
+
+- Used `@amiceli/vitest-cucumber` with `describeFeature` and `Scenario` blocks
+- Used `withTempDir` helper for isolated test environments
+- Used `runUdd` helper for CLI command execution
+- Followed pattern from `create_recovery_backlog.e2e.test.ts` for consistency
+- Real assertions with no stubs - tests verify actual CLI behavior
+
+### Current Status
+
+Tests are written but failing because `udd doctor --json` implementation is pending. This is expected TDD behavior - tests define expected behavior, implementation follows.
+
+
+## Test Implementation Notes - 2026-03-02
+
+### iteration_control.e2e.test.ts Implementation
+
+Created comprehensive E2E test file at `tests/e2e/udd/recovery/iteration_control.e2e.test.ts` covering:
+
+1. **Process one task at a time** - Validates orchestrated recovery processes one issue per run
+2. **Resume after completion** - Tests that recovery can resume from where it left off
+3. **Auto-continue for auto-fixable issues** - Validates batch processing of auto-fixable items
+4. **Stop before user-input issues** - Ensures graceful pause before interactive steps
+5. **Report progress after each iteration** - Tests progress reporting functionality
+6. **Handle all critical issues complete** - Validates behavior when only warnings remain
+7. **Complete recovery** - Tests final verification and cleanup
+8. **Handle stuck workflow** - Validates error handling for unresolvable issues
+9. **Timeout protection** - Tests timeout handling and graceful exit
+
+### Technical Patterns Used
+
+- Used `@amiceli/vitest-cucumber` with `describeFeature` and `loadFeature`
+- Implemented Background steps for shared setup context
+- Used `withTempDir` utility for isolated test environments per scenario
+- Real assertions against `runUdd()` CLI outputs
+- TypeScript interfaces for `RecoverySession` and `RecoveryBacklog` types
+
+### Known Issue: vitest-cucumber Multi-line Step Parsing
+
+The feature file uses multi-line Then steps with numbered lists:
+
+```gherkin
+Then it should:
+  1. Complete any remaining auto-fixes
+  2. Report summary:
+     ...
+  3. Exit cleanly (code 0)
+```
+
+vitest-cucumber incorrectly parses these as separate steps. This affects multiple test files in the project including:
+- `present_user_decision.e2e.test.ts`
+- `create_recovery_backlog.e2e.test.ts`
+- `iteration_control.e2e.test.ts`
+
+Workaround: Define numbered steps explicitly in test file to match vitest-cucumber's parsing.
+
+Test file follows all project patterns and requirements from the spec.

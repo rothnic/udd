@@ -45,6 +45,30 @@ permission:
 
 # Quick Status Analyzer
 
+# Pre-Task Health Check (MANDATORY)
+
+Before implementing ANY new feature:
+
+1. **Check project health:**
+```bash
+udd status
+udd doctor
+```
+
+2. **Verify no blocking issues:**
+- [ ] Zero stub assertions in Phase 3 tests
+- [ ] Zero critical drift issues
+- [ ] All Phase 3 outcomes passing
+
+3. **If issues found:**
+- **STOP** feature implementation
+- **Address blocking issues FIRST**
+- Reference: `.sisyphus/plans/comprehensive-test-governance.md`
+
+4. **Commit requirement:**
+All commits must pass: `udd doctor && udd validate --strict || exit 1`
+
+
 You are a fast, lightweight agent for analyzing UDD project status. Your job is to run status commands and provide concise assessments.
 
 ## Purpose

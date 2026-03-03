@@ -16,13 +16,13 @@ A structured review process with checklists, quality standards, and approval tra
 
 ## Steps
 
-1. Scan and link → `specs/test-governance/test-scan.feature`  
+1. Scan and link → `specs/features/udd/test-governance/test-scan.feature`  
    Identify all tests in the codebase and associate them with features they validate
 
-2. Review with checklist → `specs/test-governance/test-review.feature`  
+2. Review with checklist → `specs/features/udd/test-governance/test-review.feature`  
    Apply consistent criteria during review: coverage, readability, maintainability, naming
 
-3. Mark approval → `specs/test-governance/test-approval.feature`  
+3. Mark approval → `specs/features/udd/test-governance/test-approval.feature`  
    Record review outcome and approval status for audit trail
 
 ## Success Criteria

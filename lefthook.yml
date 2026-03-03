@@ -1,0 +1,62 @@
+# Lefthook configuration for UDD validation gates
+#
+# Purpose:
+# - Run fast, staged-file-aware UDD validation during pre-commit to catch
+#   spec/schema errors early.
+# - Provide a small pre-push gate that runs the test suite before pushing.
+#
+# Install:
+# 1) Ensure lefthook is a dev dependency (npm/yarn/bun), then run:
+#      lefthook install
+# 2) If using bun scripts, ensure package.json has udd scripts:
+#      "scripts": {
+#        "udd": "udd",
+#        "test": "bun test"
+#      }
+#
+# Notes / optimizations included in commands:
+# - Hooks try to run only when relevant files are staged (fast).
+# - Hooks exit immediately on first failure (fast-fail).
+# - Standard git --no-verify still bypasses hooks when explicitly requested.
+
+pre-commit:
+  # Run hooks in parallel by default; each command should be fast.
+  parallel: true
+  commands:
+    # Primary UDD validation: strict mode to prevent invalid specs from entering commits.
+    # This command should operate on staged files and be fast; udd validate supports
+    # staged-file execution in this repo's tooling (preferred). If not available, it
+    # will still run full validation — keep strict to satisfy policy.
+    udd-validate:
+      run: |
+        # Prefer validating only staged files when possible for speed.
+        # The "--staged" flag is optional depending on udd CLI support; if unsupported
+        # the command will fall back to full strict validation.
+        if bun run udd --silent validate --help | grep -q -- "--staged"; then
+          bun run udd validate --strict --staged
+        else
+          bun run udd validate --strict
+        fi
+      # Only run when markdown/specs or relevant files change to avoid wasted cycles
+      include: "**/*.feature,**/*.md,product/**,specs/**"
+
+    # A lighter doctor check to surface environment issues quickly (non-blocking is
+    # acceptable but we keep it blocking here to ensure health gates before commit).
+    udd-doctor:
+      run: |
+        # Run a quick doctest / environment check. Keep it fast.
+        bun run udd doctor
+      include: "**/*"
+
+pre-push:
+  parallel: true
+  commands:
+    # Pre-push: run tests to catch regressions before pushing. Keep developers' CI in mind;
+    # this should be reasonably fast. For lengthy test suites, teams can disable locally
+    # with --no-verify or adjust this hook to run only a smoke subset.
+    udd-test:
+      run: |
+        # Run the test script via bun. If you have a slow full suite, consider creating a
+        # fast 'test:smoke' script and switching to that here.
+        bun run test
+      include: "**/*"

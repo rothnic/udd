@@ -16,13 +16,13 @@ Current status reports are manual, stale, or nonexistent. Teams discover problem
 
 ## Steps
 
-1. Status integration → `specs/test-governance/status-integration.feature`  
+1. Status integration → `specs/features/udd/test-governance/status-integration.feature`  
    Integrate with CI pipelines and test runners to automatically collect pass/fail status in real-time
 
-2. Health metrics → `specs/test-governance/health-metrics.feature`  
+2. Health metrics → `specs/features/udd/test-governance/health-metrics.feature`  
    Calculate and track key health indicators: coverage trends, flakiness rates, suite execution time, debt accumulation
 
-3. Setup checks → `specs/test-governance/setup-health-check.feature`  
+3. Setup checks → `specs/features/udd/test-governance/setup-health-check.feature`  
    Validate that the test environment is properly configured and dependencies are satisfied
 
 ## Success Criteria

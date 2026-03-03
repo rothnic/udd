@@ -4,6 +4,7 @@ import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
 import yaml from "yaml";
+import { checkGate, handleGateResult } from "../lib/gate.js";
 import {
 	buildTestManifest,
 	calculateExpirationDate,
@@ -55,7 +56,12 @@ export const testCommand = new Command("test")
 		new Command("run")
 			.description("Run E2E tests with vitest")
 			.argument("[args...]", "Arguments to pass to vitest")
-			.action(async (args: string[]) => {
+			.option("--skip-gate", "Skip gate check (not recommended)")
+			.action(async (args: string[], options: { skipGate?: boolean }) => {
+				// Gate check before running tests (critical issues always block)
+				const gateResult = await checkGate({ skipGate: options.skipGate || false });
+				handleGateResult(gateResult);
+
 				const child = spawn(
 					"npx",
 					["vitest", "run", "--reporter=verbose", ...(args || [])],

@@ -157,13 +157,19 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 		try {
 			const journeysDir = path.join(rootDir, "product/journeys");
 			const journeyFiles = await fs.readdir(journeysDir);
-			const manifestPath = path.join(rootDir, "specs/.udd/manifest.yml");
+			// Load manifest from canonical location: specs/.udd/manifest.yml
+			const specsManifestPath = path.join(
+				rootDir,
+				"specs",
+				".udd",
+				"manifest.yml",
+			);
 			let manifest: { journeys?: Record<string, { hash: string }> } = {};
 			try {
-				const manifestContent = await fs.readFile(manifestPath, "utf-8");
+				const manifestContent = await fs.readFile(specsManifestPath, "utf-8");
 				manifest = yaml.parse(manifestContent) || {};
 			} catch {
-				// No manifest yet
+				// No manifest at canonical location - proceed with empty manifest
 			}
 
 			for (const file of journeyFiles) {

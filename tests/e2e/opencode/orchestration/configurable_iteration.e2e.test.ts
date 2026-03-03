@@ -84,7 +84,8 @@ describeFeature(feature, ({ Background, Scenario }) => {
 	Background(({ Given }) => {
 		Given("the OpenCode SDK is available", () => {
 			// SDK simulated for testing config logic
-			expect(true).toBe(true);
+			expect(createOrchestrator).toBeDefined();
+			expect(typeof createOrchestrator).toBe("function");
 		});
 	});
 

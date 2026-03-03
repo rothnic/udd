@@ -1,0 +1,17 @@
+id: track_test_quality
+name: Track Test Quality
+summary: "Collect and surface test quality metrics (coverage, flakiness, pass rate) for project visibility"
+phase: 3
+actors:
+  - developer
+  - agent
+outcomes:
+  - description: "Test coverage metrics are available"
+    scenarios:
+      - "udd/test-governance/health-metrics"
+  - description: "Flaky test detection is reported"
+    scenarios:
+      - "udd/test-governance/test-scan"
+  - description: "Historical pass rate is tracked"
+    scenarios:
+      - "udd/test-governance/test-status"

@@ -140,6 +140,114 @@ User has created their first item within 5 minutes.
 6. **Run tests after changes**: `npm test`
 7. **Commit often with meaningful messages**
 
+## UDD Strict Mode and Recovery
+
+UDD strict mode enforces traceability between journeys, scenarios, and tests. When enabled, the system blocks operations that would create drift between these layers.
+
+### What is Strict Mode
+
+Strict mode ensures:
+- Every code change traces back to a user journey
+- Scenarios stay synchronized with journey definitions
+- Tests remain aligned with specifications
+
+Drift occurs when journeys change but scenarios do not, or when tests are written without corresponding scenarios.
+
+### Gates: Critical vs Warning
+
+UDD uses two types of enforcement gates:
+
+| Gate Type | Behavior | When to Bypass |
+|-----------|----------|----------------|
+| **Critical** | Blocks operation entirely | Never. Must fix first. |
+| **Warning** | Requires confirmation to proceed | Temporarily with `--skip-gate` |
+
+Critical gates protect core traceability. Warning gates alert you to issues that should be addressed soon.
+
+### Checking for Drift
+
+Always check status before starting work:
+
+```bash
+udd doctor              # Check for all drift issues
+udd doctor --strict     # Exit with error if drift detected
+```
+
+The doctor command analyzes:
+- Journey files without corresponding scenarios
+- Scenarios referencing non-existent journeys
+- Tests without matching scenario definitions
+- Manifest synchronization state
+
+### Recovery Workflow
+
+When blocked by drift:
+
+1. **Run diagnosis**
+   ```bash
+   udd doctor --fix
+   ```
+
+2. **Review the plan**
+   The doctor shows proposed fixes. Review each change carefully.
+
+3. **Apply fixes**
+   - Interactive mode: Confirm each fix individually
+   - Auto mode: Apply safe fixes automatically
+   ```bash
+   udd doctor --fix --auto  # Auto-fix safe issues only
+   ```
+
+4. **Verify clean state**
+   ```bash
+   udd doctor
+   udd status
+   ```
+
+### Checkpoint System
+
+For ambiguous cases, UDD creates checkpoints that require clarification:
+
+- When a journey change could map to multiple scenarios
+- When scenario semantics are unclear
+- When automatic sync would lose intent
+
+Resolve checkpoints by editing the relevant journey or scenario file directly, then run `udd sync` again.
+
+### Command Quick Reference
+
+```bash
+# Diagnosis
+udd doctor              # Check drift
+udd doctor --strict     # Fail on any drift
+
+# Recovery
+udd doctor --fix        # Interactive recovery
+udd doctor --fix --auto # Auto-fix safe issues
+
+# Strict operations
+udd sync --strict       # Block on drift during sync
+
+# Bypass (use sparingly)
+udd new --skip-gate     # Bypass warning gates
+```
+
+### Guidelines for Agents
+
+**Before starting work:**
+1. Run `udd status` to see current state
+2. Run `udd doctor` to check for drift
+
+**If critical drift detected:**
+- Stop and fix before writing any code
+- Use `udd doctor --fix` for guided recovery
+
+**If warning drift detected:**
+- Prefer to fix the issue
+- Can use `--skip-gate` if blocked, but create a task to fix it
+
+**Never use `--skip-gate` for critical gates.** The block exists to prevent broken traceability.
+
 ## Example Workflow
 
 User: "Add CSV export feature"

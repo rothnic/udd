@@ -17,12 +17,14 @@ defineSteps((s: any) => {
 		"there are defined journeys and actors in product/ and specs/",
 		() => {
 			// no-op assertion
+			// @phase:4 - Intentional stub for future implementation
 			expect(true).toBe(true);
 		},
 	);
 	s.And?.(
 		"there are defined journeys and actors in product/ and specs/",
 		() => {
+			// @phase:4 - Intentional stub for future implementation
 			expect(true).toBe(true);
 		},
 	);
@@ -60,12 +62,14 @@ describeFeature(feature, ({ Scenario }) => {
 		let stdout: string;
 
 		Given("UDD is initialized in the current directory", () => {
+			// @phase:4 - Intentional stub for future implementation
 			expect(true).toBe(true);
 		});
 
 		// The feature uses 'And' for this step; register an And step only so the
 		// library (which keeps 'And' separate) can match the step type exactly.
 		And("there are defined journeys and actors in product/ and specs/", () => {
+			// @phase:4 - Intentional stub for future implementation
 			expect(true).toBe(true);
 		});
 
@@ -102,12 +106,14 @@ describeFeature(feature, ({ Scenario }) => {
 			let stdout: string;
 
 			Given("UDD is initialized in the current directory", () => {
+			// @phase:4 - Intentional stub for future implementation
 				expect(true).toBe(true);
 			});
 
 			And(
 				"the product/actors.md and product/journeys/ exist with at least one actor",
 				() => {
+				// @phase:4 - Intentional stub for future implementation
 					expect(true).toBe(true);
 				},
 			);
@@ -131,10 +137,12 @@ describeFeature(feature, ({ Scenario }) => {
 		let stdout: string;
 
 		Given("UDD is initialized in the current directory", () => {
+			// @phase:4 - Intentional stub for future implementation
 			expect(true).toBe(true);
 		});
 
 		And("product/journeys/ contains one or more journey files", () => {
+			// @phase:4 - Intentional stub for future implementation
 			expect(true).toBe(true);
 		});
 
@@ -158,12 +166,14 @@ describeFeature(feature, ({ Scenario }) => {
 		let stdout: string;
 
 		Given("UDD is initialized in the current directory", () => {
+			// @phase:4 - Intentional stub for future implementation
 			expect(true).toBe(true);
 		});
 
 		And(
 			"specs/features/ contains feature files generated from journeys",
 			() => {
+				// @phase:4 - Intentional stub for future implementation
 				expect(true).toBe(true);
 			},
 		);
@@ -200,10 +210,12 @@ describeFeature(feature, ({ Scenario }) => {
 		let stdout: string;
 
 		Given("UDD is initialized in the current directory", () => {
+			// @phase:4 - Intentional stub for future implementation
 			expect(true).toBe(true);
 		});
 
 		And("there are journeys, features, and tests present in the repo", () => {
+			// @phase:4 - Intentional stub for future implementation
 			expect(true).toBe(true);
 		});
 
@@ -242,12 +254,14 @@ describeFeature(feature, ({ Scenario }) => {
 		let stdout: string;
 
 		Given("UDD is initialized in the current directory", () => {
+			// @phase:4 - Intentional stub for future implementation
 			expect(true).toBe(true);
 		});
 
 		And(
 			"the repository contains journeys and features with some missing tests",
 			() => {
+				// @phase:4 - Intentional stub for future implementation
 				expect(true).toBe(true);
 			},
 		);

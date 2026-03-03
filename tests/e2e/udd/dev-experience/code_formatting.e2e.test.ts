@@ -21,6 +21,7 @@ describeFeature(feature, ({ Scenario }) => {
 		Then("something happens", () => {
 			// Minimal assertion to satisfy the step. Replace with real checks when
 			// environment/setup is available.
+			// @phase:5 - Intentional stub for future implementation
 			expect(true).toBe(true);
 		});
 	});
