@@ -6,6 +6,7 @@ import yaml from "yaml";
 import { listExamples, resolvePaths } from "../lib/paths.js";
 import { getProjectStatus } from "../lib/status.js";
 import type { TestReviewRecord } from "../types.js";
+import { detectDrift } from "./doctor.js";
 
 export const statusCommand = new Command("status")
 	.description("Summarize current test-based status")
@@ -20,6 +21,7 @@ export const statusCommand = new Command("status")
 	)
 	.option("--verbose", "Show detailed status output")
 	.option("--failed-only", "Show only failed/pending items")
+	.option("--health", "Include health/drift status in output")
 	.action(async (options) => {
 		try {
 			// New multi-project handling: --all and --example
@@ -143,6 +145,42 @@ export const statusCommand = new Command("status")
 				} catch {
 					console.log(chalk.yellow("  ○ Unable to load test governance data"));
 				}
+				return;
+			}
+
+		// Health mode: quick drift check
+			if (options.health) {
+				const drift = await detectDrift();
+				const isHealthy = drift.status === "clean";
+
+				if (options.json) {
+					console.log(
+						JSON.stringify(
+							{
+								healthy: isHealthy,
+								status: drift.status,
+								summary: drift.summary,
+								lastCheck: drift.lastCheck,
+							},
+							null,
+							2,
+						),
+					);
+				} else {
+					console.log(chalk.bold("\nHealth Status:"));
+					console.log(chalk.dim("=============="));
+					if (isHealthy) {
+						console.log(chalk.green("  ✓ Project is healthy"));
+						console.log(chalk.dim(`  Last check: ${drift.lastCheck}`));
+					} else {
+						console.log(chalk.yellow("  ⚠ Project has drift issues"));
+						console.log(chalk.dim(`  Critical: ${drift.summary.critical}`));
+						console.log(chalk.dim(`  Warning: ${drift.summary.warning}`));
+						console.log(chalk.dim(`  Info: ${drift.summary.info}`));
+						console.log(chalk.dim(`\n  Run 'udd doctor' for details`));
+					}
+				}
+				process.exit(isHealthy ? 0 : 1);
 				return;
 			}
 

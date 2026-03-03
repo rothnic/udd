@@ -15,6 +15,7 @@ import { statusCommand } from "../src/commands/status.js";
 import { syncCommand } from "../src/commands/sync.js";
 import { testCommand } from "../src/commands/test.js";
 import { validateCommand } from "../src/commands/validate.js";
+import { healthCommand } from "../src/commands/health.js";
 
 const program = new Command();
 
@@ -25,6 +26,7 @@ program.addCommand(syncCommand);
 program.addCommand(lintCommand);
 program.addCommand(statusCommand);
 program.addCommand(doctorCommand);
+program.addCommand(healthCommand);
 program.addCommand(newCommand);
 program.addCommand(discoverCommand);
 program.addCommand(validateCommand);
