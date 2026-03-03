@@ -109,7 +109,8 @@ if (!_hasRunnable) {
 	);
 	describe("iterate_until_complete (skipped)", () => {
 		test("skipped due to phase filter", () => {
-			expect(true).toBe(true);
+			// TEST FIXTURE: not a real assertion
+		expect(true).toBe(true);
 		});
 	});
 } else {

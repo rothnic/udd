@@ -99,7 +99,8 @@ if (!_hasRunnable) {
 	);
 	describe("udd_status_tool (skipped)", () => {
 		test("skipped due to phase filter", () => {
-			expect(true).toBe(true);
+			// TEST FIXTURE: not a real assertion
+		expect(true).toBe(true);
 		});
 	});
 } else {
@@ -109,7 +110,8 @@ if (!_hasRunnable) {
 		Background(({ Given, And }) => {
 			Given("the OpenCode SDK is available", () => {
 				// SDK availability is assumed for CLI tests
-				expect(true).toBe(true);
+				// TEST FIXTURE: not a real assertion
+		expect(true).toBe(true);
 			});
 
 			And("the udd CLI is installed", async () => {

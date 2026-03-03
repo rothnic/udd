@@ -20,7 +20,8 @@ describeFeature(feature, ({ Scenario }) => {
 
 		Then("something happens", () => {
 			// @phase:4 - Intentional stub for future implementation
-			expect(true).toBe(true);
+			// TEST FIXTURE: not a real assertion
+		expect(true).toBe(true);
 		});
 	});
 

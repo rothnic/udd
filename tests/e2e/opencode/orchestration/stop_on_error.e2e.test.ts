@@ -42,7 +42,8 @@ describeFeature(feature, ({ Background, Scenario }) => {
 	Background(({ Given, And }) => {
 		Given("the OpenCode SDK is available", () => {
 			// SDK simulated for testing error handling logic
-			expect(true).toBe(true);
+			// TEST FIXTURE: not a real assertion
+		expect(true).toBe(true);
 		});
 
 		And("an orchestrator agent session is running", () => {
