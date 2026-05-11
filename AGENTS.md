@@ -48,6 +48,8 @@ tests/                            # Verification
 
 ## CLI Commands
 
+> If `udd` is not available on PATH, run commands as `npm run udd -- <command>` from the repo root.
+
 | Command | Purpose |
 |---------|---------|
 | `udd status` | Show journey → scenario → test coverage |

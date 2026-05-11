@@ -7,8 +7,12 @@ This guide walks you through setting up UDD in a new or existing project.
 ```bash
 # In your project
 npm install udd
-# or
-npx udd init
+
+# Initialize
+udd init
+
+# Alternative if not linked globally
+npm run udd -- init
 ```
 
 ## 1. Initialize Your Project
@@ -88,14 +92,14 @@ When requirements change:
 ## Commands Reference
 
 ```bash
-udd init                          # Set up project
-udd sync                          # Sync journeys → scenarios
-udd sync --dry-run                # Preview without changes
-udd sync --auto                   # Auto-accept proposals
-udd status                        # Show coverage
-udd new journey <slug>            # Create journey
-udd new scenario <domain> <action> # Create scenario + test
-udd lint                          # Validate specs
+udd init                            # Set up project
+udd sync                            # Sync journeys → scenarios
+udd sync --dry-run                  # Preview without changes
+udd sync --auto                     # Auto-accept proposals
+udd status                          # Show coverage
+udd new journey <slug>              # Create journey
+udd new scenario <domain> <action>  # Create scenario + test
+udd lint                            # Validate specs
 ```
 
 ## Tips
@@ -104,3 +108,31 @@ udd lint                          # Validate specs
 - **Split by variation** - `login_basic.feature`, `login_2fa.feature`
 - **Journeys are requirements** - they describe *what* users accomplish
 - **Scenarios are tests** - they verify *how* the system behaves
+
+
+## Local Bootstrap Note
+
+Commands in this guide use `udd ...` as the primary workflow.
+If `udd` is not available on your shell `PATH`, run the same command through npm:
+
+```bash
+npm run udd -- <command>
+# example
+npm run udd -- status
+```
+
+To make `udd` available in a local dev checkout:
+
+```bash
+npm run setup:link
+```
+
+## Codex/CI Bootstrap
+
+For freshly cloned repos in Codex or CI-like environments, run:
+
+```bash
+npm run setup:codex
+```
+
+This installs dependencies and verifies CLI access via `udd status` (or `npm run udd -- status` fallback).
