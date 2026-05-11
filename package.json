@@ -28,7 +28,7 @@
 	"author": "Nick Roth",
 	"license": "MIT",
 	"scripts": {
-		"setup": "npm install && chmod +x bin/udd && npm link",
+		"setup": "npm ci && npm run setup:link",
 		"test": "vitest run",
 		"test:ui": "vitest --ui",
 		"lint": "npm run udd -- lint",
@@ -37,7 +37,9 @@
 		"check:fix": "biome check --write .",
 		"prepare": "husky",
 		"postinstall": "tsx scripts/patch-vitest-cucumber.ts",
-		"udd": "tsx bin/udd.ts"
+		"udd": "tsx bin/udd.ts",
+		"setup:link": "chmod +x bin/udd && npm link",
+		"setup:codex": "npm ci && chmod +x bin/udd && npm run udd -- status"
 	},
 	"lint-staged": {
 		"**/*.ts": [

@@ -40,9 +40,9 @@ tests/                            # Verification
 
 ## Workflow
 
-1. **Check status first**: `udd status`
+1. **Check status first**: `npm run udd -- status`
 2. **Journeys define intent** in `product/journeys/`
-3. **Sync generates scenarios**: `udd sync`
+3. **Sync generates scenarios**: `npm run udd -- sync`
 4. **Tests verify behavior**: `npm test`
 5. **Implement to make tests pass**
 
@@ -50,12 +50,12 @@ tests/                            # Verification
 
 | Command | Purpose |
 |---------|---------|
-| `udd status` | Show journey → scenario → test coverage |
-| `udd sync` | Detect journey changes, propose scenarios |
-| `udd init` | Initialize product/ structure |
-| `udd new journey <slug>` | Create journey file |
-| `udd new scenario <domain> <action>` | Create scenario + test stub |
-| `udd lint` | Validate spec structure |
+| `npm run udd -- status` | Show journey → scenario → test coverage |
+| `npm run udd -- sync` | Detect journey changes, propose scenarios |
+| `npm run udd -- init` | Initialize product/ structure |
+| `npm run udd -- new journey <slug>` | Create journey file |
+| `npm run udd -- new scenario <domain> <action>` | Create scenario + test stub |
+| `npm run udd -- lint` | Validate spec structure |
 
 ## Journey Format
 
@@ -84,9 +84,9 @@ User has created their first item within 5 minutes.
 
 ## Rules for Agents
 
-1. **Check `udd status` before starting work**
+1. **Check `npm run udd -- status` before starting work**
 2. **Create/update journey before implementing new behavior**
-3. **Run `udd sync` to generate scenarios from journeys**
+3. **Run `npm run udd -- sync` to generate scenarios from journeys**
 4. **One scenario per file** - keeps files small and focused
 5. **Split by variation** - `login_basic.feature`, `login_2fa.feature`
 6. **Run tests after changes**: `npm test`
@@ -102,17 +102,17 @@ User: "Add CSV export feature"
    - What alternatives exist? (Direct Excel, API, CSV)
    - Which is best for the user? (CSV: simple, universal)
 
-2. Check status: `udd status`
+2. Check status: `npm run udd -- status`
 3. Create journey: `udd new journey export_data`
 4. Edit `product/journeys/export_data.md` with user context
 5. Create rich feature file with:
    - Comments explaining alternatives considered
    - Comprehensive scenarios (happy path, errors, edge cases)
-6. Sync: `udd sync`
+6. Sync: `npm run udd -- sync`
 7. Run tests (fail): `npm test`
 8. Implement code
 9. Run tests (pass): `npm test`
-10. Verify: `udd status`
+10. Verify: `npm run udd -- status`
 
 **See `docs/sysml-informed-discovery.md` for detailed guidance on using SysML principles to create better feature scenarios.**
 
