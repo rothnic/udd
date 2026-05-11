@@ -6,13 +6,13 @@ A spec-first CLI tool where **user journeys are requirements** and **BDD scenari
 
 ```bash
 # Initialize in your project
-npx udd init
+npm run udd -- init
 
 # Sync journeys to scenarios
-udd sync
+npm run udd -- sync
 
 # Check status
-udd status
+npm run udd -- status
 ```
 
 ## How It Works
@@ -51,6 +51,8 @@ tests/                            # Agent-generated
 ```
 
 ## Commands
+
+> Tip: If `udd` is not globally linked, use `npm run udd -- <command>` from the repo root.
 
 | Command | Purpose |
 |---------|---------|

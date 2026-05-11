@@ -31,12 +31,13 @@
 		"setup": "npm install && chmod +x bin/udd && npm link",
 		"test": "vitest run",
 		"test:ui": "vitest --ui",
-		"lint": "tsx bin/udd.ts lint",
-		"status": "tsx bin/udd.ts status",
+		"lint": "npm run udd -- lint",
+		"status": "npm run udd -- status",
 		"check": "biome check .",
 		"check:fix": "biome check --write .",
 		"prepare": "husky",
-		"postinstall": "tsx scripts/patch-vitest-cucumber.ts"
+		"postinstall": "tsx scripts/patch-vitest-cucumber.ts",
+		"udd": "tsx bin/udd.ts"
 	},
 	"lint-staged": {
 		"**/*.ts": [
