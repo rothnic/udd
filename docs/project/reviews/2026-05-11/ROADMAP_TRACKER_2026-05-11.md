@@ -1,6 +1,6 @@
 # Goal Gap Roadmap Tracker (2026-05-11)
 
-This tracker converts the prioritized recommendations from `GOAL_GAP_ASSESSMENT_2026-05-11.md` into explicitly owned, stateful work items.
+This tracker converts the prioritized recommendations from `docs/project/reviews/2026-05-11/GOAL_GAP_ASSESSMENT_2026-05-11.md` into explicitly owned, stateful work items.
 
 ## Status Legend
 
@@ -13,7 +13,7 @@ This tracker converts the prioritized recommendations from `GOAL_GAP_ASSESSMENT_
 
 | ID | Priority | Item | Status | Owner | Depends On | Exit Criteria |
 | --- | --- | --- | --- | --- | --- | --- |
-| GG-01 | P0 | Define/enforce canonical traceability graph (objective → use case → scenario → e2e test) | in_progress | engineering | none | `udd lint` fails on broken trace links and unlinked scenarios |
+| GG-01 | P0 | Define/enforce canonical traceability graph (objective → use case → scenario → e2e test) | done | engineering | none | `udd lint` fails on broken trace links and unlinked scenarios |
 | GG-02 | P0 | Add objective-aware status rollups | todo | engineering | GG-01 | `udd status --json` includes objective health/progress |
 | GG-03 | P1 | Unify spec structure or codify dual-mode operation | todo | product+engineering | GG-01 | Canonical mode documented and lint-enforced |
 | GG-04 | P1 | Tighten developer/runtime onboarding | in_progress | engineering | none | Documented command path works in CI + local bootstrap |
@@ -25,3 +25,9 @@ This tracker converts the prioritized recommendations from `GOAL_GAP_ASSESSMENT_
 1. Update `Status`, `Owner`, and `Depends On` as work changes.
 2. Add links to implementing PRs beside the relevant row when available.
 3. Keep this file in sync with status output changes to preserve planning visibility.
+
+
+## Machine-Readable State
+
+- Canonical roadmap state is tracked in `docs/project/reviews/2026-05-11/ROADMAP_TRACKER_2026-05-11.yml`.
+- Keep the YAML and this markdown table synchronized in the same commit whenever status changes.

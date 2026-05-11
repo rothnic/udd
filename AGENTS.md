@@ -115,3 +115,9 @@ User: "Add CSV export feature"
 10. Verify: `udd status`
 
 **See `docs/sysml-informed-discovery.md` for detailed guidance on using SysML principles to create better feature scenarios.**
+
+
+## Docs Organization Preference
+
+To keep the repository tidy, dated review/status artifacts **must not** be added directly under `docs/`.
+Place them under a scoped subdirectory such as `docs/project/reviews/<YYYY-MM-DD>/` (or another domain-specific folder), and keep related files (assessment, tracker markdown, tracker YAML) together in that directory.

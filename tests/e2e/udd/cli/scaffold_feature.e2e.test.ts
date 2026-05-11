@@ -74,6 +74,10 @@ describeFeature(feature, ({ Scenario }) => {
 				expect(content).toMatch(/Given/);
 				expect(content).toMatch(/When/);
 				expect(content).toMatch(/Then/);
+				await fs.rm(path.dirname(path.dirname(testFeaturePath)), {
+					recursive: true,
+					force: true,
+				});
 			});
 		},
 	);
