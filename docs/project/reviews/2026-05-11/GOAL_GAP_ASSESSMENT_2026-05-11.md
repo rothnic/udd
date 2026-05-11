@@ -37,7 +37,7 @@ This aligns with existing commands and specs that now include:
 
 ## Gaps to Reach “Usable for Managing Executable Specs Traced to Objectives and User Flows”
 
-1. **Objective-level traceability is incomplete**
+1. **Objective-level traceability is now enforced in lint (completed)**
    - The repo has vision/use-case artifacts, but there is no single enforced, machine-checked chain from objective → journey → feature/scenario → test result.
    - `udd status` reports journey/scenario/test health, but not objective attainment rollups.
 

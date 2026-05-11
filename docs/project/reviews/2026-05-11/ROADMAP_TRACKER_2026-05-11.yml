@@ -1,0 +1,53 @@
+version: 1
+source: docs/project/reviews/2026-05-11/GOAL_GAP_ASSESSMENT_2026-05-11.md
+as_of: 2026-05-11
+legend:
+  todo: planned and not started
+  in_progress: actively being implemented
+  blocked: cannot proceed until dependency/decision is resolved
+  done: completed and merged
+items:
+  - id: GG-01
+    priority: P0
+    title: Define/enforce canonical traceability graph (objective -> use case -> scenario -> e2e test)
+    status: done
+    owner: engineering
+    depends_on: []
+    evidence:
+      - src/lib/validator.ts
+    exit_criteria: udd lint fails on broken trace links and unlinked scenarios
+  - id: GG-02
+    priority: P0
+    title: Add objective-aware status rollups
+    status: todo
+    owner: engineering
+    depends_on: [GG-01]
+    exit_criteria: udd status --json includes objective health/progress
+  - id: GG-03
+    priority: P1
+    title: Unify spec structure or codify dual-mode operation
+    status: todo
+    owner: product+engineering
+    depends_on: [GG-01]
+    exit_criteria: Canonical mode documented and lint-enforced
+  - id: GG-04
+    priority: P1
+    title: Tighten developer/runtime onboarding
+    status: in_progress
+    owner: engineering
+    depends_on: []
+    exit_criteria: Documented command path works in CI + local bootstrap
+  - id: GG-05
+    priority: P1
+    title: Clarify command generation contracts
+    status: todo
+    owner: docs
+    depends_on: [GG-03]
+    exit_criteria: Commands have explicit generated outputs and examples
+  - id: GG-06
+    priority: P2
+    title: Add management-facing reports
+    status: todo
+    owner: engineering
+    depends_on: [GG-02]
+    exit_criteria: Machine-readable and markdown planning reports available
