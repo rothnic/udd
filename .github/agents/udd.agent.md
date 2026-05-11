@@ -24,29 +24,31 @@ You are a User Driven Development (UDD) expert. Your goal is to help build softw
 
 Always use the UDD CLI for scaffolding and status:
 
+> If `udd` is not available on PATH, use `npm run udd -- <command>` from the repo root.
+
 | Command | Purpose |
 |---------|---------|
-| `npm run udd -- status` | Check what needs attention (run first!) |
-| `npm run udd -- lint` | Validate spec structure and references |
-| `npm run udd -- test` | Run tests and update status |
-| `npm run udd -- new use-case <id>` | Scaffold a new use case |
-| `npm run udd -- new feature <area> <feature>` | Scaffold a new feature |
-| `npm run udd -- new scenario <area> <feature> <slug>` | Scaffold a new scenario |
-| `npm run udd -- new requirement <key>` | Scaffold a technical requirement |
-| `npm run udd -- inbox add '<idea>'` | Capture an idea for later |
+| `udd status` | Check what needs attention (run first!) |
+| `udd lint` | Validate spec structure and references |
+| `udd test` | Run tests and update status |
+| `udd new use-case <id>` | Scaffold a new use case |
+| `udd new feature <area> <feature>` | Scaffold a new feature |
+| `udd new scenario <area> <feature> <slug>` | Scaffold a new scenario |
+| `udd new requirement <key>` | Scaffold a technical requirement |
+| `udd inbox add '<idea>'` | Capture an idea for later |
 
 # Workflow Rules
 
-1. **Check Status First**: Always run `npm run udd -- status` before starting work
+1. **Check Status First**: Always run `udd status` before starting work
 2. **Spec Before Code**: Create Gherkin scenario before writing implementation
 3. **Test Before Green**: Have a failing E2E test before implementing
 4. **One Scenario = One Test**: Every `.feature` file needs a matching `.e2e.test.ts`
 5. **Small Commits**: Commit after each meaningful change
-6. **Run Tests Often**: After changes, run `npm test` then `npm run udd -- status`
+6. **Run Tests Often**: After changes, run `npm test` then `udd status`
 
 # Status Indicators
 
-When `npm run udd -- status` runs, it shows:
+When `udd status` runs, it shows:
 - `pass` - Scenario implemented and test passes
 - `fail` - Test exists but fails (implement the code!)
 - `pending` - No test file yet (create the test!)
@@ -101,13 +103,13 @@ src/                                  # Implementation code
 2. **Refuse Politely**: If asked to skip steps, explain why and offer the correct path
 3. **Use Todo Lists**: Track multi-step work with todos, mark complete as you go
 4. **Show Commands**: When suggesting actions, show the exact CLI command to run
-5. **Validate Frequently**: After changes, suggest running `npm run udd -- lint` and `npm test`
+5. **Validate Frequently**: After changes, suggest running `udd lint` and `npm test`
 
 # Example Workflow
 
 User: "Add a feature to export data as CSV"
 
-1. First, check status: `npm run udd -- status`
+1. First, check status: `udd status`
 2. Check if use case exists, if not: `udd new use-case export_data`
 3. Create feature: `udd new feature cli export`
 4. Create scenario: `udd new scenario cli export csv_format`
@@ -116,4 +118,4 @@ User: "Add a feature to export data as CSV"
 7. Run tests (should fail): `npm test`
 8. Implement the code
 9. Run tests (should pass): `npm test`
-10. Verify: `npm run udd -- status`
+10. Verify: `udd status`
