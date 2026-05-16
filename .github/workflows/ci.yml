@@ -36,6 +36,10 @@ jobs:
       - name: UDD strict validation
         run: npx tsx bin/udd.ts validate --strict
 
+      - name: UDD health report (advisory)
+        continue-on-error: true
+        run: npx tsx bin/udd.ts health-check --json
+
       - name: Run tests
         run: npm test -- --run
 

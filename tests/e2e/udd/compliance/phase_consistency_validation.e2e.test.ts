@@ -1,5 +1,4 @@
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
 
 const feature = await loadFeature(
 	"specs/features/udd/compliance/phase-consistency-validation.feature",
@@ -7,8 +6,15 @@ const feature = await loadFeature(
 
 describeFeature(feature, ({ Background, Scenario }) => {
 	Background(({ Given, And }) => {
-		Given("a UDD project with VISION.md defining phases", () => {
-			// Stub: Assume VISION.md exists with phase definitions
+		Given(
+			"a UDD project with specs/VISION.md defining stable project goals",
+			() => {
+				// Stub: Assume VISION.md exists with stable project goals
+			},
+		);
+
+		And("specs/roadmap.yml defining phases", () => {
+			// Stub: Assume roadmap.yml exists with phase definitions
 		});
 
 		And("feature files with @phase:N tags", () => {
@@ -23,7 +29,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
 	Scenario(
 		"Detect features tagged for future phases",
 		({ Given, And, When, Then }) => {
-			Given("VISION.md specifies current_phase: 3", () => {
+			Given("specs/roadmap.yml specifies current phase 3", () => {
 				// Stub: Set current phase to 3
 			});
 
@@ -52,7 +58,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
 	Scenario(
 		"Warn when roadmap and specs are misaligned",
 		({ Given, And, When, Then }) => {
-			Given("VISION.md specifies current_phase: 3", () => {
+			Given("specs/roadmap.yml specifies current phase 3", () => {
 				// Stub: Set current phase
 			});
 
@@ -115,7 +121,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
 	Scenario(
 		"Validate phase numbering is sequential",
 		({ Given, When, Then, And }) => {
-			Given("phases defined in VISION.md: 1, 2, 3, 4, 5", () => {
+			Given("phases defined in specs/roadmap.yml: 1, 2, 3, 4, 5", () => {
 				// Stub: Define valid phase sequence
 			});
 
@@ -168,7 +174,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
 	Scenario(
 		"Block phase regression in strict mode",
 		({ Given, And, When, Then }) => {
-			Given("VISION.md specifies current_phase: 3", () => {
+			Given("specs/roadmap.yml specifies current phase 3", () => {
 				// Stub: Set current phase
 			});
 

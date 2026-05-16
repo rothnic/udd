@@ -6,41 +6,88 @@ import yaml from "yaml";
 import { getPhaseFromTest } from "../lib/test-governance.js";
 import type { ManifestTestEntry } from "../types.js";
 
-const VISION_FILE = "specs/VISION.md";
+const ROADMAP_FILE = "specs/roadmap.yml";
 const TEST_MANIFEST_FILE = ".udd/test-reviews.yml";
 
-async function loadVision(rootDir: string): Promise<{
-	current_phase: number;
-	phases: Record<string, string>;
-}> {
-	const visionPath = path.join(rootDir, VISION_FILE);
-	const content = await fs.readFile(visionPath, "utf-8");
-	const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-	if (!frontmatterMatch) {
-		throw new Error("VISION.md missing frontmatter");
+interface RoadmapPhase {
+	id: string;
+	name: string;
+	number: number;
+	status?: string;
+}
+
+interface RoadmapState {
+	currentPhase: number;
+	currentPhaseId: string;
+	phaseNames: Record<string, string>;
+	roadmap: Record<string, unknown>;
+}
+
+function isRoadmapPhase(value: unknown): value is RoadmapPhase {
+	if (!value || typeof value !== "object") return false;
+	const phase = value as { id?: unknown; name?: unknown; number?: unknown };
+	return (
+		typeof phase.id === "string" &&
+		typeof phase.name === "string" &&
+		typeof phase.number === "number"
+	);
+}
+
+async function loadRoadmap(rootDir: string): Promise<RoadmapState> {
+	const roadmapPath = path.join(rootDir, ROADMAP_FILE);
+	const content = await fs.readFile(roadmapPath, "utf-8");
+	const roadmap = yaml.parse(content) as Record<string, unknown>;
+	const phases = Array.isArray(roadmap.phases)
+		? roadmap.phases.filter(isRoadmapPhase)
+		: [];
+	const currentPhaseId = String(roadmap.current_phase || "");
+	const current = phases.find((phase) => phase.id === currentPhaseId);
+	if (!current) {
+		throw new Error("roadmap.yml current_phase does not match a phase id");
 	}
-	const frontmatter = yaml.parse(frontmatterMatch[1]);
+
+	const phaseNames = Object.fromEntries(
+		phases.map((phase) => [String(phase.number), phase.name]),
+	);
 	return {
-		current_phase: frontmatter.current_phase ?? 1,
-		phases: frontmatter.phases ?? {},
+		currentPhase: current.number,
+		currentPhaseId,
+		phaseNames,
+		roadmap,
 	};
 }
 
-async function saveVision(
+async function saveRoadmapCurrentPhase(
 	rootDir: string,
-	vision: { current_phase: number; phases: Record<string, string> },
-): Promise<void> {
-	const visionPath = path.join(rootDir, VISION_FILE);
-	const content = await fs.readFile(visionPath, "utf-8");
-	const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-	if (!frontmatterMatch) throw new Error("VISION.md missing frontmatter");
+	roadmap: Record<string, unknown>,
+	phaseNum: number,
+): Promise<RoadmapState> {
+	const phases = Array.isArray(roadmap.phases)
+		? roadmap.phases.filter(isRoadmapPhase)
+		: [];
+	const next = phases.find((phase) => phase.number === phaseNum);
+	if (!next) {
+		throw new Error(`Phase ${phaseNum} not defined in roadmap.yml`);
+	}
 
-	const newFrontmatter = {
-		...yaml.parse(frontmatterMatch[1]),
-		current_phase: vision.current_phase,
+	const updated = {
+		...roadmap,
+		current_phase: next.id,
+		phases: phases.map((phase) => ({
+			...phase,
+			status:
+				phase.number < phaseNum
+					? "completed"
+					: phase.number === phaseNum
+						? "active"
+						: phase.status === "completed"
+							? "planned"
+							: phase.status,
+		})),
 	};
-	const newContent = `---\n${yaml.stringify(newFrontmatter)}---${content.slice(frontmatterMatch[0].length)}`;
-	await fs.writeFile(visionPath, newContent);
+	const roadmapPath = path.join(rootDir, ROADMAP_FILE);
+	await fs.writeFile(roadmapPath, yaml.stringify(updated));
+	return loadRoadmap(rootDir);
 }
 
 async function loadTestManifest(rootDir: string): Promise<ManifestTestEntry[]> {
@@ -75,27 +122,32 @@ export const phaseCommand = new Command("phase")
 			.action(async (phaseNum: number) => {
 				const rootDir = process.cwd();
 
-				// 1. Load current vision
-				const vision = await loadVision(rootDir);
-				const oldPhase = vision.current_phase;
+				// 1. Load current roadmap state
+				const roadmap = await loadRoadmap(rootDir);
+				const oldPhase = roadmap.currentPhase;
 
 				// 2. Validate phase exists
-				if (!vision.phases[phaseNum]) {
+				if (!roadmap.phaseNames[phaseNum]) {
 					console.error(
-						chalk.red(`✗ Phase ${phaseNum} not defined in VISION.md`),
+						chalk.red(`✗ Phase ${phaseNum} not defined in roadmap.yml`),
 					);
 					console.log(chalk.dim("  Available phases:"));
-					for (const [num, desc] of Object.entries(vision.phases)) {
+					for (const [num, desc] of Object.entries(roadmap.phaseNames)) {
 						console.log(chalk.dim(`    ${num}: ${desc}`));
 					}
 					process.exit(1);
 				}
 
-				// 3. Update vision
-				vision.current_phase = phaseNum;
-				await saveVision(rootDir, vision);
+				// 3. Update roadmap
+				const updated = await saveRoadmapCurrentPhase(
+					rootDir,
+					roadmap.roadmap,
+					phaseNum,
+				);
 				console.log(
-					chalk.green(`✓ Phase set to ${phaseNum}: ${vision.phases[phaseNum]}`),
+					chalk.green(
+						`✓ Phase set to ${phaseNum}: ${updated.phaseNames[phaseNum]}`,
+					),
 				);
 
 				// 4. If phase increased, mark phase-specific tests as dirty
@@ -137,15 +189,15 @@ export const phaseCommand = new Command("phase")
 			.description("Show current phase")
 			.action(async () => {
 				const rootDir = process.cwd();
-				const vision = await loadVision(rootDir);
+				const roadmap = await loadRoadmap(rootDir);
 				console.log(chalk.blue.bold("\n📊 Current Phase\n"));
 				console.log(
-					`Phase ${vision.current_phase}: ${vision.phases[vision.current_phase] ?? "Unknown"}`,
+					`Phase ${roadmap.currentPhase}: ${roadmap.phaseNames[roadmap.currentPhase] ?? "Unknown"}`,
 				);
 				console.log(chalk.dim("\nAvailable phases:"));
-				for (const [num, desc] of Object.entries(vision.phases)) {
+				for (const [num, desc] of Object.entries(roadmap.phaseNames)) {
 					const marker =
-						Number(num) === vision.current_phase ? chalk.green("→ ") : "  ";
+						Number(num) === roadmap.currentPhase ? chalk.green("→ ") : "  ";
 					console.log(`${marker}${num}: ${desc}`);
 				}
 			}),
@@ -155,13 +207,13 @@ export const phaseCommand = new Command("phase")
 	.addCommand(
 		new Command("list").description("List all phases").action(async () => {
 			const rootDir = process.cwd();
-			const vision = await loadVision(rootDir);
+			const roadmap = await loadRoadmap(rootDir);
 			console.log(chalk.blue.bold("\n📋 Development Phases\n"));
-			for (const [num, desc] of Object.entries(vision.phases)) {
+			for (const [num, desc] of Object.entries(roadmap.phaseNames)) {
 				const marker =
-					Number(num) === vision.current_phase ? chalk.green("→ ") : "  ";
+					Number(num) === roadmap.currentPhase ? chalk.green("→ ") : "  ";
 				const status =
-					Number(num) === vision.current_phase ? chalk.green(" (current)") : "";
+					Number(num) === roadmap.currentPhase ? chalk.green(" (current)") : "";
 				console.log(`${marker}${num}: ${desc}${status}`);
 			}
 		}),

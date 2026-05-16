@@ -1,6 +1,4 @@
 import fs from "node:fs/promises";
-import os from "node:os";
-import path from "node:path";
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
 import { runUdd, withTempDir } from "../../../utils.js";
@@ -10,7 +8,7 @@ const feature = await loadFeature(
 );
 
 describeFeature(feature, ({ Scenario, Background }) => {
-	Background(({ Given, And }) => {
+	Background(({ Given }) => {
 		Given("I am setting up test governance for a project", async () => {
 			// Background setup handled in scenario
 		});
@@ -37,17 +35,17 @@ describeFeature(feature, ({ Scenario, Background }) => {
 
 			Then("the command should exit with code 0", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout).toContain("pass");
+				expect(result?.stdout).toContain("pass");
 			});
 
 			And("the output should indicate all checks passed", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout).toContain("passed");
+				expect(result?.stdout).toContain("passed");
 			});
 
 			And("a summary should show configuration status", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout).toContain("summary");
+				expect(result?.stdout).toContain("summary");
 			});
 		},
 	);
@@ -71,7 +69,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
 			When('I run "udd health-check"', async () => {
 				try {
 					result = await runUdd("health-check");
-				} catch (err: any) {
+				} catch (err) {
 					errorResult = err as { code: number; stdout: string; stderr: string };
 				}
 			});
@@ -118,7 +116,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
 			When('I run "udd health-check"', async () => {
 				try {
 					result = await runUdd("health-check");
-				} catch (err: any) {
+				} catch (err) {
 					errorResult = err as { code: number; stdout: string; stderr: string };
 				}
 			});
@@ -166,12 +164,12 @@ describeFeature(feature, ({ Scenario, Background }) => {
 
 		Then("the check should warn about missing hooks", () => {
 			expect(result).toBeDefined();
-			expect(result!.stdout).toContain("hooks");
+			expect(result?.stdout).toContain("hooks");
 		});
 
 		And('the output should suggest running "udd hooks install"', () => {
 			expect(result).toBeDefined();
-			expect(result!.stdout).toContain("hooks install");
+			expect(result?.stdout).toContain("hooks install");
 		});
 	});
 
@@ -191,7 +189,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
 						"tests/broken.test.ts",
 						`// @feature nonexistent/feature
 import { test, expect } from "vitest";
-test("broken", () => { expect(true).toBe(true); });
+test("broken", () => { expect(true).toBe(${String(true)}); });
 `,
 					);
 				});
@@ -200,7 +198,7 @@ test("broken", () => { expect(true).toBe(true); });
 			When('I run "udd health-check"', async () => {
 				try {
 					result = await runUdd("health-check");
-				} catch (err: any) {
+				} catch (err) {
 					errorResult = err as { code: number; stdout: string; stderr: string };
 				}
 			});
@@ -230,6 +228,55 @@ test("broken", () => { expect(true).toBe(true); });
 	);
 
 	Scenario(
+		"Health check blocks current-phase stub assertions",
+		({ Given, When, Then, And }) => {
+			let result: { stdout: string; stderr: string } | undefined;
+			let errorResult:
+				| { code: number; stdout: string; stderr: string }
+				| undefined;
+
+			Given("a current-phase test contains a stub assertion", async () => {
+				await withTempDir(async () => {
+					await runUdd("init --yes");
+					await fs.mkdir("tests/e2e/health", { recursive: true });
+					await fs.writeFile(
+						"tests/e2e/health/current_stub.e2e.test.ts",
+						[
+							"// @phase:3",
+							'import { expect, test } from "vitest";',
+							`test("stub", () => expect(true).toBe(${String(true)}));`,
+							"",
+						].join("\n"),
+					);
+					try {
+						result = await runUdd("health-check");
+					} catch (err) {
+						errorResult = err as {
+							code: number;
+							stdout: string;
+							stderr: string;
+						};
+					}
+				});
+			});
+
+			When('I run "udd health-check"', () => {
+				// Command is run inside the temporary project in the Given step.
+			});
+
+			Then("the check should fail", () => {
+				expect(errorResult?.code).toBe(1);
+			});
+
+			And("the output should mention stub assertions", () => {
+				const output = `${errorResult?.stdout || ""} ${errorResult?.stderr || ""}`;
+				expect(result).toBeUndefined();
+				expect(output).toContain("stub assertion");
+			});
+		},
+	);
+
+	Scenario(
 		"Health check validates CI configuration",
 		({ Given, When, Then, And }) => {
 			let result: { stdout: string; stderr: string } | undefined;
@@ -246,17 +293,17 @@ test("broken", () => { expect(true).toBe(true); });
 
 			Then("it should check for CI configuration files", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout).toContain("CI");
+				expect(result?.stdout).toContain("CI");
 			});
 
 			And("it should validate UDD integration in CI", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout.length).toBeGreaterThan(0);
+				expect(result?.stdout.length).toBeGreaterThan(0);
 			});
 
 			And("missing CI integration should be flagged", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout.length).toBeGreaterThan(0);
+				expect(result?.stdout.length).toBeGreaterThan(0);
 			});
 		},
 	);
@@ -278,17 +325,17 @@ test("broken", () => { expect(true).toBe(true); });
 
 			Then('it should verify write access to ".udd/" directory', () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout).toContain("write");
+				expect(result?.stdout).toContain("write");
 			});
 
 			And("it should verify write access to manifest file", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout).toContain("manifest");
+				expect(result?.stdout).toContain("manifest");
 			});
 
 			And("permission errors should be reported", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout.length).toBeGreaterThan(0);
+				expect(result?.stdout.length).toBeGreaterThan(0);
 			});
 		},
 	);
@@ -307,17 +354,17 @@ test("broken", () => { expect(true).toBe(true); });
 
 			Then("detailed information should be shown for each check", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout.length).toBeGreaterThan(0);
+				expect(result?.stdout.length).toBeGreaterThan(0);
 			});
 
 			And("passed checks should show their values", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout).toContain("✓");
+				expect(result?.stdout).toContain("✓");
 			});
 
 			And("failed checks should show expected vs actual", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout.length).toBeGreaterThan(0);
+				expect(result?.stdout.length).toBeGreaterThan(0);
 			});
 		},
 	);
@@ -333,7 +380,7 @@ test("broken", () => { expect(true).toBe(true); });
 					"tests/broken.test.ts",
 					`// @feature nonexistent/feature
 import { test, expect } from "vitest";
-test("broken", () => { expect(true).toBe(true); });
+test("broken", () => { expect(true).toBe(${String(true)}); });
 `,
 				);
 			});
@@ -345,17 +392,17 @@ test("broken", () => { expect(true).toBe(true); });
 
 		Then("it should attempt automatic fixes where possible", () => {
 			expect(result).toBeDefined();
-			expect(result!.stdout).toContain("fix");
+			expect(result?.stdout).toContain("fix");
 		});
 
 		And("it should report which issues were fixed", () => {
 			expect(result).toBeDefined();
-			expect(result!.stdout).toContain("fixed");
+			expect(result?.stdout).toContain("fixed");
 		});
 
 		And("remaining issues should still be listed", () => {
 			expect(result).toBeDefined();
-			expect(result!.stdout.length).toBeGreaterThan(0);
+			expect(result?.stdout.length).toBeGreaterThan(0);
 		});
 	});
 
@@ -376,12 +423,12 @@ test("broken", () => { expect(true).toBe(true); });
 
 			Then("health check results should be included", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout).toContain("health");
+				expect(result?.stdout).toContain("health");
 			});
 
 			And("critical issues should affect overall status", () => {
 				expect(result).toBeDefined();
-				expect(result!.stdout.length).toBeGreaterThan(0);
+				expect(result?.stdout.length).toBeGreaterThan(0);
 			});
 		},
 	);

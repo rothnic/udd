@@ -1,9 +1,9 @@
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
-import { mkdir, mkdtemp, writeFile } from "fs/promises";
-import os from "os";
-import path, { dirname } from "path";
 import { expect } from "vitest";
-import { runUdd, withTempDir } from "../../../utils.js";
+import { runUdd } from "../../../utils.js";
 
 const feature = await loadFeature(
 	"specs/features/opencode/tools/status_deep.feature",
@@ -132,21 +132,27 @@ describeFeature(feature, ({ Background, Scenario }) => {
 	);
 
 	Scenario(
-		"Status command shows current phase from specs/VISION.md",
+		"Status command shows current phase from specs/roadmap.yml",
 		({ Given, When, Then, And }) => {
 			let statusOutput: string;
 			let runResult: { stdout: string; stderr: string };
 
 			Given(
-				'specs/VISION.md declares the current phase as "Phase 3 - Comprehensive"',
+				'specs/roadmap.yml declares the current phase as "Phase 3 - OpenCode Integration"',
 				async () => {
 					const tempDir = await mkdtemp(path.join(os.tmpdir(), "udd-test-"));
 					await runUdd("init --yes", { cwd: tempDir });
 					await mkdir(path.join(tempDir, "specs"), { recursive: true });
-					// create specs/VISION.md
 					await writeFile(
-						path.join(tempDir, "specs/VISION.md"),
-						"Current Phase: Phase 3 - Comprehensive\n",
+						path.join(tempDir, "specs/roadmap.yml"),
+						[
+							"current_phase: opencode-integration",
+							"phases:",
+							"  - id: opencode-integration",
+							"    number: 3",
+							'    name: "OpenCode Integration"',
+							"",
+						].join("\n"),
 					);
 				},
 			);
@@ -161,10 +167,10 @@ describeFeature(feature, ({ Background, Scenario }) => {
 			});
 
 			And(
-				'the output should contain "Current Phase: Phase 3 - Comprehensive"',
+				'the output should contain "Current Phase: Phase 3 - OpenCode Integration"',
 				async () => {
 					expect(statusOutput).toContain(
-						"Current Phase: Phase 3 - Comprehensive",
+						"Current Phase: Phase 3 - OpenCode Integration",
 					);
 				},
 			);
@@ -319,16 +325,22 @@ describeFeature(feature, ({ Background, Scenario }) => {
 			);
 
 			And(
-				'the JSON "phase" value should equal the current phase from specs/VISION.md',
+				'the JSON "phase" value should equal the current phase from specs/roadmap.yml',
 				async () => {
-					// ensure VISION.md exists
 					await mkdir(path.join(process.cwd(), "specs"), { recursive: true });
 					await writeFile(
-						path.join(process.cwd(), "specs/VISION.md"),
-						"Current Phase: Phase 3 - Comprehensive\n",
+						path.join(process.cwd(), "specs/roadmap.yml"),
+						[
+							"current_phase: opencode-integration",
+							"phases:",
+							"  - id: opencode-integration",
+							"    number: 3",
+							'    name: "OpenCode Integration"',
+							"",
+						].join("\n"),
 					);
 					const json = JSON.parse(statusOutput);
-					expect(json.phase).toBe("Phase 3 - Comprehensive");
+					expect(json.phase).toBe("Phase 3 - OpenCode Integration");
 				},
 			);
 
@@ -375,8 +387,14 @@ describeFeature(feature, ({ Background, Scenario }) => {
 			And('the JSON "issues" array should contain an object:', async () => {
 				const json = JSON.parse(statusOutput);
 				expect(Array.isArray(json.issues)).toBe(true);
-				const issue = json.issues.find(
-					(i: any) =>
+				const issue = (
+					json.issues as Array<{
+						file?: string;
+						type?: string;
+						severity?: string;
+					}>
+				).find(
+					(i) =>
 						i.file === "specs/.udd/manifest.yml" || i.type === "missing_file",
 				);
 				expect(issue).toBeDefined();

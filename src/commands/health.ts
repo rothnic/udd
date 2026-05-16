@@ -8,7 +8,7 @@ export const healthCommand = new Command("health-check")
 	.option("--verbose", "Show detailed health information")
 	.action(async (options) => {
 		try {
-			const drift = await detectDrift();
+			const drift = await detectDrift(true);
 			const isHealthy = drift.status === "clean";
 
 			if (options.json) {
@@ -18,6 +18,7 @@ export const healthCommand = new Command("health-check")
 							healthy: isHealthy,
 							status: drift.status,
 							summary: drift.summary,
+							issues: drift.issues,
 							lastCheck: drift.lastCheck,
 						},
 						null,
@@ -33,6 +34,9 @@ export const healthCommand = new Command("health-check")
 					console.log(chalk.dim(`  Critical: ${drift.summary.critical}`));
 					console.log(chalk.dim(`  Warning: ${drift.summary.warning}`));
 					console.log(chalk.dim(`  Info: ${drift.summary.info}`));
+					for (const issue of drift.issues.slice(0, 10)) {
+						console.log(chalk.dim(`  - ${issue.message}`));
+					}
 					console.log(chalk.dim(`\n  Run 'udd doctor' for details`));
 				}
 			}
