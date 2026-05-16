@@ -9,6 +9,9 @@ tests/e2e/my_area/
 # Test feature files
 specs/features/test_domain/
 
-# Memory search sessions
-.memsearch/sessions/
+# Local agent/runtime state
+/.memsearch/
+/memory/
+/.sisyphus/
+/.opencode/memsearch
 repos/
