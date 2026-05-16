@@ -5,7 +5,7 @@ import phase from "./src/lib/phase";
 /**
  * Vitest setup file for UDD project.
  *
- * Reads the current phase from specs/VISION.md and excludes
+ * Reads the current phase from specs/roadmap.yml and excludes
  * scenarios tagged with future phases (e.g., @phase:4, @phase:5)
  * from test runs.
  */

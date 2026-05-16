@@ -40,11 +40,11 @@ Feature: udd opencode status (deep)
     And the output should contain "billing_migration — missing"
 
   @phase:3 @opencode @status
-  Scenario: Status command shows current phase from specs/VISION.md
-    Given specs/VISION.md declares the current phase as "Phase 3 - Comprehensive"
+  Scenario: Status command shows current phase from specs/roadmap.yml
+    Given specs/roadmap.yml declares the current phase as "Phase 3 - OpenCode Integration"
     When I run "udd opencode status"
     Then the command should exit with code 0
-    And the output should contain "Current Phase: Phase 3 - Comprehensive"
+    And the output should contain "Current Phase: Phase 3 - OpenCode Integration"
 
   @phase:3 @opencode @status
   Scenario: Status command identifies blocking issues
@@ -73,7 +73,7 @@ Feature: udd opencode status (deep)
     Then the command should exit with code 0
     And the output should be valid JSON
     And the JSON should include keys: "project", "phase", "journeys", "issues", "coverage"
-    And the JSON "phase" value should equal the current phase from specs/VISION.md
+    And the JSON "phase" value should equal the current phase from specs/roadmap.yml
     And the JSON "journeys" should be an array of objects with "name" and "status"
 
   @phase:3 @opencode @status

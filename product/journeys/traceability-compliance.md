@@ -39,7 +39,7 @@ UDD should dogfood itself perfectly. This journey ensures:
    - `specs/features/udd/dev-experience/test_discovery/editor_status.feature`
    - `specs/features/udd/cli/manifest_recovery.feature`
    - `specs/features/udd/cli/orphan_detection.feature`
-5. Run validation to confirm strict mode passes → `udd validate --strict`
+5. Run validation to confirm strict mode passes: `udd validate --strict`
 
 ## Success Criteria
 

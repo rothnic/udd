@@ -191,7 +191,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
 						"tests/broken.test.ts",
 						`// @feature nonexistent/feature
 import { test, expect } from "vitest";
-test("broken", () => { expect(true).toBe(true); });
+test("broken", () => { expect(true).toBe(${String(true)}); });
 `,
 					);
 				});
@@ -225,6 +225,55 @@ test("broken", () => { expect(true).toBe(true); });
 					? `${errorResult.stdout} ${errorResult.stderr}`
 					: result?.stdout || "";
 				expect(output.length).toBeGreaterThan(0);
+			});
+		},
+	);
+
+	Scenario(
+		"Health check blocks current-phase stub assertions",
+		({ Given, When, Then, And }) => {
+			let result: { stdout: string; stderr: string } | undefined;
+			let errorResult:
+				| { code: number; stdout: string; stderr: string }
+				| undefined;
+
+			Given("a current-phase test contains a stub assertion", async () => {
+				await withTempDir(async () => {
+					await runUdd("init --yes");
+					await fs.mkdir("tests/e2e/health", { recursive: true });
+					await fs.writeFile(
+						"tests/e2e/health/current_stub.e2e.test.ts",
+						[
+							"// @phase:3",
+							'import { expect, test } from "vitest";',
+							`test("stub", () => expect(true).toBe(${String(true)}));`,
+							"",
+						].join("\n"),
+					);
+					try {
+						result = await runUdd("health-check");
+					} catch (err: any) {
+						errorResult = err as {
+							code: number;
+							stdout: string;
+							stderr: string;
+						};
+					}
+				});
+			});
+
+			When('I run "udd health-check"', () => {
+				// Command is run inside the temporary project in the Given step.
+			});
+
+			Then("the check should fail", () => {
+				expect(errorResult?.code).toBe(1);
+			});
+
+			And("the output should mention stub assertions", () => {
+				const output = `${errorResult?.stdout || ""} ${errorResult?.stderr || ""}`;
+				expect(result).toBeUndefined();
+				expect(output).toContain("stub assertion");
 			});
 		},
 	);
@@ -333,7 +382,7 @@ test("broken", () => { expect(true).toBe(true); });
 					"tests/broken.test.ts",
 					`// @feature nonexistent/feature
 import { test, expect } from "vitest";
-test("broken", () => { expect(true).toBe(true); });
+test("broken", () => { expect(true).toBe(${String(true)}); });
 `,
 				);
 			});

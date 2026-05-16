@@ -22,8 +22,8 @@ jobs:
       - name: Validate UDD specs (strict)
         run: bun run udd validate --strict
 
-      - name: Run UDD doctor (drift checks)
-        run: bun run udd doctor
+      - name: Run UDD doctor (drift and stub checks)
+        run: bun run udd doctor --check-stubs --strict
 
       - name: Run test suite
         run: bun test

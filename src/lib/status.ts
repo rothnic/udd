@@ -117,20 +117,21 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 	const rootDir = process.cwd();
 	const gitStatus = await getGitStatus();
 
-	// Read current phase from VISION.md
+	// Read current phase from roadmap.yml; VISION.md is legacy fallback only.
 	let currentPhase = 1;
 	let phases: Record<string, string> = {};
 	try {
 		currentPhase = phase.getCurrentPhase(rootDir);
-		// try to also read phases map from frontmatter if present
+		phases = phase.getPhaseNames(rootDir);
+		// try legacy VISION phase names if roadmap did not provide them
 		try {
 			const visionPath = path.join(rootDir, "specs/VISION.md");
 			const visionContent = await fs.readFile(visionPath, "utf-8");
 			const frontmatterMatch = visionContent.match(/^---\n([\s\S]*?)\n---/);
-			if (frontmatterMatch) {
+			if (frontmatterMatch && Object.keys(phases).length === 0) {
 				const frontmatter = yaml.parse(frontmatterMatch[1]);
 				phases = frontmatter.phases || {};
-			} else {
+			} else if (Object.keys(phases).length === 0) {
 				const simpleMatch = visionContent.match(
 					/Current Phase:\s*Phase\s*(\d+)\s*-\s*(.+)/i,
 				);
@@ -142,7 +143,7 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 			// ignore
 		}
 	} catch {
-		// Default to phase 1 if VISION.md is missing
+		// Default to phase 1 if roadmap/VISION metadata is missing.
 	}
 
 	// Check if product/ directory exists (V2 model)

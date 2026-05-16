@@ -16,7 +16,7 @@ describeFeature(feature, ({ Scenario }) => {
 				"I have outcomes with @phase:N scenarios where N > current_phase",
 				() => {
 					// This test verifies the status command's deferred display logic
-					// The actual deferred scenarios depend on current_phase in VISION.md
+					// The actual deferred scenarios depend on current_phase in roadmap.yml
 					// We just need to verify the display format is correct when deferred items exist
 				},
 			);

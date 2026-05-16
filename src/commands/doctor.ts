@@ -19,8 +19,13 @@ import {
 	loadCheckpointCache,
 	saveCheckpointResponse,
 } from "../lib/checkpoint-cache.js";
+import phase from "../lib/phase.js";
 import { getProjectStatus } from "../lib/status.js";
-import { detectStubAssertions, markTestDirty } from "../lib/test-governance.js";
+import {
+	detectStubAssertions,
+	getPhaseFromTest,
+	markTestDirty,
+} from "../lib/test-governance.js";
 import type { ManifestTestEntry } from "../types.js";
 
 /**
@@ -313,6 +318,7 @@ export async function detectDrift(
 
 	if (checkStubs) {
 		try {
+			const currentPhase = phase.getCurrentPhase(rootDir);
 			const testPattern = "tests/**/*.e2e.test.ts";
 			const matches = await glob(testPattern, { cwd: rootDir });
 			for (const rel of matches) {
@@ -321,13 +327,12 @@ export async function detectDrift(
 					const content = await fs.readFile(abs, "utf-8");
 					const res = detectStubAssertions(content);
 					if (res.hasStubs) {
-						// Determine phase from file comment like '@phase:4'
-						const phaseMatch = content.match(/@phase\s*:\s*(\d+)/i);
-						// If no phase tag, default to 1 (treat as current/previous phases)
-						const phaseNum = phaseMatch ? parseInt(phaseMatch[1], 10) : 1;
+						// If no explicit or associated feature phase exists, default to 1
+						// so unclassified stubs are treated as current/prior phase debt.
+						const phaseNum = (await getPhaseFromTest(abs)) ?? 1;
 
-						// In lenient mode, ignore stubs that are explicitly marked as future work (phase >= 4)
-						if (mode === "lenient" && phaseNum >= 4) {
+						// In lenient mode, ignore stubs that are explicitly tagged for future phases.
+						if (mode === "lenient" && phaseNum > currentPhase) {
 							// skip reporting this stub (future phase acceptable)
 						} else {
 							issues.push({
@@ -1500,7 +1505,7 @@ export const doctorCommand = new Command("doctor")
 	.option("--create-backlog", "Generate recovery backlog (alias for --plan)")
 	.option("--bead-status", "Show current bead plan progress and ready beads")
 	.option("--backlog-status", "Show backlog progress (alias for --bead-status)")
-	.option("--check-stubs", "Check for stub assertions in tests")
+	.option("--check-stubs", "Check for stub assertions in tests (default)")
 	.option(
 		"--mode <mode>",
 		"Enforcement mode: lenient (future phases OK) or strict (all phases)",
@@ -1532,10 +1537,7 @@ export const doctorCommand = new Command("doctor")
 			// Run detection
 			const mode =
 				(options && options.mode) === "strict" ? "strict" : "lenient";
-			const drift = await detectDrift(
-				!!(options && options.checkStubs),
-				mode as "lenient" | "strict",
-			);
+			const drift = await detectDrift(true, mode as "lenient" | "strict");
 
 			if ((options as any)?.strict && drift.status === "drift-detected") {
 				console.error(chalk.red("Error: drift detected (strict mode)"));

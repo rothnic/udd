@@ -120,7 +120,7 @@ export async function getPhaseFromTest(
 | Phase 4 | Phase 3 | Warning only (allowed) |
 | Phase 5 | Phase 3 | Warning only (allowed) |
 
-**Current Phase:** See `specs/VISION.md` for `current_phase` value.
+**Current Phase:** See `specs/roadmap.yml` for `current_phase` and phase definitions.
 
 ## Common Patterns and Fixes
 
@@ -387,6 +387,18 @@ rejection:
 ## Enforcement Gates
 
 UDD enforces the no-stub policy through multiple gates:
+
+### Health Gate (Default Block)
+
+```bash
+udd health-check --json
+```
+
+**Purpose:** This is the default machine-readable gate for agents and CI.
+Current- and prior-phase stub assertions fail the command. Tests explicitly
+tagged for a future phase are deferred by phase filtering.
+**Action:** Replace current-phase stubs with meaningful assertions, or defer
+only with an explicit future `@phase:N` tag and traceable scenario context.
 
 ### Pre-Commit (Soft Warning)
 

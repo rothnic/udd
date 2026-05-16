@@ -8,7 +8,7 @@ Feature: Phase-aware enforcement of test quality rules
 
   Background:
     Given a UDD project is initialized
-    And the project vision current_phase is 3
+    And specs/roadmap.yml defines current phase 3
 
   @phase:3 @governance @test-quality
   Scenario: Fail when Phase 3 tests contain stub assertions (current phase)

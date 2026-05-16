@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { glob } from "glob";
 import yaml from "yaml";
+import phase from "./phase.js";
 
 export interface Actor {
 	name: string;
@@ -217,13 +218,7 @@ export async function getFeatures(): Promise<Feature[]> {
 	// Get current phase
 	let currentPhase = 1;
 	try {
-		const visionPath = path.join(rootDir, "specs/VISION.md");
-		const visionContent = await fs.readFile(visionPath, "utf-8");
-		const frontmatterMatch = visionContent.match(/^---\n([\s\S]*?)\n---/);
-		if (frontmatterMatch) {
-			const frontmatter = yaml.parse(frontmatterMatch[1]);
-			currentPhase = frontmatter.current_phase || 1;
-		}
+		currentPhase = phase.getCurrentPhase(rootDir);
 	} catch {
 		// Default to phase 1
 	}
