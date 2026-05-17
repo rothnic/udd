@@ -1,22 +1,23 @@
 # Journey: Agent Customization
 
 **Actor**: Developer  
-**Goal**: Customize the GitHub Copilot agent for UDD workflows
+**Goal**: Configure agent adapters to use shared UDD workflow guidance
 
 ## Context
 
-The Copilot agent needs context about UDD to assist effectively. This journey
-ensures the agent has access to project status and can guide users.
+Agent runtimes need context about UDD to assist effectively. This journey
+ensures Codex, OpenCode, and future adapters can access project status and guide
+users through the same source-of-truth workflow.
 
 ## Steps
 
-1. Developer opens Copilot chat
+1. Developer opens an agent adapter
 2. Agent has access to `udd status` output → `specs/features/udd/agent/status_prompt.feature`
 3. Agent guides user through UDD process → `specs/features/udd/agent/guide_user.feature`
 4. User gets contextual assistance
-5. Check deep status → `specs/features/opencode/tools/status_deep.feature`
-6. Get next recommendation → `specs/features/opencode/tools/next_recommendation.feature`
-7. List all issues → `specs/features/opencode/tools/issues_list.feature`
+5. OpenCode adapter checks deep status → `specs/features/opencode/tools/status_deep.feature`
+6. OpenCode adapter gets next recommendation → `specs/features/opencode/tools/next_recommendation.feature`
+7. OpenCode adapter lists all issues → `specs/features/opencode/tools/issues_list.feature`
 
 ## Success Criteria
 

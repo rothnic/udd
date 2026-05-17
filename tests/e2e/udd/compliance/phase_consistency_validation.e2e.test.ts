@@ -62,7 +62,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
 				// Stub: Set current phase
 			});
 
-			And('the active phase name is "OpenCode Integration"', () => {
+			And('the active phase name is "Agent Integration"', () => {
 				// Stub: Set phase name
 			});
 

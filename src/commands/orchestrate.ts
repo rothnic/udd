@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import { Command } from "commander";
+import { describeProjectState } from "../lib/agent-integration.js";
 import { getProjectStatus } from "../lib/status.js";
 import { detectDrift } from "./doctor.js";
 
@@ -107,7 +108,7 @@ function shouldPause(
  */
 async function executeIteration(
 	iteration: number,
-	config: OrchestratorConfig,
+	_config: OrchestratorConfig,
 ): Promise<IterationState> {
 	const actions: IterationAction[] = [];
 
@@ -125,7 +126,7 @@ async function executeIteration(
 		]);
 
 		actions[0].status = "success";
-		actions[0].result = `Phase ${status.current_phase}, ${Object.keys(status.journeys).length} journeys`;
+		actions[0].result = describeProjectState(status);
 
 		// Step 2: Determine if there's work to do
 		actions.push({
@@ -305,7 +306,7 @@ function formatResult(result: OrchestrationResult): string {
 	// Metrics
 	lines.push(chalk.bold("Iterations: ") + result.iterations.toString());
 	lines.push(
-		chalk.bold("Duration: ") + `${(result.durationMs / 1000).toFixed(2)}s`,
+		`${chalk.bold("Duration: ")}${(result.durationMs / 1000).toFixed(2)}s`,
 	);
 
 	// Message
@@ -359,7 +360,7 @@ export const orchestrateCommand = new Command("orchestrate")
 		try {
 			// Parse and validate options
 			const maxIterations = parseInt(options.maxIterations, 10);
-			if (isNaN(maxIterations) || maxIterations < 1) {
+			if (Number.isNaN(maxIterations) || maxIterations < 1) {
 				throw new Error(
 					`Invalid max-iterations: ${options.maxIterations}. Must be a positive integer.`,
 				);

@@ -1,6 +1,6 @@
 id: orchestrated_iteration
 name: Orchestrated Iteration
-summary: Enable continuous autonomous development using an orchestrator agent that coordinates worker agents via the OpenCode SDK, iterating until project completion or error state.
+summary: Enable continuous autonomous development using an orchestrator agent that coordinates worker agents through a shared UDD integration contract and adapter-specific runtime.
 phase: 3
 actors:
   - developer

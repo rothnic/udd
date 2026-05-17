@@ -1,10 +1,10 @@
 # Phase 3 Completion: Final State Vision
 
-This document describes the complete, correct state of the UDD project after Phase 3 (OpenCode Integration) is fully implemented and validated.
+This document describes the complete, correct state of the UDD project after Phase 3 (Agent Integration) is fully implemented and validated.
 
 ## Executive Summary
 
-Phase 3 delivers **OpenCode Integration** - the ability for AI agents to autonomously drive UDD workflows. The project now has:
+Phase 3 delivers **Agent Integration** - the ability for AI agents to autonomously drive UDD workflows through shared contracts and runtime-specific adapters. The project now has:
 
 - ✅ **Clear phase alignment**: All Phase 3 features tagged @phase:3
 - ✅ **Proper roadmap**: specs/roadmap.yml drives timing
@@ -135,9 +135,9 @@ phases:
     description: "Research workflow, tech spec scaffolding"
     
   - id: opencode-integration
-    name: "OpenCode Integration"
+    name: "Agent Integration"
     status: active
-    description: "Custom tools, orchestrator plugin, JSON output"
+    description: "Shared integration contracts, adapter tools, orchestrator plugin, JSON output"
     use_cases:
       - id: orchestrated_iteration
         capability: autonomous-development
@@ -385,10 +385,10 @@ User Journeys:
   Validate Phase Consistency ✓             2/2 outcomes satisfied
 
 Roadmap:
-  Current Phase: 3 - OpenCode Integration
+  Current Phase: 3 - Agent Integration
     Phase 1: Core CLI & Validation ✓
     Phase 2: Research & Tech Specs ✓
-  → Phase 3: OpenCode Integration (ACTIVE)
+  → Phase 3: Agent Integration (ACTIVE)
     Phase 4: Agent Intelligence (planned)
     Phase 5: Advanced Workflows (planned)
 
@@ -566,7 +566,7 @@ $ cd udd && npm install
 # Verify Phase 3 complete
 $ udd status
 ✓ All journeys satisfied
-✓ Current Phase: 3 - OpenCode Integration (COMPLETE)
+✓ Current Phase: 3 - Agent Integration (COMPLETE)
 
 # Run orchestration
 $ udd orchestrate --max-iterations 10 --json

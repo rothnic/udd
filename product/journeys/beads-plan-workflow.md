@@ -37,7 +37,7 @@ The current plan system uses a simple list of issues with basic dependency track
 
 ## Phase
 
-Phase 3 - OpenCode Integration
+Phase 3 - Agent Integration
 
 ## Notes
 

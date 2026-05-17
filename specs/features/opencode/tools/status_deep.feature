@@ -41,10 +41,10 @@ Feature: udd opencode status (deep)
 
   @phase:3 @opencode @status
   Scenario: Status command shows current phase from specs/roadmap.yml
-    Given specs/roadmap.yml declares the current phase as "Phase 3 - OpenCode Integration"
+    Given specs/roadmap.yml declares the current phase as "Phase 3 - Agent Integration"
     When I run "udd opencode status"
     Then the command should exit with code 0
-    And the output should contain "Current Phase: Phase 3 - OpenCode Integration"
+    And the output should contain "Current Phase: Phase 3 - Agent Integration"
 
   @phase:3 @opencode @status
   Scenario: Status command identifies blocking issues
