@@ -9,6 +9,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { describe, expect, test } from "vitest";
+import phase from "../../../../src/lib/phase.js";
 import { runUdd } from "../../../utils.js";
 
 const feature = await loadFeature(
@@ -21,10 +22,7 @@ const feature = await loadFeature(
 // by the global configuration and may throw ScenarioNotCalledError.
 function getCurrentPhase(): number {
 	try {
-		const visionPath = resolve(process.cwd(), "specs/VISION.md");
-		const content = readFileSync(visionPath, "utf-8");
-		const match = content.match(/current_phase:\s*(\d+)/);
-		return match ? Number.parseInt(match[1], 10) : 1;
+		return phase.getCurrentPhase(process.cwd());
 	} catch {
 		return 1;
 	}
@@ -110,7 +108,7 @@ if (!_hasRunnable) {
 	describe("iterate_until_complete (skipped)", () => {
 		test("skipped due to phase filter", () => {
 			// TEST FIXTURE: not a real assertion
-		expect(true).toBe(true);
+			expect(_hasRunnable).toBe(false);
 		});
 	});
 } else {
@@ -311,13 +309,13 @@ if (!_hasRunnable) {
 			({ Given, When, Then, And }) => {
 				let workerError: Error | undefined;
 				let errorCaptured: boolean;
-				let iterationCount: number;
+				let _iterationCount: number;
 				let maxIterations: number;
 
 				Given("a worker agent is processing a task", () => {
 					// Worker is processing
 					errorCaptured = false;
-					iterationCount = 0;
+					_iterationCount = 0;
 					maxIterations = 10;
 				});
 
@@ -325,13 +323,13 @@ if (!_hasRunnable) {
 					workerError = new Error("Worker failed: timeout");
 					errorCaptured = true;
 					// Stop iteration on error
-					iterationCount = maxIterations;
+					_iterationCount = maxIterations;
 				});
 
 				Then("the orchestrator should capture the error", () => {
 					expect(errorCaptured).toBe(true);
 					expect(workerError).toBeDefined();
-					expect(workerError!.message).toContain("timeout");
+					expect(workerError?.message).toContain("timeout");
 				});
 
 				And("the orchestrator should preserve session state for retry", () => {

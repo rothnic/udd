@@ -60,6 +60,13 @@ Feature: Setup Health Checks
     And remediation steps should be suggested
 
   @phase:3
+  Scenario: Health check blocks current-phase stub assertions
+    Given a current-phase test contains a stub assertion
+    When I run "udd health-check"
+    Then the check should fail
+    And the output should mention stub assertions
+
+  @phase:3
   Scenario: Health check validates CI configuration
     Given CI configuration should exist
     When I run "udd health-check"

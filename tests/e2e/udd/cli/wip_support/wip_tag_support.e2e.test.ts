@@ -18,7 +18,7 @@ describeFeature(feature, ({ Scenario }) => {
 			});
 
 			And("the project current_phase is 1", () => {
-				// VISION.md has current_phase: 1
+				// roadmap.yml owns current_phase; VISION.md remains stable project vision.
 				// This is already true in the workspace
 			});
 

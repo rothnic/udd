@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { confirm, input, select } from "@inquirer/prompts";
+import { input, select } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import { glob } from "glob";
@@ -15,12 +15,15 @@ import {
 } from "../lib/beads.js";
 import {
 	getCachedResponse,
-	hasCachedResponse,
-	loadCheckpointCache,
 	saveCheckpointResponse,
 } from "../lib/checkpoint-cache.js";
+import phase from "../lib/phase.js";
 import { getProjectStatus } from "../lib/status.js";
-import { detectStubAssertions, markTestDirty } from "../lib/test-governance.js";
+import {
+	detectStubAssertions,
+	getPhaseFromTest,
+	markTestDirty,
+} from "../lib/test-governance.js";
 import type { ManifestTestEntry } from "../types.js";
 
 /**
@@ -313,6 +316,7 @@ export async function detectDrift(
 
 	if (checkStubs) {
 		try {
+			const currentPhase = phase.getCurrentPhase(rootDir);
 			const testPattern = "tests/**/*.e2e.test.ts";
 			const matches = await glob(testPattern, { cwd: rootDir });
 			for (const rel of matches) {
@@ -321,13 +325,12 @@ export async function detectDrift(
 					const content = await fs.readFile(abs, "utf-8");
 					const res = detectStubAssertions(content);
 					if (res.hasStubs) {
-						// Determine phase from file comment like '@phase:4'
-						const phaseMatch = content.match(/@phase\s*:\s*(\d+)/i);
-						// If no phase tag, default to 1 (treat as current/previous phases)
-						const phaseNum = phaseMatch ? parseInt(phaseMatch[1], 10) : 1;
+						// If no explicit or associated feature phase exists, default to 1
+						// so unclassified stubs are treated as current/prior phase debt.
+						const phaseNum = (await getPhaseFromTest(abs)) ?? 1;
 
-						// In lenient mode, ignore stubs that are explicitly marked as future work (phase >= 4)
-						if (mode === "lenient" && phaseNum >= 4) {
+						// In lenient mode, ignore stubs that are explicitly tagged for future phases.
+						if (mode === "lenient" && phaseNum > currentPhase) {
 							// skip reporting this stub (future phase acceptable)
 						} else {
 							issues.push({
@@ -529,7 +532,7 @@ async function saveTestReviews(
  * Calls existing sync functionality
  */
 async function fixStaleJourney(
-	issue: DriftIssue,
+	_issue: DriftIssue,
 	ctx: FixContext,
 ): Promise<RemediationResult> {
 	if (ctx.dryRun) {
@@ -588,7 +591,7 @@ async function fixMissingScenario(
 	// Extract domain and action from path
 	const parts = match[1].split("/");
 	const action = parts[parts.length - 1];
-	const domain = parts.slice(0, -1).join("/") || "general";
+	const _domain = parts.slice(0, -1).join("/") || "general";
 
 	// Generate basic scenario content
 	const scenarioContent = `Feature: ${action.replace(/_/g, " ")}
@@ -739,7 +742,7 @@ async function fixTestDirty(
  * Remediation Agent 4: Fix corrupt/missing manifest
  */
 async function fixManifestIssue(
-	issue: DriftIssue,
+	_issue: DriftIssue,
 	ctx: FixContext,
 ): Promise<RemediationResult> {
 	const rootDir = process.cwd();
@@ -1142,7 +1145,9 @@ async function applyFixes(
 		);
 
 		// Helper function to process a single issue
-		const processIssue = async (issue: DriftIssue): Promise<RemediationResult> => {
+		const processIssue = async (
+			issue: DriftIssue,
+		): Promise<RemediationResult> => {
 			switch (issue.type) {
 				case "journey_stale":
 					return await fixStaleJourney(issue, ctx);
@@ -1172,39 +1177,25 @@ async function applyFixes(
 			fn: (item: T) => Promise<R>,
 		): Promise<R[]> => {
 			const results: R[] = [];
-			const executing: Promise<void>[] = [];
+			const executing = new Set<Promise<void>>();
 
 			for (let i = 0; i < items.length; i++) {
 				const item = items[i];
-				const promise = fn(item).then((result) => {
-					results[i] = result;
-				});
-				executing.push(promise);
+				const promise = fn(item)
+					.then((result) => {
+						results[i] = result;
+					})
+					.finally(() => {
+						executing.delete(promise);
+					});
+				executing.add(promise);
 
-				if (executing.length >= limit) {
+				if (executing.size >= limit) {
 					await Promise.race(executing);
-					// Remove completed promises
-					for (let j = executing.length - 1; j >= 0; j--) {
-						// Check if promise is settled by racing against an already resolved promise
-						const checkPromise = executing[j];
-						const timeoutPromise = new Promise<void>((resolve) =>
-							setTimeout(resolve, 0),
-						);
-						const race = Promise.race([checkPromise, timeoutPromise]);
-						// If the original promise is done, race resolves immediately
-						// Otherwise, it resolves after timeout
-						// We need to check if checkPromise is still pending
-						let isSettled = false;
-						checkPromise.then(() => { isSettled = true; }).catch(() => { isSettled = true; });
-						await timeoutPromise;
-						if (isSettled) {
-							executing.splice(j, 1);
-						}
-					}
 				}
 			}
 
-			await Promise.all(executing);
+			await Promise.all([...executing]);
 			return results;
 		};
 
@@ -1255,7 +1246,7 @@ async function applyFixes(
 		for (const issue of needsUserInput) {
 			// If resume option passed through options to applyFixes, forward to handler
 			const result = await handleAmbiguousScenario(issue, ctx, {
-				resume: !!(options as any)?.resume,
+				resume: !!options.resume,
 			});
 
 			const icon = result.success
@@ -1500,7 +1491,8 @@ export const doctorCommand = new Command("doctor")
 	.option("--create-backlog", "Generate recovery backlog (alias for --plan)")
 	.option("--bead-status", "Show current bead plan progress and ready beads")
 	.option("--backlog-status", "Show backlog progress (alias for --bead-status)")
-	.option("--check-stubs", "Check for stub assertions in tests")
+	.option("--check-stubs", "Check for stub assertions in tests (default)", true)
+	.option("--no-check-stubs", "Skip stub assertion checks")
 	.option(
 		"--mode <mode>",
 		"Enforcement mode: lenient (future phases OK) or strict (all phases)",
@@ -1530,14 +1522,13 @@ export const doctorCommand = new Command("doctor")
 			}
 
 			// Run detection
-			const mode =
-				(options && options.mode) === "strict" ? "strict" : "lenient";
+			const mode = options?.mode === "strict" ? "strict" : "lenient";
 			const drift = await detectDrift(
-				!!(options && options.checkStubs),
+				options?.checkStubs ?? true,
 				mode as "lenient" | "strict",
 			);
 
-			if ((options as any)?.strict && drift.status === "drift-detected") {
+			if (options?.strict && drift.status === "drift-detected") {
 				console.error(chalk.red("Error: drift detected (strict mode)"));
 				process.exitCode = 1;
 			}

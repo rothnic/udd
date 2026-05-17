@@ -17,6 +17,8 @@ COLUMN 1 - "Specification Layer" (Blue theme):
 ┌─────────────────────────────────────┐
 │  specs/                             │
 │  ├── VISION.md                      │
+│  │   └── stable goals, backlog basis│
+│  ├── roadmap.yml                    │
 │  │   └── current_phase, phases      │
 │  ├── use-cases/                     │
 │  │   └── *.yml (id, outcomes)       │
@@ -55,8 +57,9 @@ ARROWS (show relationships):
 2. *.feature --"1:1 mapping"--> *.e2e.test.ts (dashed line, same slug)
 3. *.e2e.test.ts --"generates"--> results.json
 4. results.json --"read by"--> src/lib/status.ts
-5. VISION.md --"defines phase for"--> all *.feature files
-6. @phase:N tag in .feature --"defers to"--> future phases
+5. VISION.md --"grounds backlog for"--> roadmap.yml and use-cases/*.yml
+6. roadmap.yml --"defines phase for"--> all *.feature files
+7. @phase:N tag in .feature --"defers to"--> future phases
 
 VISUAL STYLE:
 - Clean, minimalist boxes with rounded corners
@@ -175,12 +178,13 @@ PROMPT FOR DIAGRAM GENERATION:
 Create a data flow diagram showing how `udd status` gathers and displays information.
 
 INPUT SOURCES (left side, as database cylinders):
-1. specs/VISION.md → current_phase, phases
-2. specs/use-cases/*.yml → outcomes, scenario links
-3. specs/features/**/*.feature → scenarios, @phase:N tags
-4. specs/features/**/_feature.yml → feature metadata
-5. .udd/results.json → test pass/fail status
-6. git status → branch, dirty state
+1. specs/VISION.md → stable goals, backlog foundation
+2. specs/roadmap.yml → current_phase, phases
+3. specs/use-cases/*.yml → outcomes, scenario links
+4. specs/features/**/*.feature → scenarios, @phase:N tags
+5. specs/features/**/_feature.yml → feature metadata
+6. .udd/results.json → test pass/fail status
+7. git status → branch, dirty state
 
 PROCESSING (center, as process box):
 ┌─────────────────────────────────────┐
