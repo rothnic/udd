@@ -19,7 +19,7 @@ Example:
 
 ```
 Project: udd
-Phase: 3 - OpenCode Integration
+Phase: 3 - Agent Integration
 Journeys: 12 (2 changed)
 Scenarios: 48 total (5 failing, 3 missing, 2 stale)
 Dirty tests: 46

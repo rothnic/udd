@@ -138,7 +138,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
 			let runResult: { stdout: string; stderr: string };
 
 			Given(
-				'specs/roadmap.yml declares the current phase as "Phase 3 - OpenCode Integration"',
+				'specs/roadmap.yml declares the current phase as "Phase 3 - Agent Integration"',
 				async () => {
 					const tempDir = await mkdtemp(path.join(os.tmpdir(), "udd-test-"));
 					await runUdd("init --yes", { cwd: tempDir });
@@ -150,7 +150,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
 							"phases:",
 							"  - id: opencode-integration",
 							"    number: 3",
-							'    name: "OpenCode Integration"',
+							'    name: "Agent Integration"',
 							"",
 						].join("\n"),
 					);
@@ -167,10 +167,10 @@ describeFeature(feature, ({ Background, Scenario }) => {
 			});
 
 			And(
-				'the output should contain "Current Phase: Phase 3 - OpenCode Integration"',
+				'the output should contain "Current Phase: Phase 3 - Agent Integration"',
 				async () => {
 					expect(statusOutput).toContain(
-						"Current Phase: Phase 3 - OpenCode Integration",
+						"Current Phase: Phase 3 - Agent Integration",
 					);
 				},
 			);
@@ -335,12 +335,12 @@ describeFeature(feature, ({ Background, Scenario }) => {
 							"phases:",
 							"  - id: opencode-integration",
 							"    number: 3",
-							'    name: "OpenCode Integration"',
+							'    name: "Agent Integration"',
 							"",
 						].join("\n"),
 					);
 					const json = JSON.parse(statusOutput);
-					expect(json.phase).toBe("Phase 3 - OpenCode Integration");
+					expect(json.phase).toBe("Phase 3 - Agent Integration");
 				},
 			);
 

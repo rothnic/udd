@@ -28,7 +28,7 @@ Example injection (rendered from JSON):
 ```
 ## Current Project Status
 
-**Phase**: 3 - OpenCode Integration
+**Phase**: 3 - Agent Integration
 **Roadmap (next steps)**: sync journeys → generate scenarios → implement failing scenarios
 **Dirty Tests**: 46 (run `udd test` to refresh results)
 **Drift Status**: ⚠️ 31 issues detected (run `udd doctor` for diagnostics or `udd doctor --fix` to attempt automated remediation)

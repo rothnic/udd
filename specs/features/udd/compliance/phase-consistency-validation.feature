@@ -46,7 +46,7 @@ Feature: Phase Consistency Validation
   @phase:3
   Scenario: Warn when roadmap and specs are misaligned
     Given specs/roadmap.yml specifies current phase 3
-    And the active phase name is "OpenCode Integration"
+    And the active phase name is "Agent Integration"
     When I scan all feature files
     Then features with @phase:4 should trigger a warning
     And the warning should explain: "Phase 4 work detected but current phase is 3"

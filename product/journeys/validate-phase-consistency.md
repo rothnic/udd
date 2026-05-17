@@ -10,7 +10,7 @@ UDD uses `specs/VISION.md` as the stable statement of project purpose and
 @phase:N tags to indicate which phase they belong to. These can drift:
 
 - VISION says agent integrations should be reusable across tools
-- `specs/roadmap.yml` says `current_phase: opencode-integration` (Phase 3)
+- `specs/roadmap.yml` says `current_phase: opencode-integration` (legacy Phase 3 id, now named Agent Integration)
 - Feature files have @phase:4 tags (Agent Intelligence phase)
 - No automated validation catches this mismatch
 

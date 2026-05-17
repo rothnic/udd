@@ -2,8 +2,35 @@ import fs from "node:fs";
 import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
+import {
+	buildAgentEditPlan,
+	buildAgentProjectSnapshot,
+	getAgentHealthLabel,
+	summarizeIssuesBySeverity,
+} from "../lib/agent-integration.js";
 import { getProjectStatus, type ProjectStatus } from "../lib/status.js";
-import { type DriftIssue, type DriftState, detectDrift } from "./doctor.js";
+import { type DriftState, detectDrift } from "./doctor.js";
+
+type SuggestedFile = { path: string; action: string };
+type JsonSuggestedFile =
+	| SuggestedFile
+	| { path: string; suggested_action: string };
+type RecommendationJsonOutput = {
+	recommended: string;
+	reason: string;
+	suggestedFiles: JsonSuggestedFile[];
+	suggested_files: JsonSuggestedFile[];
+	edit_plan: SuggestedFile[];
+	editPlan: SuggestedFile[];
+	blocking: Array<{ slug: string; blocked_by?: string }>;
+	recommendation: string;
+	generated_at: string;
+	chosen_phase?: number;
+	scored_priorities?: Array<{ phase: number; score: number }>;
+	recommended_phase?: number;
+	recommended_meta?: { phase?: number };
+	human_summary?: string;
+};
 
 /**
  * Format a journey status for display
@@ -85,28 +112,10 @@ function formatIssuesList(drift: DriftState): string {
  * Get a health summary string
  */
 function getHealthSummary(status: ProjectStatus, drift: DriftState): string {
-	const totalJourneys = Object.keys(status.journeys).length;
-	const staleJourneys = Object.values(status.journeys).filter(
-		(j) => j.isStale,
-	).length;
-
-	let totalScenarios = 0;
-	let missingScenarios = 0;
-	let failingScenarios = 0;
-	let passingScenarios = 0;
-
-	for (const feature of Object.values(status.features)) {
-		for (const scenario of Object.values(feature.scenarios)) {
-			totalScenarios++;
-			if (scenario.e2e === "missing") missingScenarios++;
-			else if (scenario.e2e === "failing") failingScenarios++;
-			else if (scenario.e2e === "passing") passingScenarios++;
-		}
-	}
-
-	if (drift.issues.length === 0) {
+	const label = getAgentHealthLabel(status, drift);
+	if (label === "Healthy") {
 		return chalk.green("Healthy");
-	} else if (drift.summary.critical === 0) {
+	} else if (label === "Issues detected") {
 		return chalk.yellow("Issues detected");
 	} else {
 		return chalk.red("Critical issues");
@@ -117,7 +126,7 @@ function getHealthSummary(status: ProjectStatus, drift: DriftState): string {
  * Status subcommand - Deep project status for agents
  */
 export const statusCommand = new Command("status")
-	.description("Deep project status for OpenCode agents")
+	.description("Deep project status for the OpenCode adapter")
 	.option("--json", "Output status as JSON for agent consumption")
 	.action(async (options) => {
 		try {
@@ -128,80 +137,7 @@ export const statusCommand = new Command("status")
 
 			if (options.json) {
 				// Structured JSON output for agents
-				const jsonOutput = {
-					project: {
-						name: process.cwd().split("/").pop() || "unknown",
-						root: process.cwd(),
-					},
-					phase: {
-						current: status.current_phase,
-						name: status.phases[status.current_phase.toString()] || "Unknown",
-						all: status.phases,
-					},
-					journeys: Object.entries(status.journeys).map(([key, journey]) => ({
-						name: key,
-						display_name: journey.name,
-						actor: journey.actor,
-						goal: journey.goal,
-						status:
-							journey.scenariosMissing > 0
-								? "incomplete"
-								: journey.isStale
-									? "stale"
-									: "complete",
-						scenario_count: journey.scenarioCount,
-						scenarios_missing: journey.scenariosMissing,
-						scenarios_passing: journey.scenariosPassing,
-						is_stale: journey.isStale,
-					})),
-					scenarios: {
-						total: Object.values(status.features).reduce(
-							(acc, f) => acc + Object.keys(f.scenarios).length,
-							0,
-						),
-						passing: Object.values(status.features).reduce(
-							(acc, f) =>
-								acc +
-								Object.values(f.scenarios).filter((s) => s.e2e === "passing")
-									.length,
-							0,
-						),
-						failing: Object.values(status.features).reduce(
-							(acc, f) =>
-								acc +
-								Object.values(f.scenarios).filter((s) => s.e2e === "failing")
-									.length,
-							0,
-						),
-						missing: Object.values(status.features).reduce(
-							(acc, f) =>
-								acc +
-								Object.values(f.scenarios).filter((s) => s.e2e === "missing")
-									.length,
-							0,
-						),
-						stale: Object.values(status.features).reduce(
-							(acc, f) =>
-								acc +
-								Object.values(f.scenarios).filter((s) => s.e2e === "stale")
-									.length,
-							0,
-						),
-					},
-					issues: drift.issues.map((issue) => ({
-						id: issue.id,
-						severity: issue.severity,
-						type: issue.type,
-						file: issue.file,
-						message: issue.message,
-						auto_fixable: issue.autoFixable,
-					})),
-					health: {
-						status: drift.status,
-						summary: drift.summary,
-					},
-					generated_at: new Date().toISOString(),
-				};
+				const jsonOutput = buildAgentProjectSnapshot(status, drift);
 				console.log(JSON.stringify(jsonOutput, null, 2));
 			} else {
 				// Human-readable output
@@ -241,11 +177,11 @@ export const statusCommand = new Command("status")
  */
 async function findNextRecommendation(
 	status: ProjectStatus,
-	drift: DriftState,
+	_drift: DriftState,
 ): Promise<{
 	recommended: string;
 	reason: string;
-	suggestedFiles: Array<{ path: string; action: string }>;
+	suggestedFiles: SuggestedFile[];
 	blocking: Array<{ slug: string; blocked_by?: string }>;
 }> {
 	// prefer recommending direct product work (fixing a missing scenario)
@@ -259,11 +195,8 @@ async function findNextRecommendation(
 	// Aggregate blocking info across all journeys so consumers can see dependencies
 	const aggregatedBlocking: Array<{ slug: string; blocked_by: string }> = [];
 	for (const [jk, jv] of Object.entries(status.journeys)) {
-		if (
-			Array.isArray((jv as any).blocking) &&
-			(jv as any).blocking.length > 0
-		) {
-			for (const b of (jv as any).blocking) {
+		if (Array.isArray(jv.blocking) && jv.blocking.length > 0) {
+			for (const b of jv.blocking) {
 				aggregatedBlocking.push({ slug: jk, blocked_by: b });
 			}
 		}
@@ -298,7 +231,7 @@ async function findNextRecommendation(
 			blocking:
 				aggregatedBlocking.length > 0
 					? aggregatedBlocking
-					: (journey as any).blocking?.map((b: string) => ({
+					: journey.blocking?.map((b: string) => ({
 							slug: journeyKey,
 							blocked_by: b,
 						})) || [],
@@ -392,7 +325,7 @@ async function findNextRecommendation(
 				blocking,
 			};
 		}
-	} catch (e) {
+	} catch (_e) {
 		// swallow any error - fall through to default
 	}
 
@@ -432,14 +365,9 @@ export const nextCommand = new Command("next")
 			if (options.json) {
 				// Base output: include both camelCase and snake_case variants to be
 				// tolerant with downstream agents and tests.
-				const editPlan = recommendation.suggestedFiles.map(
-					(f: { path: string; action: string }) => ({
-						path: f.path,
-						action: f.action,
-					}),
-				);
+				const editPlan = buildAgentEditPlan(recommendation.suggestedFiles);
 
-				const jsonOutput: any = {
+				const jsonOutput: RecommendationJsonOutput = {
 					// spread core fields
 					...recommendation,
 					// ensure both naming styles exist
@@ -577,15 +505,11 @@ export const issuesCommand = new Command("issues")
 				console.log(chalk.dim("==============\n"));
 
 				// Summary by severity
-				const criticalCount = drift.issues.filter(
-					(i) => i.severity === "critical",
-				).length;
-				const warningCount = drift.issues.filter(
-					(i) => i.severity === "warning",
-				).length;
-				const infoCount = drift.issues.filter(
-					(i) => i.severity === "info",
-				).length;
+				const {
+					critical: criticalCount,
+					warning: warningCount,
+					info: infoCount,
+				} = summarizeIssuesBySeverity(drift.issues);
 
 				console.log("Summary:");
 				console.log(
@@ -639,7 +563,7 @@ export const issuesCommand = new Command("issues")
  * Main opencode command with subcommands
  */
 export const opencodeCommand = new Command("opencode")
-	.description("OpenCode agent integration commands")
+	.description("OpenCode adapter integration commands")
 	.addCommand(statusCommand)
 	.addCommand(nextCommand)
 	.addCommand(issuesCommand);

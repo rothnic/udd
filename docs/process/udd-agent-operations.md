@@ -2,7 +2,28 @@
 
 Purpose
 -------
-This playbook documents the agent operations workflow for UDD (User Driven Development). It defines the agent workflow, handoff protocol, and traceability update procedures so agent work is consistent, auditable, and verifiable.
+This playbook documents the agent operations workflow for UDD (User Driven Development). It defines the shared agent workflow, handoff protocol, and traceability update procedures so Codex, OpenCode, and future adapters behave consistently.
+
+Shared integration contracts live under `integrations/shared/`. Adapter-specific
+details live under `integrations/opencode/`, `integrations/codex/`, or the
+runtime-native adapter directory.
+
+Goal command contract
+---------------------
+Use `/goal goals/<file>.md` for goal-file execution. This command is
+vendor-independent and resolves to the shared contract in
+`integrations/shared/goal-command-contract.md`.
+
+Every adapter must:
+
+- Read the referenced goal file.
+- Check current repo state before editing.
+- Execute only that goal.
+- Run the explicit checks named by the goal.
+- Produce a PR-ready summary with objective, files changed, checks, cleanup
+  findings, and deferred work.
+- Wait for configured PR review comments and address comments relevant to the
+  goal before completion.
 
 Agent workflow (canonical)
 --------------------------
@@ -30,7 +51,7 @@ Agent workflow (canonical)
    - Run `udd status` again to confirm passing state and no orphaned journeys.
 
 Handoff protocol
------------------
+----------------
 When pausing work or passing to another agent/person, include the following in the handoff note (in PR, issue, or handoff doc):
 
 - Context: one-line summary of the user journey, actor, and goal.
@@ -72,9 +93,14 @@ Verification checklist
 
 Guidelines and constraints
 --------------------------
-- Single-task rule: agents should accept exactly one atomic task at a time (one file, one change, one verification). If multiple tasks are given, refuse and request a single-task instruction.
-- Never implement behavior not specified by a journey or feature — ask for clarification.
-- Keep changes minimal and reversible: small commits, no force pushes to protected branches.
+- Goal-file rule: when invoked through `/goal`, agents execute the referenced
+  goal file end to end and do not add unrelated cleanup.
+- Never implement behavior not specified by a journey, feature, or accepted goal
+  file.
+- Keep changes minimal and reversible: small commits, one focused PR, no force
+  pushes to protected branches.
+- Keep reusable workflow rules in `integrations/shared/`; adapter docs should
+  point there instead of duplicating the canonical process.
 
 Evidence and audit
 ------------------
@@ -86,7 +112,10 @@ Appendix: Quick commands
 - udd sync — convert journeys to feature files
 - npm test — run test suite
 - npm run check — run repository checks (lint, typecheck, test subset)
+- /goal goals/<file>.md — execute one goal through the shared agent contract
 
 Change history
 --------------
 - T16: Initial agent operations playbook (created for Task 16: Agent flow and handoff)
+- 2026-05-17: Added vendor-independent `/goal` contract and adapter/shared
+  integration routing.

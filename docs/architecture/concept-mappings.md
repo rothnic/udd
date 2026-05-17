@@ -254,7 +254,7 @@ current_phase: opencode-integration
 
 phases:
   - id: opencode-integration
-    name: "OpenCode Integration"
+    name: "Agent Integration"
     status: active
     use_cases:
       - id: orchestrated_iteration
@@ -686,4 +686,3 @@ TEST: create_task.e2e.test.ts
 | Scenario | `specs/features/*.feature` | E2E Tests | Acceptance Criteria |
 | Roadmap | `specs/roadmap.yml` | Use Cases (assigns phase) | Life Cycle Plan |
 | Test | `tests/e2e/*.test.ts` | Scenarios | Verification |
-
