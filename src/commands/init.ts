@@ -4,10 +4,12 @@ import { confirm, input } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import { userWarn } from "../lib/cli-error.js";
+import { installCodexHooks } from "../lib/codex-hooks.js";
 
 export const initCommand = new Command("init")
 	.description("Initialize UDD in a project")
 	.option("-y, --yes", "Skip prompts and use defaults")
+	.option("--codex-hooks", "Install Codex UDD session hooks")
 	.action(async (options) => {
 		const rootDir = process.cwd();
 		const productDir = path.join(rootDir, "product");
@@ -273,6 +275,11 @@ scenarios: {}
 			manifestContent,
 		);
 		console.log(chalk.green("✓ Created specs/.udd/manifest.yml"));
+
+		if (options.codexHooks) {
+			await installCodexHooks(rootDir);
+			console.log(chalk.green("✓ Installed Codex UDD hooks"));
+		}
 
 		console.log(
 			chalk.cyan(

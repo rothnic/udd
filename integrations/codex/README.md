@@ -6,7 +6,19 @@ UDD-driven development sessions.
 
 ## Session Hook
 
-Concrete Codex hook:
+Install the Codex hook into an external UDD project:
+
+```bash
+udd hooks install-codex
+```
+
+New projects can opt in during initialization:
+
+```bash
+udd init --codex-hooks
+```
+
+Installed files:
 
 - `.codex/hooks.json`
 - `.codex/hooks/pre-task.sh`
