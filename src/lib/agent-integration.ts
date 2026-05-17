@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { ProjectStatus } from "./status.js";
 
 export interface AgentDriftIssue {
@@ -75,17 +76,25 @@ export interface GoalCommandContract {
 }
 
 export function getScenarioTotals(status: ProjectStatus): ScenarioTotals {
-	const scenarios = Object.values(status.features).flatMap((feature) =>
-		Object.values(feature.scenarios),
-	);
-
-	return {
-		total: scenarios.length,
-		passing: scenarios.filter((scenario) => scenario.e2e === "passing").length,
-		failing: scenarios.filter((scenario) => scenario.e2e === "failing").length,
-		missing: scenarios.filter((scenario) => scenario.e2e === "missing").length,
-		stale: scenarios.filter((scenario) => scenario.e2e === "stale").length,
+	const totals: ScenarioTotals = {
+		total: 0,
+		passing: 0,
+		failing: 0,
+		missing: 0,
+		stale: 0,
 	};
+
+	for (const feature of Object.values(status.features)) {
+		for (const scenario of Object.values(feature.scenarios)) {
+			totals.total++;
+			if (scenario.e2e === "passing") totals.passing++;
+			else if (scenario.e2e === "failing") totals.failing++;
+			else if (scenario.e2e === "missing") totals.missing++;
+			else if (scenario.e2e === "stale") totals.stale++;
+		}
+	}
+
+	return totals;
 }
 
 export function summarizeIssuesBySeverity(issues: AgentDriftIssue[]): {
@@ -93,11 +102,11 @@ export function summarizeIssuesBySeverity(issues: AgentDriftIssue[]): {
 	warning: number;
 	info: number;
 } {
-	return {
-		critical: issues.filter((issue) => issue.severity === "critical").length,
-		warning: issues.filter((issue) => issue.severity === "warning").length,
-		info: issues.filter((issue) => issue.severity === "info").length,
-	};
+	const counts = { critical: 0, warning: 0, info: 0 };
+	for (const issue of issues) {
+		counts[issue.severity]++;
+	}
+	return counts;
 }
 
 export function buildAgentEditPlan(
@@ -130,7 +139,7 @@ export function buildAgentProjectSnapshot(
 ): AgentProjectSnapshot {
 	return {
 		project: {
-			name: root.split("/").pop() || "unknown",
+			name: path.basename(root) || "unknown",
 			root,
 		},
 		phase: {

@@ -15,9 +15,6 @@ type SuggestedFile = { path: string; action: string };
 type JsonSuggestedFile =
 	| SuggestedFile
 	| { path: string; suggested_action: string };
-type JourneyWithBlocking = ProjectStatus["journeys"][string] & {
-	blocking?: string[];
-};
 type RecommendationJsonOutput = {
 	recommended: string;
 	reason: string;
@@ -198,12 +195,8 @@ async function findNextRecommendation(
 	// Aggregate blocking info across all journeys so consumers can see dependencies
 	const aggregatedBlocking: Array<{ slug: string; blocked_by: string }> = [];
 	for (const [jk, jv] of Object.entries(status.journeys)) {
-		const journeyWithBlocking = jv as JourneyWithBlocking;
-		if (
-			Array.isArray(journeyWithBlocking.blocking) &&
-			journeyWithBlocking.blocking.length > 0
-		) {
-			for (const b of journeyWithBlocking.blocking) {
+		if (Array.isArray(jv.blocking) && jv.blocking.length > 0) {
+			for (const b of jv.blocking) {
 				aggregatedBlocking.push({ slug: jk, blocked_by: b });
 			}
 		}
@@ -238,7 +231,7 @@ async function findNextRecommendation(
 			blocking:
 				aggregatedBlocking.length > 0
 					? aggregatedBlocking
-					: (journey as JourneyWithBlocking).blocking?.map((b: string) => ({
+					: journey.blocking?.map((b: string) => ({
 							slug: journeyKey,
 							blocked_by: b,
 						})) || [],
