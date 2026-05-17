@@ -1,24 +1,31 @@
+import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
+import { promisify, stripVTControlCharacters } from "node:util";
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { afterAll, beforeAll, expect } from "vitest";
 import yaml from "yaml";
-import { rootDir, runUdd } from "../../../../utils.js";
+import { rootDir, uddBin } from "../../../../utils.js";
+
+const execFileAsync = promisify(execFile);
 
 const feature = await loadFeature(
 	"specs/features/udd/cli/inbox/add_item_via_cli.feature",
 );
 
 describeFeature(feature, ({ Scenario }) => {
-	const inboxPath = path.join(rootDir, "specs/inbox.yml");
-	let originalContent: string;
+	let projectDir: string;
+	let inboxPath: string;
 
 	beforeAll(async () => {
-		originalContent = await fs.readFile(inboxPath, "utf-8");
+		projectDir = await fs.mkdtemp(path.join(os.tmpdir(), "udd-inbox-e2e-"));
+		inboxPath = path.join(projectDir, "specs/inbox.yml");
+		await fs.mkdir(path.dirname(inboxPath), { recursive: true });
 	});
 
 	afterAll(async () => {
-		await fs.writeFile(inboxPath, originalContent);
+		await fs.rm(projectDir, { recursive: true, force: true });
 	});
 
 	Scenario("Add item via CLI", ({ Given, When, Then, And }) => {
@@ -29,7 +36,22 @@ describeFeature(feature, ({ Scenario }) => {
 		When(
 			"I run \"udd inbox add 'My new idea' --description 'Some details'\"",
 			async () => {
-				await runUdd("inbox add 'My new idea' --description 'Some details'");
+				const result = await execFileAsync(
+					path.join(rootDir, "node_modules/.bin/tsx"),
+					[
+						uddBin,
+						"inbox",
+						"add",
+						"My new idea",
+						"--description",
+						"Some details",
+					],
+					{ cwd: projectDir },
+				);
+
+				expect(stripVTControlCharacters(result.stdout)).toContain(
+					"Added to inbox: My new idea",
+				);
 			},
 		);
 

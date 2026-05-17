@@ -9,6 +9,10 @@ import { userWarn } from "../lib/cli-error.js";
 import { checkGate, handleGateResult } from "../lib/gate.js";
 import { listExamples, resolvePaths } from "../lib/paths.js";
 import { detectFeatureChanges } from "../lib/test-governance.js";
+import {
+	loadUseCaseScenarioPaths,
+	resolveJourneyReference,
+} from "../lib/trace.js";
 import type { ManifestTestEntry } from "../types.js";
 
 interface JourneyStep {
@@ -255,6 +259,24 @@ function generateScenarioContent(journey: Journey, step: JourneyStep): string {
 `;
 }
 
+function resolveJourneyScenarios(
+	journey: Journey,
+	useCaseScenarios: Map<string, string[]>,
+): string[] {
+	return journey.steps.flatMap((step) =>
+		step.scenarioPath
+			? resolveJourneyReference(step.scenarioPath, useCaseScenarios)
+			: [],
+	);
+}
+
+function sameList(left: string[], right: string[]): boolean {
+	return (
+		left.length === right.length &&
+		left.every((value, index) => value === right[index])
+	);
+}
+
 function generateTestContent(
 	scenarioPath: string,
 	scenarioName: string,
@@ -491,6 +513,7 @@ export const syncCommand = new Command("sync")
 		let changesDetected = 0;
 		let scenariosCreated = 0;
 		const updatedManifest = { ...manifest };
+		const useCaseScenarios = await loadUseCaseScenarioPaths(rootDir);
 
 		for (const file of mdFiles) {
 			const journeyPath = path.join(journeysDir, file);
@@ -503,9 +526,20 @@ export const syncCommand = new Command("sync")
 
 			const journeyKey = path.basename(file, ".md");
 			const existingJourney = manifest.journeys[journeyKey];
+			const resolvedScenarios = resolveJourneyScenarios(
+				journey,
+				useCaseScenarios,
+			);
+			const scenariosChanged =
+				existingJourney &&
+				!sameList(existingJourney.scenarios ?? [], resolvedScenarios);
 
 			// Check if journey changed
-			if (existingJourney && existingJourney.hash === journey.hash) {
+			if (
+				existingJourney &&
+				existingJourney.hash === journey.hash &&
+				!scenariosChanged
+			) {
 				console.log(chalk.dim(`✓ ${journeyKey} (unchanged)`));
 				continue;
 			}
@@ -526,55 +560,73 @@ export const syncCommand = new Command("sync")
 					continue;
 				}
 
-				const exists = await scenarioExists(rootDir, step.scenarioPath);
-				scenarios.push(step.scenarioPath);
+				const scenarioPaths = resolveJourneyReference(
+					step.scenarioPath,
+					useCaseScenarios,
+				);
+				if (scenarioPaths.length === 0) {
+					console.log(
+						chalk.yellow(
+							`  → ${step.scenarioPath} (no scenarios found for reference)`,
+						),
+					);
+					scenarios.push(step.scenarioPath);
+					continue;
+				}
 
-				if (exists) {
-					console.log(chalk.dim(`  ✓ ${step.scenarioPath} (exists)`));
-				} else {
-					console.log(chalk.yellow(`  → ${step.scenarioPath} (missing)`));
+				for (const scenarioPath of scenarioPaths) {
+					const exists = await scenarioExists(rootDir, scenarioPath);
+					scenarios.push(scenarioPath);
 
-					if (options.dryRun) {
-						console.log(chalk.dim("    (dry-run: would create)"));
-						continue;
-					}
+					if (exists) {
+						console.log(chalk.dim(`  ✓ ${scenarioPath} (exists)`));
+					} else {
+						console.log(chalk.yellow(`  → ${scenarioPath} (missing)`));
 
-					const shouldCreate =
-						options.auto ||
-						(await confirm({
-							message: `Create ${step.scenarioPath}?`,
-							default: true,
-						}));
+						if (options.dryRun) {
+							console.log(chalk.dim("    (dry-run: would create)"));
+							continue;
+						}
 
-					if (shouldCreate) {
-						// Create scenario file
-						const scenarioFullPath = path.join(rootDir, step.scenarioPath);
-						await fs.mkdir(path.dirname(scenarioFullPath), { recursive: true });
-						const scenarioContent = generateScenarioContent(journey, step);
-						await fs.writeFile(scenarioFullPath, scenarioContent);
-						console.log(chalk.green(`    ✓ Created ${step.scenarioPath}`));
+						const shouldCreate =
+							options.auto ||
+							(await confirm({
+								message: `Create ${scenarioPath}?`,
+								default: true,
+							}));
 
-						// Create test file
-						const testPath = step.scenarioPath
-							.replace("specs/", "tests/")
-							.replace(".feature", ".e2e.test.ts");
-						const testFullPath = path.join(rootDir, testPath);
-						await fs.mkdir(path.dirname(testFullPath), { recursive: true });
-						const testContent = generateTestContent(
-							step.scenarioPath,
-							step.description,
-						);
-						await fs.writeFile(testFullPath, testContent);
-						console.log(chalk.green(`    ✓ Created ${testPath}`));
+						if (shouldCreate) {
+							// Create scenario file
+							const scenarioFullPath = path.join(rootDir, scenarioPath);
+							await fs.mkdir(path.dirname(scenarioFullPath), {
+								recursive: true,
+							});
+							const scenarioContent = generateScenarioContent(journey, step);
+							await fs.writeFile(scenarioFullPath, scenarioContent);
+							console.log(chalk.green(`    ✓ Created ${scenarioPath}`));
 
-						scenariosCreated++;
+							// Create test file
+							const testPath = scenarioPath
+								.replace("specs/", "tests/")
+								.replace(".feature", ".e2e.test.ts");
+							const testFullPath = path.join(rootDir, testPath);
+							await fs.mkdir(path.dirname(testFullPath), { recursive: true });
+							const testContent = generateTestContent(
+								scenarioPath,
+								step.description,
+							);
+							await fs.writeFile(testFullPath, testContent);
+							console.log(chalk.green(`    ✓ Created ${testPath}`));
 
-						// Update manifest scenarios
-						updatedManifest.scenarios[step.scenarioPath] = {
-							hash: hashContent(scenarioContent),
-							test: testPath,
-							status: "pending",
-						};
+							scenariosCreated++;
+
+							// Update manifest scenarios
+							updatedManifest.scenarios[scenarioPath] = {
+								hash: hashContent(scenarioContent),
+								test: testPath,
+								status: "pending",
+							};
+						}
 					}
 				}
 			}
@@ -641,7 +693,7 @@ export const syncCommand = new Command("sync")
 
 			// Also check for newly created features that might have tests linked
 			// (tests could reference features that didn't exist during initial snapshot)
-			for (const [featurePath, content] of currentFeatureContents) {
+			for (const [featurePath] of currentFeatureContents) {
 				const wasInSnapshot = featureSnapshots.some(
 					(s) => s.path === featurePath,
 				);

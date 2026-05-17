@@ -160,22 +160,32 @@ export async function validateSpecs(): Promise<ValidationResult> {
 				errors.push(`${file}: Invalid schema - ${result.error.message}`);
 			} else {
 				// Check scenarios exist
-				for (const slug of result.data.scenarios) {
-					// We need to construct the path. Requirement has 'feature' field e.g. "todos/basic"
-					const featurePath = path.join(
+				for (const scenarioRef of result.data.scenarios) {
+					const scenarioId = scenarioRef.includes("/")
+						? scenarioRef
+						: `${result.data.feature}/${scenarioRef}`;
+					const slug = scenarioId.slice(scenarioId.lastIndexOf("/") + 1);
+					const featurePath = path.join(specsDir, "features", scenarioId);
+					const legacyFeaturePath = path.join(
 						specsDir,
 						"features",
 						result.data.feature,
 						`${slug}.feature`,
 					);
 					try {
-						await fs.access(featurePath);
-						// Mark as referenced using feature/slug
-						referencedScenarios.add(`${result.data.feature}/${slug}`);
-					} catch {
-						errors.push(
-							`${file}: References missing scenario ${slug} in feature ${result.data.feature}`,
+						await fs.access(
+							featurePath.endsWith(".feature")
+								? featurePath
+								: `${featurePath}.feature`,
 						);
+						referencedScenarios.add(scenarioId);
+					} catch {
+						try {
+							await fs.access(legacyFeaturePath);
+							referencedScenarios.add(scenarioId);
+						} catch {
+							errors.push(`${file}: References missing scenario ${scenarioId}`);
+						}
 					}
 				}
 			}
@@ -197,7 +207,7 @@ export async function validateSpecs(): Promise<ValidationResult> {
 	try {
 		const journeyErrors = await validateJourneyReferences();
 		for (const e of journeyErrors) errors.push(e);
-	} catch (err) {
+	} catch {
 		errors.push("Error validating journey references");
 	}
 
