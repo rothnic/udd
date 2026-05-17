@@ -4,6 +4,7 @@ import path from "node:path";
 import { glob } from "glob";
 import yaml from "yaml";
 import phase from "./phase.js";
+import { loadUseCaseScenarioPaths, resolveJourneyReference } from "./trace.js";
 
 export interface Actor {
 	name: string;
@@ -107,6 +108,7 @@ export async function getJourneys(): Promise<Journey[]> {
 		await fs.access(journeysDir);
 
 		const journeyFiles = await fs.readdir(journeysDir);
+		const useCaseScenarios = await loadUseCaseScenarioPaths(rootDir);
 		// Load manifest from canonical location: specs/.udd/manifest.yml
 		const specsManifestPath = path.join(
 			rootDir,
@@ -147,15 +149,23 @@ export async function getJourneys(): Promise<Journey[]> {
 				if (line.startsWith("# ")) {
 					name = line.replace(/^#\s*(Journey:\s*)?/, "").trim();
 				}
-				if (line.includes("**Actor:**")) {
-					actor = line.replace(/.*\*\*Actor:\*\*\s*/, "").trim();
+				const actorMatch = line.match(/\*\*Actor\*\*:?\s*(.+)$/);
+				if (actorMatch) {
+					actor = actorMatch[1].trim();
 				}
-				if (line.includes("**Goal:**")) {
-					goal = line.replace(/.*\*\*Goal:\*\*\s*/, "").trim();
+				const goalMatch = line.match(/\*\*Goal\*\*:?\s*(.+)$/);
+				if (goalMatch) {
+					goal = goalMatch[1].trim();
 				}
 				const stepMatch = line.match(/→\s*`([^`]+)`/);
 				if (stepMatch) {
-					linkedScenarios.push(stepMatch[1]);
+					const scenarios = resolveJourneyReference(
+						stepMatch[1],
+						useCaseScenarios,
+					);
+					linkedScenarios.push(
+						...(scenarios.length > 0 ? scenarios : [stepMatch[1]]),
+					);
 				}
 			}
 

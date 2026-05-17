@@ -32,6 +32,12 @@ artifacts:
     description: |
       Test harness mapping to a scenario. "scenario_path" must match scenario.feature_path or contain scenario id in path.
 
+  component:
+    required_fields: [id, name, responsibilities, supported_use_cases, supported_scenarios]
+    optional_fields: [owner, source, public_interfaces, requirements, tests]
+    description: |
+      Implementation ownership artifact. Components link tested scenarios to the requirements they deliver.
+
   test_review:
     required_fields: [id, test_id, scenario_path, checks]
     optional_fields: [reviewer, created_at]
@@ -40,9 +46,9 @@ artifacts:
 
   requirement:
     required_fields: [id, type, feature, description, scenarios]
-    optional_fields: [priority, owner]
+    optional_fields: [key, priority, owner, components, tests]
     description: |
-      Requirements linked to scenarios. "scenarios" lists scenario ids covered by this requirement.
+      Requirements linked to scenarios and components. "scenarios" lists scenario ids covered by this requirement.
 
 trace_queries:
   forward:
@@ -62,9 +68,17 @@ trace_queries:
       description: Find tests that target a scenario
       query: "Find e2e_test where e2e_test.scenario_path contains <scenario.id> or equals <scenario.feature_path>"
 
+    - name: test_to_components
+      description: Find components responsible for a tested scenario
+      query: "Find component where component.tests contains <e2e_test.path> or component.supported_scenarios contains <scenario.id>"
+
+    - name: component_to_requirements
+      description: Find requirements owned by a component
+      query: "Find requirement where requirement.components contains <component.id> or component.requirements contains requirement.id"
+
     - name: requirement_impact
       description: From a requirement, find impacted scenarios, tests, journeys, personas
-      query: "Find all e2e_test where requirement.scenarios contains matching scenario.id"
+      query: "Find all components, e2e_tests, scenarios, use_cases, journeys, and personas reachable through requirement.components and requirement.scenarios"
 
   reverse:
     - name: test_to_scenario
@@ -74,6 +88,14 @@ trace_queries:
     - name: scenario_to_use_case
       description: Find use_cases that reference a scenario
       query: "Find use_case where use_case.outcomes[].scenarios contains <scenario.id>"
+
+    - name: component_to_test
+      description: Find tests associated with a component
+      query: "Find e2e_test where component.tests contains e2e_test.path"
+
+    - name: requirement_to_component
+      description: Find components that deliver a requirement
+      query: "Find component where requirement.components contains component.id or component.requirements contains requirement.id"
 
     - name: use_case_to_journeys
       description: Find journeys that include a use_case
@@ -115,6 +137,12 @@ invalidation_rules:
       scenario_path: {level: ERROR, message: "Test not linked to scenario; traceability broken"}
       status: {level: ERROR, message: "Cannot determine if test is passing for reverse trace"}
 
+  - artifact: component
+    missing:
+      id: {level: ERROR, message: "Cannot reference component from requirements; ownership trace breaks"}
+      supported_scenarios: {level: ERROR, message: "Component not linked to scenario responsibility; test-to-component trace breaks"}
+      responsibilities: {level: WARN, message: "Component responsibility unavailable for rebuild guidance"}
+
   - artifact: test_review
     missing:
       test_id: {level: ERROR, message: "Review not linked to test; quality gate ineffective"}
@@ -122,7 +150,9 @@ invalidation_rules:
 
   - artifact: requirement
     missing:
+      id: {level: ERROR, message: "Cannot reference requirement from components; implementation contract trace breaks"}
       feature: {level: ERROR, message: "Cannot group requirements; impact analysis incomplete"}
       description: {level: ERROR, message: "No specification available; implementation guidance missing"}
+      components: {level: ERROR, message: "Requirement not linked to a component; ownership trace breaks"}
 
 rules_version: 1

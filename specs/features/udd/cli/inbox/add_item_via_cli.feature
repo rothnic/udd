@@ -11,6 +11,14 @@ Feature: Inbox
 # - Items added with `udd inbox add` appear in the inbox immediately and are queryable via UDD commands.
 # - Provided descriptions are stored and surfaced in detail views and tests verify the values.
 # - The CLI command returns success (exit code 0) on creation and provides a clear error for invalid input.
+#
+# Trace:
+# - Persona: developer
+# - Journey: capture-ideas
+# - Use case: capture_ideas
+# - E2E test: tests/e2e/udd/cli/inbox/add_item_via_cli.e2e.test.ts
+# - Component: cli-inbox-command
+# - Requirement: persist_inbox_item
 
   Scenario: Add item via CLI
     Given I have an empty inbox

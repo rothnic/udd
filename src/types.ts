@@ -57,12 +57,16 @@ export const ResearchMetadataSchema = z.object({
 export const RequirementTypeSchema = z.enum(["functional", "non_functional"]);
 
 export const TechnicalRequirementSchema = z.object({
+	id: z.string(),
 	key: z.string(),
 	type: RequirementTypeSchema,
 	feature: z.string(),
 	use_cases: z.array(z.string()).optional(),
 	scenarios: z.array(z.string()),
+	components: z.array(z.string()),
+	tests: z.array(z.string()).optional(),
 	description: z.string(),
+	acceptance_criteria: z.array(z.string()).optional(),
 	notes: z.array(z.string()).optional(),
 });
 

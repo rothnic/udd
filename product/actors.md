@@ -3,6 +3,7 @@
 ## Primary Actors
 
 ### Developer
+- **ID**: developer
 - **Goal**: Ship features with clear traceability to product intent
 - **Pain Points**: 
   - Requirements drift from implementation

@@ -6,6 +6,7 @@ import { promisify } from "node:util";
 import { glob } from "glob";
 import yaml from "yaml";
 import phase from "./phase.js";
+import { loadUseCaseScenarioPaths, resolveJourneyReference } from "./trace.js";
 
 const execAsync = promisify(exec);
 
@@ -172,6 +173,7 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 		try {
 			const journeysDir = path.join(rootDir, "product/journeys");
 			const journeyFiles = await fs.readdir(journeysDir);
+			const useCaseScenarios = await loadUseCaseScenarioPaths(rootDir);
 			// Load manifest from canonical location: specs/.udd/manifest.yml
 			const specsManifestPath = path.join(
 				rootDir,
@@ -221,7 +223,13 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 					}
 					const stepMatch = line.match(/→\s*`([^`]+)`/);
 					if (stepMatch) {
-						linkedScenarios.push(stepMatch[1]);
+						const scenarios = resolveJourneyReference(
+							stepMatch[1],
+							useCaseScenarios,
+						);
+						linkedScenarios.push(
+							...(scenarios.length > 0 ? scenarios : [stepMatch[1]]),
+						);
 					}
 					const blockedMatch = line.match(/Blocked by:\s*([^\n]+)/i);
 					if (blockedMatch) {
@@ -391,20 +399,55 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 	const reqFiles = await glob("specs/requirements/*.yml", { cwd: rootDir });
 	for (const file of reqFiles) {
 		const content = await fs.readFile(path.join(rootDir, file), "utf-8");
-		const data = yaml.parse(content) as { feature: string; key: string };
+		const data = yaml.parse(content) as {
+			feature: string;
+			key: string;
+			scenarios?: string[];
+		};
 		const featureId = data.feature;
 		const reqKey = data.key;
 
 		if (status.features[featureId]) {
-			// Check if test exists
-			// Expected path: tests/unit/<domain>/<key>.test.ts or similar
-			// For now, let's just look for any test file with the key in filename in tests/
 			const testFiles = await glob(`tests/**/${reqKey}.test.ts`, {
 				cwd: rootDir,
 			});
+			const scenarioStatuses = (data.scenarios ?? []).map((scenario) => {
+				const scenarioId = scenario.includes("/")
+					? scenario
+					: `${featureId}/${scenario}`;
+				const lastSlashIndex = scenarioId.lastIndexOf("/");
+				const scenarioFeatureId = scenarioId.substring(0, lastSlashIndex);
+				const slug = scenarioId.substring(lastSlashIndex + 1);
+				return status.features[scenarioFeatureId]?.scenarios[slug]?.e2e;
+			});
+			const hasScenarioStatuses = scenarioStatuses.length > 0;
+			const hasPassingScenarioTests =
+				hasScenarioStatuses &&
+				scenarioStatuses.every(
+					(scenarioStatus) => scenarioStatus === "passing",
+				);
+			const hasFailingScenarioTests = scenarioStatuses.some(
+				(scenarioStatus) => scenarioStatus === "failing",
+			);
+			const hasStaleScenarioTests = scenarioStatuses.some(
+				(scenarioStatus) => scenarioStatus === "stale",
+			);
+			const hasMissingScenarioTests =
+				hasScenarioStatuses &&
+				scenarioStatuses.some((scenarioStatus) => scenarioStatus === undefined);
 
 			status.features[featureId].requirements[reqKey] = {
-				tests: testFiles.length > 0 ? "passing" : "missing", // Stub logic
+				tests: hasPassingScenarioTests
+					? "passing"
+					: hasFailingScenarioTests
+						? "failing"
+						: hasStaleScenarioTests
+							? "stale"
+							: hasMissingScenarioTests || hasScenarioStatuses
+								? "missing"
+								: testFiles.length > 0
+									? "passing"
+									: "missing",
 			};
 		}
 	}
