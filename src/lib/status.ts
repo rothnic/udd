@@ -401,13 +401,14 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 		const content = await fs.readFile(path.join(rootDir, file), "utf-8");
 		const data = yaml.parse(content) as {
 			feature: string;
-			key: string;
+			id?: string;
+			key?: string;
 			scenarios?: string[];
 		};
 		const featureId = data.feature;
-		const reqKey = data.key;
+		const reqKey = data.key ?? data.id;
 
-		if (status.features[featureId]) {
+		if (status.features[featureId] && reqKey) {
 			const testFiles = await glob(`tests/**/${reqKey}.test.ts`, {
 				cwd: rootDir,
 			});
