@@ -1,45 +1,40 @@
-# Codex Adapter
+# Codex Tooling
 
-Codex should use the same UDD goal, status, and verification contracts as other
-agents. This directory documents the adapter path without introducing a second
-workflow.
+Codex should use the same UDD status, verification, and review contracts as
+other agents. This directory documents Codex-side hooks and tooling for
+UDD-driven development sessions.
 
-## Goal Execution
+## Session Hook
 
-Codex entrypoint:
+Concrete Codex hook:
 
-```bash
-/goal goals/<file>.md
-```
+- `.codex/hooks.json`
+- `.codex/hooks/pre-task.sh`
 
-The command resolves to the shared contract in
-`integrations/shared/goal-command-contract.md`:
+The hook is advisory and does not block work. It surfaces the same baseline
+health checks the rest of the repository uses:
 
-- Read exactly one goal file.
-- Check repo state with `udd status`, `udd doctor`, and `git status`.
-- Execute only the referenced goal.
-- Run explicit checks and classify failures.
-- Push one focused PR with the required evidence.
-- Wait for PR comments and address comments relevant to the goal.
-- Run an independent review before completion.
+- `udd health-check`
+- `udd doctor`
+- `git status --short`
 
 ## Shared Utility Path
 
-Codex adapter work should consume shared UDD state and guardrails instead of
-copying OpenCode prompts:
+Codex tooling should consume shared UDD state and guardrails instead of copying
+OpenCode prompts:
 
 - Project state: `src/lib/agent-integration.ts`, `src/lib/status.ts`,
   `src/lib/query.ts`.
-- Goal contract: `integrations/shared/goal-command-contract.md`.
-- Goal template: `goals/TEMPLATE.md`.
+- Shared integration notes: `integrations/shared/README.md`.
 - Operations playbook: `docs/process/udd-agent-operations.md`.
 
-## Adapter Scope
+## Tooling Scope
 
-In scope for a future Codex adapter:
+In scope for Codex tooling:
 
-- A concise Codex prompt or skill that points to the shared contract.
-- A wrapper that prepares the prompt-to-artifact checklist from a goal file.
+- Lightweight hooks that report UDD project health.
+- Prompt or skill helpers that point back to UDD health, doctor, tests, and
+  review gates.
 - PR comment review instructions that reuse the shared completion audit.
 
 Out of scope for this slice:

@@ -1,0 +1,15 @@
+{
+	"hooks": {
+		"UserPromptSubmit": [
+			{
+				"hooks": [
+					{
+						"type": "command",
+						"command": ".codex/hooks/pre-task.sh",
+						"timeout": 10
+					}
+				]
+			}
+		]
+	}
+}
