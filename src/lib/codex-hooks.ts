@@ -11,21 +11,22 @@ const CODEX_HOOK_GROUP = {
 		},
 	],
 };
-
 type CodexHooksConfig = {
 	hooks?: Record<string, unknown>;
 	[key: string]: unknown;
 };
 
+function createDefaultHooksConfig(): CodexHooksConfig {
+	return {
+		hooks: {
+			UserPromptSubmit: [CODEX_HOOK_GROUP],
+		},
+	};
+}
+
 function formatHooksConfig(config: CodexHooksConfig): string {
 	return `${JSON.stringify(config, null, "\t")}\n`;
 }
-
-export const CODEX_HOOKS_JSON = formatHooksConfig({
-	hooks: {
-		UserPromptSubmit: [CODEX_HOOK_GROUP],
-	},
-});
 
 export const CODEX_PRE_TASK_HOOK = `#!/usr/bin/env bash
 # Pre-task health check for Codex sessions (non-blocking).
@@ -34,9 +35,7 @@ set -euo pipefail
 echo "Codex Pre-Task Health Check"
 
 run_udd() {
-\tif [ -f "bin/udd.ts" ] && [ -d "node_modules/tsx" ]; then
-\t\tnode --import tsx bin/udd.ts "$@"
-\telif [ -x "node_modules/.bin/udd" ]; then
+\tif [ -x "node_modules/.bin/udd" ]; then
 \t\tnode_modules/.bin/udd "$@"
 \telif command -v udd >/dev/null 2>&1; then
 \t\tudd "$@"
@@ -139,16 +138,32 @@ async function writeHooksJson(
 			config = {};
 		}
 
-		config.hooks =
+		if (
 			config.hooks &&
-			typeof config.hooks === "object" &&
-			!Array.isArray(config.hooks)
-				? config.hooks
-				: {};
+			(typeof config.hooks !== "object" || Array.isArray(config.hooks))
+		) {
+			if (!options.force) {
+				throw new Error(
+					`${path.relative(process.cwd(), filePath)} has an unsupported hooks field. Re-run with --force to replace it.`,
+				);
+			}
+			config.hooks = {};
+		} else {
+			config.hooks = config.hooks ?? {};
+		}
 
-		const promptHooks = Array.isArray(config.hooks.UserPromptSubmit)
-			? config.hooks.UserPromptSubmit
-			: [];
+		let promptHooks: unknown[] = [];
+		if (config.hooks.UserPromptSubmit !== undefined) {
+			if (!Array.isArray(config.hooks.UserPromptSubmit)) {
+				if (!options.force) {
+					throw new Error(
+						`${path.relative(process.cwd(), filePath)} has an unsupported UserPromptSubmit hook list. Re-run with --force to replace it.`,
+					);
+				}
+			} else {
+				promptHooks = config.hooks.UserPromptSubmit;
+			}
+		}
 
 		if (promptHooks.some(hasCodexHook)) {
 			return "unchanged";
@@ -159,7 +174,7 @@ async function writeHooksJson(
 		if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
 			throw error;
 		}
-		config = JSON.parse(CODEX_HOOKS_JSON) as CodexHooksConfig;
+		config = createDefaultHooksConfig();
 	}
 
 	await fs.writeFile(filePath, formatHooksConfig(config));

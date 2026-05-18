@@ -58,7 +58,6 @@ test("codex pre-task hook surfaces UDD health checks", async () => {
 			"utf8",
 		);
 
-		expect(hook).toContain("node --import tsx bin/udd.ts");
 		expect(hook).toContain("node_modules/.bin/udd");
 		expect(hook).toContain("udd status");
 		expect(hook).toContain("udd status --doctor");
@@ -149,6 +148,41 @@ test("codex hook installer preserves existing codex hooks", async () => {
 			".codex/hooks/existing.sh",
 		);
 		expect(config.hooks.UserPromptSubmit[1].hooks[0].command).toBe(
+			".codex/hooks/pre-task.sh",
+		);
+	});
+});
+
+test("codex hook installer rejects malformed hook config without force", async () => {
+	await withExternalProject(async (rootDir) => {
+		const codexDir = path.join(rootDir, ".codex");
+		await fs.mkdir(codexDir, { recursive: true });
+		await fs.writeFile(
+			path.join(codexDir, "hooks.json"),
+			JSON.stringify({ hooks: [] }),
+		);
+
+		await expect(installCodexHooks(rootDir)).rejects.toThrow(
+			"unsupported hooks field",
+		);
+	});
+});
+
+test("codex hook installer can replace malformed hook config with force", async () => {
+	await withExternalProject(async (rootDir) => {
+		const codexDir = path.join(rootDir, ".codex");
+		await fs.mkdir(codexDir, { recursive: true });
+		await fs.writeFile(
+			path.join(codexDir, "hooks.json"),
+			JSON.stringify({ hooks: [] }),
+		);
+
+		await installCodexHooks(rootDir, { force: true });
+
+		const config = JSON.parse(
+			await fs.readFile(path.join(codexDir, "hooks.json"), "utf8"),
+		);
+		expect(config.hooks.UserPromptSubmit[0].hooks[0].command).toBe(
 			".codex/hooks/pre-task.sh",
 		);
 	});

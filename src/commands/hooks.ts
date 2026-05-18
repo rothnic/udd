@@ -9,7 +9,7 @@ export const hooksCommand = new Command("hooks").description(
 hooksCommand
 	.command("install-codex")
 	.description("Install Codex UDD session hooks into this project")
-	.option("-f, --force", "overwrite existing Codex hook files")
+	.option("-f, --force", "replace conflicting Codex hook files")
 	.action(async (options: { force?: boolean }) => {
 		try {
 			const result = await installCodexHooks(process.cwd(), {
