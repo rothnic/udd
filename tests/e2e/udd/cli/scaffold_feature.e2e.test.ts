@@ -121,11 +121,11 @@ describe("udd new feature CLI", () => {
 			// because the filename is constructed using the raw featureName and
 			// the write attempts to create a nested filename that wasn't mkdir'ed.
 			// Expect the command to error and no file to be created.
-			let err: any = null;
+			let err: unknown = null;
 			try {
 				await runUdd("new feature test_domain invalid/name");
 			} catch (e) {
-				err = e as any;
+				err = e;
 			}
 			expect(err).not.toBeNull();
 

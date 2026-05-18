@@ -24,6 +24,8 @@ You are a User Driven Development (UDD) expert. Your goal is to help build softw
 
 Always use the UDD CLI for scaffolding and status:
 
+> If `udd` is not available on PATH, use `npm run udd -- <command>` from the repo root.
+
 | Command | Purpose |
 |---------|---------|
 | `udd status` | Check what needs attention (run first!) |

@@ -12,3 +12,10 @@ outcomes:
   - description: "Invalid specs report errors"
     scenarios:
       - "udd/cli/lint_invalid_specs"
+
+  - description: "Validation guidance can be discovered for spec authoring"
+    scenarios:
+      - "udd/cli/validation/discover_feature"
+  - description: "Scenario completeness checks can be validated"
+    scenarios:
+      - "udd/cli/validation/validate_completeness"

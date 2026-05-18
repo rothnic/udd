@@ -83,6 +83,7 @@ export async function validateSpecs(): Promise<ValidationResult> {
 	const useCaseIds = new Set<string>();
 	// Track scenarios referenced by use cases and requirements so we can detect orphans
 	const referencedScenarios = new Set<string>();
+	const normalizedFeatureScenarios = new Set<string>();
 	for (const file of useCaseFiles) {
 		try {
 			const content = await fs.readFile(path.join(rootDir, file), "utf-8");
@@ -201,6 +202,43 @@ export async function validateSpecs(): Promise<ValidationResult> {
 	});
 	if (scenarioFiles.length === 0) {
 		errors.push("No scenario files found");
+	}
+
+	for (const file of scenarioFiles) {
+		const relativeToFeatures = file
+			.replace(/^specs\/features\//, "")
+			.replace(/\.feature$/, "");
+		normalizedFeatureScenarios.add(relativeToFeatures);
+	}
+
+	// 6. Enforce canonical traceability chain: objective (VISION use_cases) -> use case -> scenario -> e2e test
+	for (const scenarioPath of referencedScenarios) {
+		if (!normalizedFeatureScenarios.has(scenarioPath)) {
+			errors.push(
+				`Traceability gap: referenced scenario not found in canonical features path: ${scenarioPath}`,
+			);
+		}
+	}
+
+	for (const scenarioPath of normalizedFeatureScenarios) {
+		if (!referencedScenarios.has(scenarioPath)) {
+			errors.push(
+				`Traceability gap: scenario missing use-case/requirement link: ${scenarioPath}`,
+			);
+		}
+
+		const scenarioSlug = scenarioPath.split("/").pop();
+		if (!scenarioSlug) {
+			continue;
+		}
+
+		const testPattern = `tests/e2e/**/${scenarioSlug}.e2e.test.ts`;
+		const matchingTests = await glob(testPattern, { cwd: rootDir });
+		if (matchingTests.length === 0) {
+			errors.push(
+				`Traceability gap: scenario missing e2e test: ${scenarioPath}`,
+			);
+		}
 	}
 
 	// 6. Validate journey references in product/journeys/*.md
