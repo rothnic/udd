@@ -1,0 +1,366 @@
+# UDD Project Roadmap
+# Single source of truth for phase assignments and capability evolution
+
+# Current active phase
+current_phase: opencode-integration
+
+# Phase definitions
+phases:
+  - id: core-cli
+    name: "Core CLI & Validation"
+    number: 1
+    status: completed
+    description: "Basic scaffolding, validation, status reporting"
+    use_cases:
+      - id: validate_specs
+        capability: core-workflow
+        increment: v1-basic
+        scenarios:
+          - udd/cli/lint_valid_specs
+          - udd/cli/lint_invalid_specs
+          - udd/cli/validation/discover_feature
+          - udd/cli/validation/validate_completeness
+
+      - id: run_tests
+        capability: core-workflow
+        increment: v1-basic
+        scenarios:
+          - udd/cli/run_tests
+          - udd/cli/check_status
+
+      - id: project_setup
+        capability: core-workflow
+        increment: v1-basic
+        scenarios:
+          - udd/cli/setup
+
+      - id: edge_case_hardening
+        capability: core-workflow
+        increment: v1-hardening
+        scenarios:
+          - udd/cli/sync_edge_cases
+          - udd/cli/status_edge_cases
+          - udd/cli/scaffold_feature
+          - udd/cli/orphan_detection
+          - udd/cli/manifest_recovery
+          - udd/cli/init_edge_cases
+          - udd/agent/query_commands
+
+  - id: research-specs
+    name: "Research & Tech Specs"
+    number: 2
+    status: completed
+    description: "Research workflow, tech spec scaffolding"
+    use_cases:
+      - id: phased_development
+        capability: core-workflow
+        increment: v2-phased
+        scenarios:
+          - udd/cli/wip_support/wip_tag_support
+          - udd/cli/wip_support/status_shows_wip
+          - udd/agent/wip_support/agent_wip_awareness
+
+      - id: manage_wip
+        capability: agent-workflow
+        increment: v1-basic
+        scenarios:
+          - udd/agent/wip_enforcement/warn_on_large_changeset
+          - udd/agent/wip_enforcement/encourage_small_commits
+
+      - id: enforce_code_style
+        capability: developer-experience
+        increment: v1-basic
+        scenarios:
+          - udd/dev-experience/sort_imports
+          - udd/dev-experience/code_formatting
+          - udd/dev-experience/commit_hooks
+
+      - id: fix_test_discovery
+        capability: developer-experience
+        increment: v1-basic
+        scenarios:
+          - udd/dev-experience/test_discovery/vscode_detection
+          - udd/dev-experience/test_discovery/editor_status
+
+  - id: opencode-integration
+    name: "Agent Integration"
+    number: 3
+    status: active
+    description: "Shared integration contracts, adapter tools, orchestrator plugin, JSON output"
+    use_cases:
+      - id: orchestrated_iteration
+        capability: autonomous-development
+        increment: v1-basic
+        scenarios:
+          - opencode/orchestration/iterate_until_complete
+          - opencode/orchestration/stop_on_error
+          - opencode/orchestration/configurable_iteration
+          - opencode/tools/udd_status_tool
+
+      - id: agent_customization
+        capability: autonomous-development
+        increment: v1-basic
+        scenarios:
+          - udd/agent/status_prompt
+          - udd/agent/guide_user
+          - udd/cli/codex_hooks
+        future_scenarios:
+          follow_up: "#54"
+          scenarios:
+            - opencode/tools/status_deep
+            - opencode/tools/next_recommendation
+            - opencode/tools/issues_list
+
+      - id: capture_ideas
+        capability: idea-management
+        increment: v1-basic
+        scenarios:
+          - udd/cli/inbox/add_item_via_cli
+
+      - id: track_test_quality
+        capability: test-governance
+        increment: v1-basic
+        status: future
+        follow_up: "#55"
+        future_scenarios:
+          - udd/test-governance/health-metrics
+          - udd/test-governance/test-scan
+          - udd/test-governance/test-status
+
+      - id: prevent_regression
+        capability: test-governance
+        increment: v1-basic
+        status: future
+        follow_up: "#55"
+        future_scenarios:
+          - udd/test-governance/feature-change-detection
+          - udd/test-governance/dirty-marking
+          - udd/test-governance/sync-dirty-marking
+
+      - id: manage_test_lifecycle
+        capability: test-governance
+        increment: v1-basic
+        status: future
+        follow_up: "#55"
+        future_scenarios:
+          - udd/test-governance/test-review
+          - udd/test-governance/hooks-installation
+          - udd/test-governance/pre-commit-validation
+
+      - id: enforce_quality_gates
+        capability: test-governance
+        increment: v1-basic
+        status: future
+        follow_up: "#55"
+        future_scenarios:
+          - udd/test-governance/ci-validation
+          - udd/test-governance/test-approval
+          - udd/test-governance/status-integration
+
+      - id: monitor_test_health
+        capability: test-governance
+        increment: v1-basic
+        status: future
+        follow_up: "#55"
+        future_scenarios:
+          - udd/test-governance/setup-health-check
+          - udd/test-governance/test-status
+          - udd/test-governance/test-scan
+
+      - id: validate_phase_consistency
+        capability: compliance
+        increment: v1-basic
+        status: future
+        follow_up: "#51"
+        future_scenarios:
+          - udd/test-governance/test-linkage
+          - udd/test-governance/sync-dirty-marking
+          - udd/test-governance/test-status
+
+  - id: agent-intelligence
+    name: "Agent Intelligence"
+    number: 4
+    status: planned
+    description: "Adapter-neutral agent intelligence, autonomous maintenance, smart suggestions"
+
+  - id: advanced-workflows
+    name: "Advanced Workflows"
+    number: 5
+    status: planned
+    description: "Spec change tracking, migration tools, team collaboration features"
+
+# Capability definitions - enduring functional areas delivered through increments
+capabilities:
+  core-workflow:
+    name: "Core Workflow"
+    description: "Enduring ability to author, validate, and run UDD project specs"
+    current_increment: v2-phased
+    increments:
+      - version: v1-basic
+        phase: core-cli
+        number: 1
+        status: delivered
+        use_cases:
+          - validate_specs
+          - run_tests
+          - project_setup
+
+      - version: v1-hardening
+        phase: core-cli
+        number: 1
+        status: delivered
+        use_cases:
+          - edge_case_hardening
+
+      - version: v2-phased
+        phase: research-specs
+        number: 2
+        status: delivered
+        use_cases:
+          - phased_development
+
+  developer-experience:
+    name: "Developer Experience"
+    description: "Enduring ability to keep local development workflows discoverable and consistent"
+    current_increment: v1-basic
+    increments:
+      - version: v1-basic
+        phase: research-specs
+        number: 2
+        status: delivered
+        use_cases:
+          - enforce_code_style
+          - fix_test_discovery
+
+  agent-workflow:
+    name: "Agent Workflow"
+    description: "Enduring ability to keep human and agent work small, visible, and recoverable"
+    current_increment: v1-basic
+    increments:
+      - version: v1-basic
+        phase: research-specs
+        number: 2
+        status: delivered
+        use_cases:
+          - manage_wip
+
+  autonomous-development:
+    name: "Autonomous Development"
+    description: "Enduring ability for AI agents to develop software autonomously"
+    current_increment: v1-basic
+    increments:
+      - version: v1-basic
+        phase: opencode-integration
+        number: 3
+        status: delivered
+        use_cases:
+          - orchestrated_iteration
+          - agent_customization
+
+      - version: v2-advanced
+        phase: agent-intelligence
+        number: 4
+        status: planned
+        use_cases:
+          - orchestrated_iteration_advanced
+
+      - version: v3-full
+        phase: advanced-workflows
+        number: 5
+        status: vision
+        use_cases: []
+
+  idea-management:
+    name: "Idea Management"
+    description: "Enduring ability to capture and organize ideas"
+    current_increment: v1-basic
+    increments:
+      - version: v1-basic
+        phase: opencode-integration
+        number: 3
+        status: delivered
+        use_cases:
+          - capture_ideas
+
+  test-governance:
+    name: "Test Governance"
+    description: "Enduring ability to track, review, and enforce test quality"
+    current_increment: v1-basic
+    increments:
+      - version: v1-basic
+        phase: opencode-integration
+        number: 3
+        status: planned
+        follow_up: "#55"
+        use_cases:
+          - track_test_quality
+          - prevent_regression
+          - manage_test_lifecycle
+          - enforce_quality_gates
+          - monitor_test_health
+
+      - version: v2-advanced
+        phase: agent-intelligence
+        number: 4
+        status: planned
+        use_cases: []
+
+  compliance:
+    name: "Compliance & Validation"
+    description: "Enduring ability to validate project consistency and compliance"
+    current_increment: v1-basic
+    increments:
+      - version: v1-basic
+        phase: opencode-integration
+        number: 3
+        status: planned
+        follow_up: "#51"
+        use_cases:
+          - validate_phase_consistency
+
+# Validation rules for phase consistency
+validation_rules:
+  # Scenario @phase tags must match their use case's phase
+  scenario_phase_must_match_use_case_phase: true
+
+  # Use case phase must match roadmap phase assignment
+  use_case_phase_must_match_roadmap_phase: true
+
+  # Allow planning features for future phases
+  allow_future_phase_planning: true
+
+  # Strict mode fails on warnings
+  strict_mode: false
+
+  # Maximum phase gap allowed (phases ahead of current)
+  max_phase_ahead: 1
+
+# Traceability rules
+traceability:
+  # Every scenario must have a corresponding test
+  require_test_per_scenario: true
+
+  # Every use case must have at least one journey
+  require_journey_per_use_case: true
+
+  # Every capability must have at least one use case
+  require_use_case_per_capability: true
+
+# Imported journeys that are product intent but intentionally not current
+# implementation scope for this foundation PR. Follow-up issues hold the
+# executable scenario, implementation, or docs slices.
+backlog_journeys:
+  - id: beads-plan-workflow
+    status: future
+    follow_up: "#52"
+    reason: "Doctor/health recovery and orchestration implementation are deferred."
+
+  - id: recover-from-drift
+    status: future
+    follow_up: "#52"
+    reason: "Recovery scenarios and commands are deferred to the diagnostics slice."
+
+  - id: traceability-compliance
+    status: future
+    follow_up: "#51"
+    reason: "Traceability CLI validation is deferred to the phase/traceability slice."

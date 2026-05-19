@@ -1,6 +1,7 @@
 id: fix_test_discovery
 name: Fix Test Discovery
 summary: "Ensure tests are detected by VS Code extensions"
+phase: 3
 actors:
   - developer
 outcomes:

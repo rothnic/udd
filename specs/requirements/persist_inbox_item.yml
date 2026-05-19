@@ -1,0 +1,21 @@
+id: persist_inbox_item
+key: persist_inbox_item
+type: functional
+feature: udd/cli/inbox
+use_cases:
+  - capture_ideas
+scenarios:
+  - add_item_via_cli
+scenario_paths:
+  - udd/cli/inbox/add_item_via_cli
+components:
+  - cli-inbox-command
+tests:
+  - tests/e2e/udd/cli/inbox/add_item_via_cli.e2e.test.ts
+description: "The inbox add command records a titled idea with its optional description in the active project's inbox and confirms the captured title to the user."
+acceptance_criteria:
+  - "A titled idea submitted through the command is present in the project inbox after the command completes."
+  - "The optional description submitted with the command is stored with the same inbox item."
+  - "The command prints a success confirmation that includes the captured title."
+notes:
+  - "The scenario remains the acceptance source; this requirement records implementation responsibility and verification links without copying Gherkin steps."
