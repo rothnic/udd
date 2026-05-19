@@ -32,6 +32,8 @@ gh pr view 41 --json number,title,state,baseRefName,headRefName,mergedAt,url
 gh pr view 42 --json number,title,state,baseRefName,headRefName,mergedAt,url
 gh pr view 43 --json number,title,state,baseRefName,headRefName,mergedAt,url
 gh pr view 44 --json number,title,state,baseRefName,headRefName,mergedAt,url
+gh pr view 35 --json number,title,state,url,headRefName,baseRefName,mergeStateStatus,body
+gh pr view 40 --json number,title,state,url,headRefName,baseRefName,mergeStateStatus,body
 git log --oneline origin/master..origin/codex/source-of-truth-cleanup-base
 git diff --stat origin/master...origin/codex/source-of-truth-cleanup-base
 git diff --name-status origin/master...origin/codex/source-of-truth-cleanup-base
@@ -42,6 +44,10 @@ git diff --name-status origin/master...origin/codex/source-of-truth-cleanup-base
 - PR #45: closed, head `codex/agent-integration-utilities`, base `master`.
 - PR #46: merged to `master`; Codex hook installer work is no longer part of
   the unresolved stack.
+- PR #35: closed during this audit as a stale broad Phase 2 stack PR targeting
+  `master`; branch preserved.
+- PR #40: closed during this audit as a stale side-branch cleanup PR; branch
+  preserved.
 - PRs #41-#44: merged, but into `codex/source-of-truth-cleanup-base`, not
   directly into `master`.
 - Issue #47: open tracking issue for this audit.
@@ -232,6 +238,7 @@ Each issue references this report and the exact source branch:
 ## Current Completion State
 
 - PR #46 is merged.
-- No broad side-branch merge PR is open.
+- No broad side-branch merge PR is open; stale PRs #35 and #40 were closed as
+  superseded with branches preserved.
 - This audit report covers all 265 files by classification group.
 - Follow-up issues #49-#56 cover the still-valuable groups and tooling decisions.
