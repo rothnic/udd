@@ -60,8 +60,9 @@ export async function validateSpecs(): Promise<ValidationResult> {
 				// Check scenarios exist
 				if (result.data.outcomes) {
 					for (const outcome of result.data.outcomes) {
-						if (outcome.scenarios) {
-							for (const scenarioPath of outcome.scenarios) {
+						const scenarioPaths = outcome.scenario_paths ?? outcome.scenarios;
+						if (scenarioPaths) {
+							for (const scenarioPath of scenarioPaths) {
 								// Mark as referenced (format: area/feature/slug)
 								referencedScenarios.add(scenarioPath);
 								const featurePath = path.join(

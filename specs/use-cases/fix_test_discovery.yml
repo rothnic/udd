@@ -1,12 +1,17 @@
 id: fix_test_discovery
 name: Fix Test Discovery
-summary: "Ensure tests are detected by VS Code extensions"
+summary: Ensure tests are detected by VS Code extensions
+phase: 2
 actors:
   - developer
 outcomes:
-  - description: "Vitest extension shows all scenarios"
+  - description: Vitest extension shows all scenarios
     scenarios:
-      - "udd/dev-experience/test_discovery/vscode_detection"
-  - description: "Test status is visible in the editor"
+      - vscode_detection
+    scenario_paths:
+      - udd/dev-experience/test_discovery/vscode_detection
+  - description: Test status is visible in the editor
     scenarios:
-      - "udd/dev-experience/test_discovery/editor_status"
+      - editor_status
+    scenario_paths:
+      - udd/dev-experience/test_discovery/editor_status

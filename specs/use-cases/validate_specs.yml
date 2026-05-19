@@ -1,20 +1,28 @@
-id: "validate_specs"
-name: "Validate Specs"
-summary: "Ensure that the spec files in the repository follow the defined structure and schemas."
+id: validate_specs
+name: Validate Specs
+summary: Ensure that the spec files in the repository follow the defined structure and schemas.
+phase: 1
 actors:
-  - "developer"
-  - "agent"
+  - developer
+  - agent
 outcomes:
-  - description: "Valid specs pass linting"
+  - description: Valid specs pass linting
     scenarios:
-      - "udd/cli/lint_valid_specs"
-  - description: "Invalid specs report errors"
+      - lint_valid_specs
+    scenario_paths:
+      - udd/cli/lint_valid_specs
+  - description: Invalid specs report errors
     scenarios:
-      - "udd/cli/lint_invalid_specs"
-
-  - description: "Validation guidance can be discovered for spec authoring"
+      - lint_invalid_specs
+    scenario_paths:
+      - udd/cli/lint_invalid_specs
+  - description: Validation guidance can be discovered for spec authoring
     scenarios:
-      - "udd/cli/validation/discover_feature"
-  - description: "Scenario completeness checks can be validated"
+      - discover_feature
+    scenario_paths:
+      - udd/cli/validation/discover_feature
+  - description: Scenario completeness checks can be validated
     scenarios:
-      - "udd/cli/validation/validate_completeness"
+      - validate_completeness
+    scenario_paths:
+      - udd/cli/validation/validate_completeness

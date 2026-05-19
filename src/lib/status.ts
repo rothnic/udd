@@ -387,7 +387,14 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 			id: string;
 			name: string;
 			scenarios?: string[];
-			outcomes?: (string | { description: string; scenarios?: string[] })[];
+			outcomes?: (
+				| string
+				| {
+						description: string;
+						scenarios?: string[];
+						scenario_paths?: string[];
+				  }
+			)[];
 		};
 
 		const useCaseStatus: UseCaseStatus = {
@@ -410,7 +417,7 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 						`Outcome "${outcome}" is in legacy format. Expected object with 'description' and 'scenarios'.`,
 					);
 				} else {
-					const scenarios = outcome.scenarios || [];
+					const scenarios = outcome.scenario_paths ?? outcome.scenarios ?? [];
 					let isSatisfied = true;
 					let hasDeferred = false;
 					if (scenarios.length === 0) {
