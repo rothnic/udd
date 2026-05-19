@@ -7,15 +7,17 @@
 - Source branches:
   - `origin/codex/source-of-truth-cleanup-base`
   - `origin/codex/agent-integration-utilities`
-- PR target: one or more focused PRs to `master`; do not reopen a broad stack PR.
+- PR target: one or more focused PRs to the repository default branch
+  (`master` on GitHub as of 2026-05-19); do not reopen a broad stack PR.
 
 ## Objective
 
 Determine exactly which work from the superseded PR #45 side-branch stack should
-land on `master`, which work is already represented by merged PRs, and which work
-should be abandoned. By the end of the long session, every valuable change from
-the preserved stack must either be merged, waiting in a focused PR for final
-approval, or explicitly deferred with a follow-up issue/goal.
+land on the repository default branch, which work is already represented by
+merged PRs, and which work should be abandoned. By the end of the long session,
+every valuable change from the preserved stack must either be merged, waiting in
+a focused PR for final approval, or explicitly deferred with a follow-up
+issue/goal.
 
 ## Context
 
@@ -25,21 +27,27 @@ remaining stack still needs deliberate review so useful progress is not lost.
 
 Known facts to preserve:
 
-- PRs #36-#39 are already merged to `master`.
+- PRs #36-#39 are already merged to the repository default branch.
 - PRs #41-#44 were merged into `codex/source-of-truth-cleanup-base`, not
-  directly into `master`.
-- `origin/codex/source-of-truth-cleanup-base` differs from `master` by roughly
-  265 files and includes source-of-truth, phase, docs, specs, tests, and agent
-  integration work.
+  directly into the default branch.
+- GitHub reports the repository default branch as `master` as of 2026-05-19.
+  `specs/VISION.md` still describes `main`; treat that as source-of-truth drift
+  to reconcile in the source-of-truth follow-up, not as proof that `origin/main`
+  exists.
+- `origin/codex/source-of-truth-cleanup-base` differs from the default branch by
+  roughly 265 files and includes source-of-truth, phase, docs, specs, tests, and
+  agent integration work.
 - `origin/codex/agent-integration-utilities` includes that broader stack plus
   the later Codex hook work.
-- Do not promote the full stack into `master` without splitting and reviewing it.
+- Do not promote the full stack into the default branch without splitting and
+  reviewing it.
 
 ## Scope
 
 In scope:
 
-- Build a source-of-truth inventory of the stack delta against `master`.
+- Build a source-of-truth inventory of the stack delta against the default
+  branch.
 - Classify each change group as already landed, still valuable, obsolete, or
   unsafe/stale.
 - Split still-valuable work into PR-sized goal files or implementation branches.
@@ -62,11 +70,13 @@ Out of scope:
   - `gh pr view 45`
   - `gh pr view 46`
   - `gh pr list --state merged --limit 30`
+  - `gh repo view rothnic/udd --json defaultBranchRef`
 - Git comparisons:
-  - `git log --oneline origin/master..origin/codex/source-of-truth-cleanup-base`
-  - `git diff --name-status origin/master...origin/codex/source-of-truth-cleanup-base`
-  - `git diff --stat origin/master...origin/codex/source-of-truth-cleanup-base`
-  - `git range-diff origin/master...origin/codex/source-of-truth-cleanup-base`
+  - `DEFAULT_BRANCH=$(gh repo view rothnic/udd --json defaultBranchRef --jq .defaultBranchRef.name)`
+  - `git log --oneline origin/$DEFAULT_BRANCH..origin/codex/source-of-truth-cleanup-base`
+  - `git diff --name-status origin/$DEFAULT_BRANCH...origin/codex/source-of-truth-cleanup-base`
+  - `git diff --stat origin/$DEFAULT_BRANCH...origin/codex/source-of-truth-cleanup-base`
+  - `git range-diff origin/$DEFAULT_BRANCH...origin/codex/source-of-truth-cleanup-base`
 - Existing source-of-truth docs:
   - `AGENTS.md`
   - `README.md`
@@ -76,7 +86,7 @@ Out of scope:
 
 ## Workstreams
 
-1. Baseline the current `master` state.
+1. Baseline the current default-branch state.
 2. Inventory the full side-branch delta and group files by subsystem.
 3. Reconcile already-merged work from PRs #36-#39 against the side-branch stack.
 4. Classify remaining work into these buckets:
@@ -97,7 +107,7 @@ Out of scope:
 
 Create or update a durable audit report before opening implementation PRs:
 
-- Preferred path: `docs/project/pr45-side-branch-stack-audit.md`
+- Preferred path: `docs/project/reviews/2026-05-19-pr45-stack-audit/report.md`
 - The report must include:
   - Branches inspected.
   - Commands run.
@@ -113,9 +123,11 @@ Create or update a durable audit report before opening implementation PRs:
 The goal is complete only when all of these are true:
 
 - [ ] PR #46 is either merged or explicitly excluded from this stack audit.
-- [ ] The audit report exists at `docs/project/pr45-side-branch-stack-audit.md`.
-- [ ] Every file changed by `origin/master...origin/codex/source-of-truth-cleanup-base`
-      is covered by a classification group in the audit report.
+- [ ] The audit report exists at
+      `docs/project/reviews/2026-05-19-pr45-stack-audit/report.md`.
+- [ ] Every file changed between the repository default branch and
+      `origin/codex/source-of-truth-cleanup-base` is covered by a classification
+      group in the audit report.
 - [ ] Every still-valuable group is either merged, in an open focused PR, or
       represented by a follow-up goal/issue with exact branch and file evidence.
 - [ ] No broad side-branch merge PR is open.
@@ -142,8 +154,10 @@ Run these at the start:
 git fetch origin
 git status --short --branch
 gh issue view 47
-git diff --stat origin/master...origin/codex/source-of-truth-cleanup-base
-git diff --name-status origin/master...origin/codex/source-of-truth-cleanup-base
+gh repo view rothnic/udd --json defaultBranchRef
+DEFAULT_BRANCH=$(gh repo view rothnic/udd --json defaultBranchRef --jq .defaultBranchRef.name)
+git diff --stat origin/$DEFAULT_BRANCH...origin/codex/source-of-truth-cleanup-base
+git diff --name-status origin/$DEFAULT_BRANCH...origin/codex/source-of-truth-cleanup-base
 ```
 
 Run these before each implementation PR:

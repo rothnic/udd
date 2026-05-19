@@ -10,14 +10,22 @@ later Codex work. The Codex hook work has since landed through PR #46, so the
 remaining task is to preserve and split the useful work from the side branch
 without merging the entire stack.
 
-This report classifies 100% of the current side-branch delta from
-`origin/master...origin/codex/source-of-truth-cleanup-base`: 265 changed files.
+This report classifies 100% of the current side-branch delta from the
+repository default branch to `origin/codex/source-of-truth-cleanup-base`.
+GitHub reports the default branch as `master` as of 2026-05-19, so the concrete
+comparison is `origin/master...origin/codex/source-of-truth-cleanup-base`: 265
+changed files.
 
 ## Branches Inspected
 
 - `origin/master`
 - `origin/codex/source-of-truth-cleanup-base`
 - `origin/codex/agent-integration-utilities`
+
+Note: `specs/VISION.md` currently describes `main`, but this is not the current
+GitHub default branch and there is no `origin/main` remote branch. The next
+source-of-truth increment must reconcile that drift instead of using commands
+that target a missing branch.
 
 ## Commands Run
 
@@ -34,6 +42,7 @@ gh pr view 43 --json number,title,state,baseRefName,headRefName,mergedAt,url
 gh pr view 44 --json number,title,state,baseRefName,headRefName,mergedAt,url
 gh pr view 35 --json number,title,state,url,headRefName,baseRefName,mergeStateStatus,body
 gh pr view 40 --json number,title,state,url,headRefName,baseRefName,mergeStateStatus,body
+gh repo view rothnic/udd --json defaultBranchRef
 git log --oneline origin/master..origin/codex/source-of-truth-cleanup-base
 git diff --stat origin/master...origin/codex/source-of-truth-cleanup-base
 git diff --name-status origin/master...origin/codex/source-of-truth-cleanup-base
@@ -51,6 +60,7 @@ git diff --name-status origin/master...origin/codex/source-of-truth-cleanup-base
 - PRs #41-#44: merged, but into `codex/source-of-truth-cleanup-base`, not
   directly into `master`.
 - Issue #47: open tracking issue for this audit.
+- Repository default branch: `master` as reported by GitHub on 2026-05-19.
 
 ## File Groups and Classification
 
@@ -81,6 +91,9 @@ Total: 265 files.
 - PRs #36-#39 are already on `master` and should be treated as baseline.
 - PRs #41-#44 are merged only into the preserved side branch. They remain
   source evidence, not `master` state.
+- `specs/VISION.md` branch naming is stale relative to GitHub's default branch;
+  issue #49 and `goals/006-source-of-truth-foundation.md` now make that an
+  explicit source-of-truth reconciliation item.
 
 ## Valuable Work to Salvage
 
@@ -234,6 +247,9 @@ Each issue references this report and the exact source branch:
   must distinguish baseline debt from regressions caused by the slice.
 - `origin/master` moved during this audit when PR #46 merged. Future execution
   should fetch and rebase before creating salvage branches.
+- Branch naming is inconsistent across repo docs. Use the GitHub default branch
+  as the command source of truth until the source-of-truth increment resolves the
+  `main` vs `master` policy.
 
 ## Current Completion State
 
@@ -242,3 +258,5 @@ Each issue references this report and the exact source branch:
   superseded with branches preserved.
 - This audit report covers all 265 files by classification group.
 - Follow-up issues #49-#56 cover the still-valuable groups and tooling decisions.
+- The next executable increment is defined in
+  `goals/006-source-of-truth-foundation.md`.

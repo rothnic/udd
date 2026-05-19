@@ -16,4 +16,5 @@ checks, and prepare focused PRs.
 
 - `005-pr45-side-branch-stack-audit.md`: audit the broad stack preserved after
   superseded PR #45 and split valid work into mergeable slices.
-
+- `006-source-of-truth-foundation.md`: execute the first salvage increment from
+  issue #49 by landing the product/source-of-truth foundation.
