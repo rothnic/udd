@@ -1,0 +1,20 @@
+id: monitor_test_health
+name: Monitor Test Health
+summary: "Continuously monitor test suite health and surface alerts for failures, slow tests, and flakiness"
+phase: 3
+actors:
+  - developer
+  - agent
+future_outcomes:
+  - description: "Health checks run periodically"
+    follow_up: "#55"
+    scenarios:
+      - "udd/test-governance/setup-health-check"
+  - description: "Alerts are created for degrading test health"
+    follow_up: "#55"
+    scenarios:
+      - "udd/test-governance/test-status"
+  - description: "Slow tests are identified for optimization"
+    follow_up: "#55"
+    scenarios:
+      - "udd/test-governance/test-scan"

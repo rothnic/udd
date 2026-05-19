@@ -1,6 +1,7 @@
 id: enforce_code_style
 name: Enforce Code Style
 summary: "Ensure code styles are automatically applied and enforced"
+phase: 3
 actors:
   - developer
   - agent

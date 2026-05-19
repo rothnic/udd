@@ -1,8 +1,9 @@
 id: agent_customization
 name: Agent Customization
-summary: "Customize the GitHub Copilot agent for UDD"
+summary: "Configure agent adapters to reuse shared UDD workflow guidance"
+phase: 3
 actors:
-  - user
+  - developer
 outcomes:
   - description: "Agent has access to project status"
     scenarios:
@@ -10,3 +11,19 @@ outcomes:
   - description: "Agent guides user through UDD process"
     scenarios:
       - "udd/agent/guide_user"
+  - description: "Codex hooks can be installed into external projects"
+    scenarios:
+      - "udd/cli/codex_hooks"
+future_outcomes:
+  - description: "OpenCode adapter can check deep status"
+    follow_up: "#54"
+    scenarios:
+      - "opencode/tools/status_deep"
+  - description: "OpenCode adapter can get next recommendation"
+    follow_up: "#54"
+    scenarios:
+      - "opencode/tools/next_recommendation"
+  - description: "OpenCode adapter can list all issues"
+    follow_up: "#54"
+    scenarios:
+      - "opencode/tools/issues_list"

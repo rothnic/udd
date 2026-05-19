@@ -1,6 +1,7 @@
 id: manage_wip
 name: Manage Work In Progress
 summary: "Help developers avoid accumulating too many changes at once"
+phase: 3
 actors:
   - developer
   - agent

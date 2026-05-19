@@ -1,6 +1,7 @@
 id: project_setup
 name: Project Setup
 summary: "Initialize and configure the UDD project for development"
+phase: 3
 actors:
   - developer
   - agent

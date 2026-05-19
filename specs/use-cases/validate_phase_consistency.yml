@@ -1,0 +1,20 @@
+id: validate_phase_consistency
+name: Validate Phase Consistency
+summary: "Ensure roadmap phases, scenarios, and use-cases remain consistent as the project evolves"
+phase: 3
+actors:
+  - developer
+  - agent
+future_outcomes:
+  - description: "Use-cases reference scenarios with matching phase tags"
+    follow_up: "#51"
+    scenarios:
+      - "udd/test-governance/test-linkage"
+  - description: "Detects mismatches between journey phase and use-case phase"
+    follow_up: "#51"
+    scenarios:
+      - "udd/test-governance/sync-dirty-marking"
+  - description: "Provides reports for roadmap owners when inconsistencies appear"
+    follow_up: "#51"
+    scenarios:
+      - "udd/test-governance/test-status"

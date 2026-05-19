@@ -2,91 +2,71 @@
 id: "udd_tool"
 name: "User Driven Development Tool"
 version: "0.0.1"
-current_phase: 3
-phases:
-  1: "Core CLI & Validation"
-  2: "Research & Tech Specs"
-  3: "OpenCode Integration"
-  4: "Agent Intelligence"
-  5: "Advanced Workflows"
 goals:
-  - "Make user-facing scenarios the single source of truth"
-  - "Use SysML principles to create better scenarios (not add layers)"
-  - "Let agents assist with requirements discovery and analysis"
-  - "Keep everything simple, discoverable, and deterministic"
-  - "Enforce guardrails against spec/test tampering"
-  - "Enable autonomous iteration via OpenCode integration"
+  - "Make stakeholder journeys the durable source of product intent."
+  - "Derive testable BDD scenarios from user-visible outcomes."
+  - "Verify implementations through independent tests that exercise behavior from stakeholder perspectives."
+  - "Preserve traceability from persona and journey through use case, scenario, test, component, and requirement."
+  - "Give human and AI contributors a concise, deterministic project state model for safe iteration."
 use_cases:
   - "validate_specs"
   - "run_tests"
   - "orchestrated_iteration"
+  - "track_test_quality"
+  - "prevent_regression"
+  - "manage_test_lifecycle"
+  - "validate_phase_consistency"
+success_metrics:
+  - "A project can be understood and rebuilt from product intent, scenarios, and traceable requirements without relying on hidden implementation memory."
+  - "Current-phase stub tests are blocked before they create false confidence."
+  - "Agent integrations reuse shared UDD utilities instead of duplicating integration-specific workflows."
+  - "Vision remains stable while roadmap state changes in specs/roadmap.yml."
 ---
 
 # Vision
 
-The UDD tool provides a CLI to manage the lifecycle of features in a User Driven Development process. It ensures that specs are the source of truth and that features are only considered done when their E2E tests pass.
+UDD exists to make software rebuildable from stakeholder intent.
 
-## Branching Strategy
+The durable product record is the chain from persona and journey through use
+case, scenario, independent verification, component responsibility, and
+implementation requirement. A contributor should be able to inspect that chain
+and understand what the system must do, why it matters, how it is verified, and
+which implementation surface is responsible.
 
-```
-main                              # Stable, all tests pass
-  └── phase/<n>                   # Active development phase
-        ├── feat/<area>/<feature> # One branch per feature
-        └── research/<id>         # Research investigations
-```
+UDD is not a project tracker, test runner, or code generator. It is the control
+layer that keeps intent, acceptance criteria, independent tests, and
+implementation work aligned.
 
-### Branch Rules
+## Future State
 
-| Branch | Purpose | Merges To |
-|--------|---------|-----------|
-| `main` | Stable baseline | - |
-| `phase/<n>` | Phase development | `main` when phase complete |
-| `feat/<area>/<feature>` | Feature implementation | `phase/<n>` |
-| `research/<id>` | Investigation (docs only) | `phase/<n>` |
+In the target state, a project using UDD can be rebuilt from its source specs:
 
-### Workflow
+1. Stakeholders define personas, journeys, outcomes, and constraints.
+2. Use cases map each journey outcome to executable behavior.
+3. BDD scenarios describe acceptance from the stakeholder perspective.
+4. Independent E2E tests verify behavior without depending on implementation
+   internals.
+5. Components and requirements document how the system satisfies the verified
+   behavior.
+6. Agent integrations use the same project-state and traceability utilities, so
+   Codex, OpenCode, and future integrations behave consistently.
 
-1. **Start phase**: `git checkout -b phase/1 main`
-2. **Start feature**: `git checkout -b feat/cli/status phase/1`
-3. **Complete feature**: PR to `phase/1`, squash merge
-4. **Complete phase**: PR to `main`, merge when objectives met
+## Backlog Foundation
 
-### Research Branches
+When no backlog is available, new backlog items should be derived from this
+vision first. Agents should use this document to understand the project goal,
+then derive structured roadmap items, use cases, scenarios, tests, components,
+and requirements that keep work aligned with the long-term direction.
 
-- Only commit `specs/research/<id>/README.md`
-- Prototype code stays local (never committed)
-- Merge learnings document, delete branch
+Derived backlog items should point back to the relevant vision goal or success
+metric, then become concrete in `specs/roadmap.yml`, `product/journeys/`,
+`specs/use-cases/`, and `specs/features/`.
 
-## Phase Objectives
+## State Boundaries
 
-### Phase 1: Core CLI & Validation ✅
-- Basic scaffolding commands
-- Spec validation (lint)
-- Status reporting
+This file intentionally does not declare the current phase, active branch, or
+progress status. Time- and progress-dependent planning belongs in
+`specs/roadmap.yml`, generated status output, and goal documents under
+`goals/`.
 
-### Phase 2: Research & Tech Specs
-- Research workflow and commands
-- Tech spec scaffolding
-- Unit test tracing
-
-### Phase 3: OpenCode Integration
-- Custom tools for structured status (`udd-status`, `udd-next`)
-- Orchestrator plugin for autonomous iteration
-- JSON output mode for machine consumption
-- Configurable iteration limits and pause conditions
-
-### Phase 4: Agent Intelligence
-- Copilot integration improvements
-- Autonomous maintenance
-- Smart suggestions
-
-### Phase 5: Advanced Workflows
-- Spec change tracking
-- Migration tools
-- Team collaboration features
-
-## References
-
-*   [Custom Agent File Structure](https://code.visualstudio.com/docs/copilot/customization/custom-agents#_custom-agent-file-structure)
-*   [Prompt Files](https://code.visualstudio.com/docs/copilot/customization/prompt-files)
-
+`specs/VISION.md` should change only when the long-term product vision changes.

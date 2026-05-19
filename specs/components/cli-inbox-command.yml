@@ -1,0 +1,24 @@
+id: cli-inbox-command
+name: CLI Inbox Command
+type: cli-command
+owner: udd-cli
+source:
+  - src/commands/inbox.ts
+public_interfaces:
+  - command: udd inbox add <title>
+    options:
+      - --description <description>
+responsibilities:
+  - Accept an idea title and optional description from the command line.
+  - Append a new inbox item to the current project's inbox store.
+  - Print a confirmation that identifies the captured idea title.
+supported_use_cases:
+  - capture_ideas
+supported_scenarios:
+  - udd/cli/inbox/add_item_via_cli
+requirements:
+  - persist_inbox_item
+tests:
+  - tests/e2e/udd/cli/inbox/add_item_via_cli.e2e.test.ts
+notes:
+  - "This component owns the command boundary only; scenario acceptance text remains in the feature file."
