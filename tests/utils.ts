@@ -36,8 +36,26 @@ export async function withTempDir<T>(fn: () => Promise<T> | T): Promise<T> {
 export const execAsync = promisify(exec);
 export const rootDir = process.cwd();
 export const uddBin = path.resolve(rootDir, "bin/udd.ts");
+export const tsxLoader = path.resolve(
+	rootDir,
+	"node_modules/tsx/dist/loader.mjs",
+);
+
+function shellQuote(value: string): string {
+	return `'${value.replace(/'/g, "'\\''")}'`;
+}
+
+export function buildUddCommand(args: string): string {
+	return [
+		"node",
+		"--import",
+		shellQuote(tsxLoader),
+		shellQuote(uddBin),
+		args,
+	].join(" ");
+}
 
 export async function runUdd(args: string) {
-	const command = `npx tsx ${uddBin} ${args}`;
+	const command = buildUddCommand(args);
 	return execAsync(command);
 }

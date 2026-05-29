@@ -1,4 +1,4 @@
-import { exec } from "node:child_process";
+import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -6,7 +6,7 @@ import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
 import { rootDir } from "../../../utils.js";
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 const feature = await loadFeature(
 	"specs/features/udd/dev-experience/sort_imports.feature",
 );
@@ -29,8 +29,12 @@ export const suite = describe("suite", () => {});
 			await fs.writeFile(testFilePath, content);
 		});
 
-		When('I run "npm run check:fix"', async () => {
-			await execAsync("npm run check:fix");
+		When("I run the repository formatter", async () => {
+			const biomeBin = path.join(
+				rootDir,
+				"node_modules/@biomejs/biome/bin/biome",
+			);
+			await execFileAsync("node", [biomeBin, "check", "--write", testFilePath]);
 		});
 
 		Then("the imports should be sorted", async () => {

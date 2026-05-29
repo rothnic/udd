@@ -10,12 +10,7 @@ const execFileAsync = promisify(execFile);
 async function runUddInCwd(args: string[]) {
 	const uddBin = path.resolve(rootDir, "bin/udd.ts");
 	const tsxLoader = path.resolve(rootDir, "node_modules/tsx/dist/loader.mjs");
-	return execFileAsync(process.execPath, [
-		"--import",
-		tsxLoader,
-		uddBin,
-		...args,
-	]);
+	return execFileAsync("node", ["--import", tsxLoader, uddBin, ...args]);
 }
 
 async function readInstalledHookConfig(root: string) {

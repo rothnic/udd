@@ -1,6 +1,6 @@
 # Agent Instructions: UDD (User Driven Development)
 
-UDD is a spec-first workflow where **user journeys are requirements** and **BDD scenarios are tests**.
+UDD is a spec-first workflow where **user-facing scenarios define behavior** and **BDD scenarios are tests**.
 
 ## Core Principle
 
@@ -19,32 +19,48 @@ UDD uses **SysML principles to create better feature scenarios**, not to add art
 
 ## Project Structure
 
-```
-product/                          # Human-authored intent
-├── README.md                     # Product overview
-├── actors.md                     # Who uses it
-├── constraints.md                # NFRs, hard rules
-├── changelog.md                  # Decision history (auto)
-└── journeys/                     # User outcomes
-    └── *.md                      # One file per journey
+Canonical traceability chain:
 
-specs/                            # Testable behaviors
-├── .udd/manifest.yml             # Traceability (auto)
-└── <domain>/                     # Grouped by domain
-    └── *.feature                 # BDD scenarios
-
-tests/                            # Verification
-└── <domain>/
-    └── *.e2e.test.ts             # E2E tests (match scenarios)
 ```
+Objective -> Use Case -> Scenario -> E2E Test
+```
+
+Required traceability artifacts:
+
+```
+specs/use-cases/*.yml             # Outcomes and scenario links
+specs/features/**/*.feature       # BDD behavior contracts
+tests/e2e/**/*.test.ts            # Executable proof
+```
+
+Journey files and SysML-informed notes are optional discovery context during
+compatibility mode. Do not duplicate the same requirement across journey, use
+case, scenario, and requirement files.
 
 ## Workflow
 
 1. **Check status first**: `udd status`
-2. **Journeys define intent** in `product/journeys/`
-3. **Sync generates scenarios**: `udd sync`
+2. **Update the use case or scenario first** for behavior changes
+3. **Run `udd sync` only when journey files drive scenario generation**
 4. **Tests verify behavior**: `npm test`
 5. **Implement to make tests pass**
+
+## Codex Environment
+
+If the Codex shell has `node` but not `npm` or `npx`, run:
+
+```bash
+scripts/codex-setup.sh
+```
+
+Then run checks through:
+
+```bash
+scripts/codex-verify.sh <optional vitest path>
+```
+
+This uses Bun to supply npm from `package-lock.json` and runs Vitest with
+`UDD_TEST_RUNTIME=bun` to avoid Codex bundled-Node native module restrictions.
 
 ## CLI Commands
 
@@ -52,14 +68,17 @@ tests/                            # Verification
 
 | Command | Purpose |
 |---------|---------|
-| `udd status` | Show journey → scenario → test coverage |
-| `udd sync` | Detect journey changes, propose scenarios |
+| `udd status` | Show use-case → scenario → test coverage |
+| `udd sync` | Detect journey changes and propose scenario updates |
 | `udd init` | Initialize product/ structure |
-| `udd new journey <slug>` | Create journey file |
-| `udd new scenario <domain> <action>` | Create scenario + test stub |
+| `udd new journey <slug>` | Create optional discovery-context journey file |
+| `udd new scenario <domain> <action>` | Create legacy flat scenario + test stub |
 | `udd lint` | Validate spec structure |
 
-## Journey Format
+## Optional Journey Format
+
+Journey files are discovery context. Link journey steps to canonical scenario
+files instead of treating the journey as a second requirement layer.
 
 ```markdown
 # Journey: New User Onboarding
@@ -69,8 +88,8 @@ tests/                            # Verification
 
 ## Steps
 
-1. User signs up → `specs/auth/signup.feature`
-2. User creates first item → `specs/items/create.feature`
+1. User signs up → `specs/features/auth/signup.feature`
+2. User creates first item → `specs/features/items/create.feature`
 
 ## Success
 
@@ -87,8 +106,8 @@ User has created their first item within 5 minutes.
 ## Rules for Agents
 
 1. **Check `udd status` before starting work**
-2. **Create/update journey before implementing new behavior**
-3. **Run `udd sync` to generate scenarios from journeys**
+2. **Create/update the use case or scenario before implementing new behavior**
+3. **Run `udd sync` when journey files need to generate or update scenarios**
 4. **One scenario per file** - keeps files small and focused
 5. **Split by variation** - `login_basic.feature`, `login_2fa.feature`
 6. **Run tests after changes**: `npm test`
@@ -105,12 +124,12 @@ User: "Add CSV export feature"
    - Which is best for the user? (CSV: simple, universal)
 
 2. Check status: `udd status`
-3. Create journey: `udd new journey export_data`
-4. Edit `product/journeys/export_data.md` with user context
-5. Create rich feature file with:
+3. Identify or create the relevant use case in `specs/use-cases/`
+4. Add optional journey/SysML context if it clarifies the user need
+5. Create or update the feature file with:
    - Comments explaining alternatives considered
    - Comprehensive scenarios (happy path, errors, edge cases)
-6. Sync: `udd sync`
+6. Sync journey-driven scenario changes with `udd sync` when journey files changed
 7. Run tests (fail): `npm test`
 8. Implement code
 9. Run tests (pass): `npm test`
