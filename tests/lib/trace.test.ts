@@ -45,6 +45,34 @@ test("loads scenario paths from use-case ids", async () => {
 	).toEqual(["specs/features/udd/cli/inbox/add_item_via_cli.feature"]);
 });
 
+test("prefers scenario paths over scenario ids when both are present", async () => {
+	await fs.writeFile(
+		path.join(projectDir, "specs/use-cases/mixed_refs.yml"),
+		[
+			"id: mixed_refs",
+			"name: Mixed References",
+			"outcomes:",
+			"  - description: Canonical paths win",
+			"    scenario_paths:",
+			"      - udd/compliance/traceability_validation",
+			"    scenarios:",
+			"      - traceability_validation",
+			"scenario_paths:",
+			"  - udd/compliance/phase-consistency-validation",
+			"scenarios:",
+			"  - phase-consistency-validation",
+			"",
+		].join("\n"),
+	);
+
+	const useCaseScenarios = await loadUseCaseScenarioPaths(projectDir);
+
+	expect(resolveJourneyReference("mixed_refs", useCaseScenarios)).toEqual([
+		"specs/features/udd/compliance/traceability_validation.feature",
+		"specs/features/udd/compliance/phase-consistency-validation.feature",
+	]);
+});
+
 test("keeps direct scenario references backward compatible", async () => {
 	const useCaseScenarios = await loadUseCaseScenarioPaths(projectDir);
 

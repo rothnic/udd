@@ -401,9 +401,16 @@ export const syncCommand = new Command("sync")
 					userWarn(
 						`Could not resolve journey reference '${step.scenarioPath}' to scenario files`,
 					);
+					continue;
 				}
 
 				for (const scenarioPath of scenarioPaths) {
+					if (!scenarioPath.endsWith(".feature")) {
+						userWarn(
+							`Skipping non-feature journey reference '${scenarioPath}'`,
+						);
+						continue;
+					}
 					const exists = await scenarioExists(rootDir, scenarioPath);
 					scenarios.push(scenarioPath);
 

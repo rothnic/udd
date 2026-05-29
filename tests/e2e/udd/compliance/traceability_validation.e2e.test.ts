@@ -67,6 +67,25 @@ async function writeTraceProject() {
 	);
 }
 
+async function writeUnresolvedTraceProject() {
+	await fs.mkdir("product/journeys", { recursive: true });
+	await fs.mkdir("specs/use-cases", { recursive: true });
+	await fs.writeFile(
+		"product/journeys/unresolved.md",
+		[
+			"# Journey: Unresolved",
+			"",
+			"**Actor:** Developer",
+			"**Goal:** Avoid malformed sync output",
+			"",
+			"## Steps",
+			"",
+			"1. Reference missing use case → `missing_use_case`",
+			"",
+		].join("\n"),
+	);
+}
+
 describeFeature(feature, ({ Scenario }) => {
 	Scenario("Resolve journey use-case references", ({ Given, When, Then }) => {
 		let resolved: string[] = [];
@@ -120,6 +139,40 @@ describeFeature(feature, ({ Scenario }) => {
 					}
 				},
 			);
+		},
+	);
+
+	Scenario(
+		"Skip unresolved journey references",
+		({ Given, When, Then, And }) => {
+			let stderr: string;
+
+			Given("a journey step references an unknown use case id", async () => {
+				await cleanupProject();
+				previousCwd = process.cwd();
+				projectDir = await fs.mkdtemp(path.join(os.tmpdir(), "udd-trace-e2e-"));
+				process.chdir(projectDir);
+				await writeUnresolvedTraceProject();
+			});
+
+			When('I run "udd sync --auto"', async () => {
+				const result = await runUdd("sync --auto");
+				stderr = result.stderr;
+			});
+
+			Then("sync should warn about the unresolved reference", () => {
+				expect(stderr).toContain(
+					"Could not resolve journey reference 'missing_use_case'",
+				);
+			});
+
+			And("it should not create an extensionless scenario file", async () => {
+				try {
+					await expect(fs.access("missing_use_case")).rejects.toThrow();
+				} finally {
+					await cleanupProject();
+				}
+			});
 		},
 	);
 });

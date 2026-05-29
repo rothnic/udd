@@ -121,8 +121,15 @@ export const validateCommand = new Command("validate")
 					}
 				}
 			}
-		} catch {
-			// Repos without roadmap.yml can still use feature completeness validation.
+		} catch (err) {
+			const code =
+				typeof err === "object" && err && "code" in err
+					? (err as { code?: unknown }).code
+					: undefined;
+			if (code !== "ENOENT") {
+				const message = err instanceof Error ? err.message : String(err);
+				console.error(chalk.red(`\n✗ Phase validation error: ${message}`));
+			}
 		}
 
 		// Recommendations

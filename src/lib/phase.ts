@@ -146,9 +146,7 @@ export function setCurrentPhase(
 					? "completed"
 					: phase.number === phaseNumber
 						? "active"
-						: phase.status === "completed"
-							? "planned"
-							: (phase.status ?? "planned"),
+						: "planned",
 			);
 		}
 	}

@@ -64,6 +64,19 @@ test("updates roadmap current phase by phase number", async () => {
 	expect(content).toContain("status: active");
 });
 
+test("sets future phases to planned when rolling phase backward", async () => {
+	setCurrentPhase(projectDir, 3);
+	const updated = setCurrentPhase(projectDir, 1);
+	const content = await fs.readFile(
+		path.join(projectDir, "specs/roadmap.yml"),
+		"utf-8",
+	);
+
+	expect(updated.currentPhase).toBe(1);
+	expect(content.match(/status: active/g)).toHaveLength(1);
+	expect(content.match(/status: planned/g)).toHaveLength(2);
+});
+
 test("parses phase tags before the feature declaration only", () => {
 	expect(getPhaseFromFeature("@phase:4\nFeature: Example\n")).toBe(4);
 	expect(

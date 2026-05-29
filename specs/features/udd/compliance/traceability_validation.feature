@@ -25,3 +25,9 @@ Feature: Traceability Reference Resolution
     Given a journey step references a use case id
     When I run "udd sync --auto"
     Then the manifest should list the resolved scenario feature path
+
+  Scenario: Skip unresolved journey references
+    Given a journey step references an unknown use case id
+    When I run "udd sync --auto"
+    Then sync should warn about the unresolved reference
+    And it should not create an extensionless scenario file

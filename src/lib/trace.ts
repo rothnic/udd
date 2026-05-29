@@ -34,22 +34,28 @@ export async function loadUseCaseScenarioPaths(
 			}
 		};
 
-		for (const outcome of data.outcomes ?? []) {
-			if (typeof outcome === "string") continue;
-			for (const scenarioPath of outcome.scenario_paths ?? []) {
-				addReference(scenarioPath);
+		const addPreferredReferences = (
+			paths: string[] | undefined,
+			scenarios: string[] | undefined,
+		) => {
+			if (paths && paths.length > 0) {
+				for (const scenarioPath of paths) {
+					addReference(scenarioPath);
+				}
+				return;
 			}
-			for (const scenario of outcome.scenarios ?? []) {
+
+			for (const scenario of scenarios ?? []) {
 				addReference(scenario);
 			}
+		};
+
+		for (const outcome of data.outcomes ?? []) {
+			if (typeof outcome === "string") continue;
+			addPreferredReferences(outcome.scenario_paths, outcome.scenarios);
 		}
 
-		for (const scenarioPath of data.scenario_paths ?? []) {
-			addReference(scenarioPath);
-		}
-		for (const scenario of data.scenarios ?? []) {
-			addReference(scenario);
-		}
+		addPreferredReferences(data.scenario_paths, data.scenarios);
 
 		const fallbackId = path.basename(file, ".yml");
 		useCaseScenarios.set(fallbackId, scenarioPaths);
