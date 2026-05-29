@@ -28,8 +28,10 @@ The UDD tool provides a CLI to manage the lifecycle of features in a User Driven
 
 ## Branching Strategy
 
+The repository default branch is currently `master` (`origin/HEAD -> origin/master` as verified on 2026-05-29). Treat `master` as the stable branch and PR target unless a future repo-wide branch rename explicitly changes the GitHub default branch.
+
 ```
-main                              # Stable, all tests pass
+master                            # Stable, all tests pass
   └── phase/<n>                   # Active development phase
         ├── feat/<area>/<feature> # One branch per feature
         └── research/<id>         # Research investigations
@@ -39,17 +41,17 @@ main                              # Stable, all tests pass
 
 | Branch | Purpose | Merges To |
 |--------|---------|-----------|
-| `main` | Stable baseline | - |
-| `phase/<n>` | Phase development | `main` when phase complete |
+| `master` | Stable baseline | - |
+| `phase/<n>` | Phase development | `master` when phase complete |
 | `feat/<area>/<feature>` | Feature implementation | `phase/<n>` |
 | `research/<id>` | Investigation (docs only) | `phase/<n>` |
 
 ### Workflow
 
-1. **Start phase**: `git checkout -b phase/1 main`
+1. **Start phase**: `git checkout -b phase/1 master`
 2. **Start feature**: `git checkout -b feat/cli/status phase/1`
 3. **Complete feature**: PR to `phase/1`, squash merge
-4. **Complete phase**: PR to `main`, merge when objectives met
+4. **Complete phase**: PR to `master`, merge when objectives met
 
 ### Research Branches
 
@@ -89,4 +91,3 @@ main                              # Stable, all tests pass
 
 *   [Custom Agent File Structure](https://code.visualstudio.com/docs/copilot/customization/custom-agents#_custom-agent-file-structure)
 *   [Prompt Files](https://code.visualstudio.com/docs/copilot/customization/prompt-files)
-
