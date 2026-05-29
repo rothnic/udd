@@ -105,6 +105,7 @@ product/                          # Optional discovery context during compatibil
 | `udd new scenario <domain> <action>` | Create legacy flat scenario + test stub |
 | `udd new feature <domain> <feature-name>` | Create feature file from SysML-informed template |
 | `udd discover feature <domain> <name>` | Interactive feature discovery with SysML principles |
+| `udd phase current/list/set/check` | Inspect, update, and validate roadmap phase state |
 | `udd lint` | Validate spec structure |
 | `udd validate` | Check feature scenario completeness |
 

@@ -7,10 +7,10 @@ implementation requirements stay connected as UDD evolves.
 
 ## Context
 
-UDD should dogfood its own traceability model. This journey is future product
-intent for issue #51; this foundation PR records the intent and makes the
-current roadmap explicit without importing the validation CLI or test-governance
-implementation.
+UDD should dogfood its own traceability model. This journey is implemented in
+the issue #51 phase/traceability foundation by resolving concise journey and
+use-case references into canonical scenario file paths, while leaving broader
+requirement/component validation for later slices.
 
 The roadmap is the current classification source:
 
@@ -26,25 +26,17 @@ The roadmap is the current classification source:
 
 ## Steps
 
-1. Read `specs/roadmap.yml` to identify current and deferred product journeys.
-2. Validate that every active or delivered use case links to scenario ids and
-   scenario paths.
-3. Validate that every deferred use case or backlog journey has an exact
-   `follow_up` issue.
-4. Validate requirement and component artifacts against
-   `specs/traceability-contract.yml`.
-5. Report gaps as actionable source-of-truth drift instead of silently creating
-   generated state.
+1. Author a journey step with a concise use-case reference → `specs/features/udd/compliance/traceability_validation.feature`
+2. Resolve that use-case reference through `specs/use-cases/*.yml` to canonical scenario file paths → `specs/features/udd/compliance/traceability_validation.feature`
+3. Store the resolved scenario file paths in the sync manifest → `specs/features/udd/compliance/traceability_validation.feature`
+4. Leave broader requirement/component validation for a later traceability slice.
 
 ## Success Criteria
 
-- Every current product journey is represented by a roadmap use case or a
-  `backlog_journeys` entry.
-- Every current roadmap use case has canonical scenario ids, with feature paths
-  stored separately when path lookup is needed.
-- Every deferred use case and backlog journey references the issue that owns
-  its executable slice.
-- Strict traceability validation is implemented and passing in the #51 slice.
+- Use-case ids resolve to canonical scenario feature files.
+- Direct feature file references remain supported for existing journeys.
+- `udd sync` stores resolved scenario feature paths in `specs/.udd/manifest.yml`.
+- Broader requirement/component validation remains outside the #51 slice.
 
 ## Related
 

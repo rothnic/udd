@@ -71,6 +71,7 @@ This uses Bun to supply npm from `package-lock.json` and runs Vitest with
 | `udd status` | Show use-case → scenario → test coverage |
 | `udd sync` | Detect journey changes and propose scenario updates |
 | `udd init` | Initialize product/ structure |
+| `udd phase current/list/set/check` | Inspect, update, and validate roadmap phase state |
 | `udd new journey <slug>` | Create optional discovery-context journey file |
 | `udd new scenario <domain> <action>` | Create legacy flat scenario + test stub |
 | `udd lint` | Validate spec structure |

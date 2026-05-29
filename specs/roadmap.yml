@@ -219,16 +219,14 @@ phases:
       - id: validate_phase_consistency
         capability: compliance
         increment: v1-basic
-        status: future
+        status: delivered
         follow_up: "#51"
-        future_scenarios:
-          - test-linkage
-          - sync-dirty-marking
-          - test-status
-        future_scenario_paths:
-          - udd/test-governance/test-linkage
-          - udd/test-governance/sync-dirty-marking
-          - udd/test-governance/test-status
+        scenarios:
+          - phase-consistency-validation
+          - traceability_validation
+        scenario_paths:
+          - udd/compliance/phase-consistency-validation
+          - udd/compliance/traceability_validation
   - id: agent-intelligence
     name: Agent Intelligence
     number: 4
@@ -351,7 +349,7 @@ capabilities:
       - version: v1-basic
         phase: opencode-integration
         number: 3
-        status: planned
+        status: delivered
         follow_up: "#51"
         use_cases:
           - validate_phase_consistency
@@ -374,7 +372,3 @@ backlog_journeys:
     status: future
     follow_up: "#52"
     reason: Recovery scenarios and commands are deferred to the diagnostics slice.
-  - id: traceability-compliance
-    status: future
-    follow_up: "#51"
-    reason: Traceability CLI validation is deferred to the phase/traceability slice.

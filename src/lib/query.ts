@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { glob } from "glob";
 import yaml from "yaml";
+import { getCurrentPhase, getPhaseFromFeature } from "./phase.js";
 
 export interface Actor {
 	name: string;
@@ -208,19 +209,7 @@ export async function getFeatures(): Promise<Feature[]> {
 		// Ignore if missing
 	}
 
-	// Get current phase
-	let currentPhase = 1;
-	try {
-		const visionPath = path.join(rootDir, "specs/VISION.md");
-		const visionContent = await fs.readFile(visionPath, "utf-8");
-		const frontmatterMatch = visionContent.match(/^---\n([\s\S]*?)\n---/);
-		if (frontmatterMatch) {
-			const frontmatter = yaml.parse(frontmatterMatch[1]);
-			currentPhase = frontmatter.current_phase || 1;
-		}
-	} catch {
-		// Default to phase 1
-	}
+	const currentPhase = getCurrentPhase(rootDir);
 
 	for (const file of featureFiles) {
 		let content: string;
@@ -250,14 +239,7 @@ export async function getFeatures(): Promise<Feature[]> {
 			let scenarioPhase: number | undefined;
 			try {
 				const featureContent = await fs.readFile(absScenarioPath, "utf-8");
-				const featureIndex = featureContent.indexOf("Feature:");
-				if (featureIndex !== -1) {
-					const preamble = featureContent.substring(0, featureIndex);
-					const phaseMatch = preamble.match(/@phase:(\d+)/);
-					if (phaseMatch) {
-						scenarioPhase = Number.parseInt(phaseMatch[1], 10);
-					}
-				}
+				scenarioPhase = getPhaseFromFeature(featureContent);
 			} catch {
 				// Ignore read errors
 			}
