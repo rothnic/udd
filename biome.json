@@ -6,7 +6,17 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": [
+			"**",
+			"!.memsearch",
+			"!.opencode/memsearch",
+			"!.ruff_cache",
+			"!.sisyphus",
+			"!.udd",
+			"!memory",
+			"!repos"
+		]
 	},
 	"formatter": {
 		"enabled": true,

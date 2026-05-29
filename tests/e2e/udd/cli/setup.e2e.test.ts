@@ -38,7 +38,8 @@ describeFeature(feature, ({ Scenario }) => {
 				await fs.readFile(path.join(rootDir, "package.json"), "utf-8"),
 			);
 			expect(packageJson.scripts.setup).toBeDefined();
-			expect(packageJson.scripts.setup).toContain("npm link");
+			expect(packageJson.scripts.setup).toContain("npm run setup:link");
+			expect(packageJson.scripts["setup:link"]).toContain("npm link");
 		});
 	});
 });

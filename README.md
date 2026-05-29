@@ -8,7 +8,7 @@ A spec-first CLI tool where **user-facing scenarios define behavior** and **BDD 
 # Initialize in your project
 npm run udd -- init
 
-# Sync discovery context to scenarios
+# Sync journey discovery context to scenarios
 npm run udd -- sync
 
 # Check status
@@ -22,8 +22,8 @@ specs/use-cases/*.yml  →→→  specs/features/**/*.feature  →→→  tests/
   (outcomes)                  (testable behaviors)             (verification)
 ```
 
-1. **Define outcomes** in `specs/use-cases/` and use journeys when narrative context helps discovery
-2. **Run `udd sync`** - detects changes and helps keep scenario links current
+1. **Define outcomes** in `specs/use-cases/` and, when generating scenarios from narrative discovery, define journeys in `product/journeys/`
+2. **Run `udd sync`** - detects journey changes and proposes scenario updates
 3. **Implement code** - make the tests pass
 4. **Iterate** - update the use case or scenario first, then sync and test again
 
@@ -99,7 +99,7 @@ product/                          # Optional discovery context during compatibil
 | Command | Purpose |
 |---------|---------|
 | `udd init` | Initialize product/ structure with interview |
-| `udd sync` | Detect discovery/spec changes and propose scenario updates |
+| `udd sync` | Detect journey changes and propose scenario updates |
 | `udd status` | Show use-case → scenario → test coverage |
 | `udd new journey <slug>` | Create optional discovery-context journey file |
 | `udd new scenario <domain> <action>` | Create legacy flat scenario + test stub |

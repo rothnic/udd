@@ -39,6 +39,30 @@ runtime-specific prompts:
 - Diagnostics: `udd status --doctor`
 - Spec validation: `udd lint` and `udd validate`
 
+## Local Codex Environment
+
+Codex desktop shells may provide `node` without `npm` or `npx`. Use the
+repo-local setup wrapper before running verification:
+
+```bash
+scripts/codex-setup.sh
+```
+
+The setup wrapper adds `~/.bun/bin` to `PATH` and runs `bunx npm ci`, which keeps
+installation anchored to `package-lock.json` without requiring a globally
+installed npm binary.
+
+Run Codex verification through:
+
+```bash
+scripts/codex-verify.sh tests/e2e/udd/cli/inbox/add_item_via_cli.e2e.test.ts
+```
+
+The verifier runs `udd status`, `udd lint`, and `udd test` with
+`UDD_TEST_RUNTIME=bun`. That runtime avoids Codex's signed bundled Node loading
+macOS native Rollup modules while still using the repository's local Vitest
+dependency.
+
 ## Tooling Scope
 
 In scope for Codex tooling:

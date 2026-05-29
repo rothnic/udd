@@ -9,6 +9,7 @@
 	"files": [
 		"bin/",
 		"src/",
+		"scripts/",
 		"templates/",
 		"README.md"
 	],
@@ -31,24 +32,27 @@
 		"setup": "npm ci && npm run setup:link",
 		"test": "vitest run",
 		"test:ui": "vitest --ui",
-		"lint": "npm run udd -- lint",
-		"status": "npm run udd -- status",
+		"lint": "./bin/udd lint",
+		"status": "./bin/udd status",
 		"check": "biome check .",
 		"check:fix": "biome check --write .",
 		"prepare": "husky",
-		"postinstall": "tsx scripts/patch-vitest-cucumber.ts",
-		"udd": "tsx bin/udd.ts",
+		"postinstall": "node --import ./node_modules/tsx/dist/loader.mjs scripts/patch-vitest-cucumber.ts",
+		"udd": "./bin/udd",
 		"setup:link": "chmod +x bin/udd && npm link",
-		"setup:codex": "npm ci && chmod +x bin/udd && npm run udd -- status"
+		"setup:codex": "bash scripts/codex-setup.sh && ./bin/udd status"
 	},
 	"lint-staged": {
 		"**/*.ts": [
-			"vitest related --run",
+			"bash -c 'if command -v bun >/dev/null 2>&1; then bun --bun node_modules/vitest/vitest.mjs related --run \"$@\"; else node node_modules/vitest/vitest.mjs related --run \"$@\"; fi' --",
 			"bash -c 'tsc --noEmit'",
 			"biome check --write --no-errors-on-unmatched"
 		],
-		"specs/**/*.yaml": [
-			"bash -c 'npm run lint'"
+		"specs/**/*.{yml,yaml}": [
+			"bash -c './bin/udd lint'"
+		],
+		"specs/**/*.feature": [
+			"bash -c './bin/udd lint'"
 		]
 	},
 	"dependencies": {

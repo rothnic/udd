@@ -1,13 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { execAsync, rootDir, withTempDir } from "../../../utils.js";
+import { buildUddCommand, execAsync, withTempDir } from "../../../utils.js";
 
 async function runUddInCwd(
 	args: string,
 ): Promise<{ stdout: string; stderr: string; code?: number }> {
-	const uddBin = path.resolve(rootDir, "bin/udd.ts");
-	const command = `npx tsx ${uddBin} ${args}`;
+	const command = buildUddCommand(args);
 	try {
 		return await execAsync(command);
 	} catch (error: unknown) {

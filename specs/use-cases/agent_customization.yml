@@ -10,3 +10,6 @@ outcomes:
   - description: "Agent guides user through UDD process"
     scenarios:
       - "udd/agent/guide_user"
+  - description: "Codex hooks can be installed for UDD-aware agent sessions"
+    scenarios:
+      - "udd/cli/codex_hooks"

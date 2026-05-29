@@ -1,3 +1,2 @@
-npx lint-staged
-
-
+export PATH="$HOME/.bun/bin:$PATH"
+node node_modules/lint-staged/bin/lint-staged.js
