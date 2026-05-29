@@ -1,9 +1,20 @@
 id: capture_ideas
 name: Capture Ideas
-summary: "Quickly capture raw ideas into an inbox for later triage and refinement"
+summary: Quickly capture raw ideas into an inbox for later triage and refinement
+phase: 3
 actors:
-  - user
+  - developer
 outcomes:
-  - description: "Ideas can be added to inbox via CLI"
+  - description: Ideas can be added to inbox via CLI
     scenarios:
+      - add_item_via_cli
+    scenario_paths:
       - udd/cli/inbox/add_item_via_cli
+components:
+  - cli-inbox-command
+requirements:
+  - persist_inbox_item
+trace:
+  journey: capture-ideas
+  persona: developer
+  navigation: specs/trace-slices/capture-ideas-inbox.md

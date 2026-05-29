@@ -1,16 +1,23 @@
 id: phased_development
 name: Phased Development
-summary: "Support incremental delivery by allowing scenarios to be marked as planned for future phases"
+summary: Support incremental delivery by allowing scenarios to be marked as planned for future phases
+phase: 2
 actors:
   - developer
   - agent
 outcomes:
-  - description: "Scenarios can be tagged as @phase:N to defer to future phases"
+  - description: Scenarios can be tagged as @phase:N to defer to future phases
     scenarios:
+      - wip_tag_support
+    scenario_paths:
       - udd/cli/wip_support/wip_tag_support
-  - description: "Status command shows deferred items separately from blocking failures"
+  - description: Status command shows deferred items separately from blocking failures
     scenarios:
+      - status_shows_wip
+    scenario_paths:
       - udd/cli/wip_support/status_shows_wip
-  - description: "Agent understands deferred scenarios are intentionally deferred"
+  - description: Agent understands deferred scenarios are intentionally deferred
     scenarios:
+      - agent_wip_awareness
+    scenario_paths:
       - udd/agent/wip_support/agent_wip_awareness

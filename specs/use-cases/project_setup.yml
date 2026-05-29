@@ -1,13 +1,18 @@
 id: project_setup
 name: Project Setup
-summary: "Initialize and configure the UDD project for development"
+summary: Initialize and configure the UDD project for development
+phase: 1
 actors:
   - developer
   - agent
 outcomes:
-  - description: "Dependencies are installed"
+  - description: Dependencies are installed
     scenarios:
-      - "udd/cli/setup"
-  - description: "CLI tool is linked and available globally"
+      - setup
+    scenario_paths:
+      - udd/cli/setup
+  - description: CLI tool is linked and available globally
     scenarios:
-      - "udd/cli/setup"
+      - setup
+    scenario_paths:
+      - udd/cli/setup

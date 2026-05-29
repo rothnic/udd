@@ -1,0 +1,26 @@
+id: enforce_quality_gates
+name: Enforce Quality Gates
+summary: Ensure code meets defined quality gates (coverage thresholds, no new flaky tests) before merging
+phase: 3
+actors:
+  - developer
+  - agent
+future_outcomes:
+  - description: CI enforces coverage and pass-rate thresholds
+    follow_up: "#55"
+    scenarios:
+      - ci-validation
+    scenario_paths:
+      - udd/test-governance/ci-validation
+  - description: PRs show test approval and status
+    follow_up: "#55"
+    scenarios:
+      - test-approval
+    scenario_paths:
+      - udd/test-governance/test-approval
+  - description: Integration with status checks for gate enforcement
+    follow_up: "#55"
+    scenarios:
+      - status-integration
+    scenario_paths:
+      - udd/test-governance/status-integration

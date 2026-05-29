@@ -1,12 +1,17 @@
 id: run_tests
 name: Run Tests
-summary: "Execute tests and view project status to track implementation progress"
+summary: Execute tests and view project status to track implementation progress
+phase: 1
 actors:
   - user
 outcomes:
-  - description: "Tests can be executed via CLI"
+  - description: Tests can be executed via CLI
     scenarios:
+      - run_tests
+    scenario_paths:
       - udd/cli/run_tests
-  - description: "Project status is visible via CLI"
+  - description: Project status is visible via CLI
     scenarios:
+      - check_status
+    scenario_paths:
       - udd/cli/check_status

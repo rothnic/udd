@@ -21,6 +21,7 @@ export const UseCaseSpecSchema = z.object({
 			z.object({
 				description: z.string(),
 				scenarios: z.array(z.string()).optional(),
+				scenario_paths: z.array(z.string()).optional(),
 			}),
 		)
 		.optional(),
@@ -62,6 +63,7 @@ export const TechnicalRequirementSchema = z.object({
 	feature: z.string(),
 	use_cases: z.array(z.string()).optional(),
 	scenarios: z.array(z.string()),
+	scenario_paths: z.array(z.string()).optional(),
 	description: z.string(),
 	notes: z.array(z.string()).optional(),
 });
