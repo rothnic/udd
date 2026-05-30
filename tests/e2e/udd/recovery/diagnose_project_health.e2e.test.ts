@@ -253,4 +253,144 @@ describeFeature(feature, ({ Scenario }) => {
 			);
 		},
 	);
+
+	Scenario(
+		"Report malformed manifest diagnostics",
+		({ Given, When, Then, And }) => {
+			Given(
+				"a temporary project with manifest scenarios stored as a list",
+				async () => {
+					await startProject();
+					await fs.mkdir(path.join(projectDir, "product/journeys"), {
+						recursive: true,
+					});
+					await fs.mkdir(path.join(projectDir, "specs/.udd"), {
+						recursive: true,
+					});
+					await fs.writeFile(
+						path.join(projectDir, "specs/.udd/manifest.yml"),
+						"journeys: {}\nscenarios: []\n",
+					);
+				},
+			);
+
+			When('I run "udd doctor --json"', async () => {
+				output = await runUddInProject("doctor --json");
+			});
+
+			Then(
+				'the JSON report should identify the project as "drift-detected"',
+				() => {
+					const report = parsedJson<{ status: string }>();
+					expect(report.status).toBe("drift-detected");
+				},
+			);
+
+			And('the report should include a "manifest_invalid" issue', async () => {
+				try {
+					expect(issueTypes(parsedJson())).toContain("manifest_invalid");
+				} finally {
+					await cleanupProject();
+				}
+			});
+		},
+	);
+
+	Scenario(
+		"Report null journey manifest entries without crashing",
+		({ Given, When, Then, And }) => {
+			Given(
+				"a temporary project with a null journey manifest entry",
+				async () => {
+					await startProject();
+					await fs.mkdir(path.join(projectDir, "product/journeys"), {
+						recursive: true,
+					});
+					await fs.mkdir(path.join(projectDir, "specs/.udd"), {
+						recursive: true,
+					});
+					await fs.writeFile(
+						path.join(projectDir, "specs/.udd/manifest.yml"),
+						"journeys:\n  missing: null\nscenarios: {}\n",
+					);
+				},
+			);
+
+			When('I run "udd health-check --json"', async () => {
+				output = await runUddInProject("health-check --json");
+			});
+
+			Then("the JSON health report should be unhealthy", () => {
+				const report = parsedJson<{ healthy: boolean }>();
+				expect(report.healthy).toBe(false);
+			});
+
+			And('the report should include a "missing_journey" issue', async () => {
+				try {
+					expect(issueTypes(parsedJson())).toContain("missing_journey");
+				} finally {
+					await cleanupProject();
+				}
+			});
+		},
+	);
+
+	Scenario(
+		"Ignore punctuation after unquoted journey scenario paths",
+		({ Given, When, Then, And }) => {
+			Given(
+				"a temporary project with an unquoted journey scenario path followed by punctuation",
+				async () => {
+					await startProject();
+					await fs.mkdir(path.join(projectDir, "product/journeys"), {
+						recursive: true,
+					});
+					await fs.mkdir(path.join(projectDir, "specs/features/punctuation"), {
+						recursive: true,
+					});
+					await fs.mkdir(path.join(projectDir, "specs/.udd"), {
+						recursive: true,
+					});
+					await fs.writeFile(
+						path.join(projectDir, "product/journeys/punctuation.md"),
+						[
+							"# Journey: Punctuation",
+							"",
+							"1. Check punctuation -> specs/features/punctuation/check.feature.",
+							"",
+						].join("\n"),
+					);
+					await fs.writeFile(
+						path.join(projectDir, "specs/features/punctuation/check.feature"),
+						"Feature: Check\n\n  Scenario: Check punctuation\n    Given punctuation exists\n",
+					);
+					await fs.writeFile(
+						path.join(projectDir, "specs/.udd/manifest.yml"),
+						"journeys: {}\nscenarios: {}\n",
+					);
+				},
+			);
+
+			When('I run "udd doctor --json"', async () => {
+				output = await runUddInProject("doctor --json");
+			});
+
+			Then('the JSON report should identify the project as "healthy"', () => {
+				const report = parsedJson<{ status: string; healthy: boolean }>();
+				expect(report.status).toBe("healthy");
+				expect(report.healthy).toBe(true);
+			});
+
+			And(
+				'the report should not include a "missing_scenario" issue',
+				async () => {
+					try {
+						expect(issueTypes(parsedJson())).not.toContain("missing_scenario");
+					} finally {
+						await cleanupProject();
+					}
+				},
+			);
+		},
+	);
 });

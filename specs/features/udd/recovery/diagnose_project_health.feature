@@ -45,3 +45,21 @@ Feature: Diagnose Project Health
     When I run "udd health-check --json"
     Then the JSON health report should be unhealthy
     And the report should include "missing_journey" and "missing_scenario" issues
+
+  Scenario: Report malformed manifest diagnostics
+    Given a temporary project with manifest scenarios stored as a list
+    When I run "udd doctor --json"
+    Then the JSON report should identify the project as "drift-detected"
+    And the report should include a "manifest_invalid" issue
+
+  Scenario: Report null journey manifest entries without crashing
+    Given a temporary project with a null journey manifest entry
+    When I run "udd health-check --json"
+    Then the JSON health report should be unhealthy
+    And the report should include a "missing_journey" issue
+
+  Scenario: Ignore punctuation after unquoted journey scenario paths
+    Given a temporary project with an unquoted journey scenario path followed by punctuation
+    When I run "udd doctor --json"
+    Then the JSON report should identify the project as "healthy"
+    And the report should not include a "missing_scenario" issue

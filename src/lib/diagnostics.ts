@@ -41,15 +41,13 @@ export interface DiagnosticReport {
 	issues: DiagnosticIssue[];
 }
 
-interface ManifestJourney {
-	path?: string;
-	hash?: string;
-	scenarios?: unknown;
+interface Manifest {
+	journeys?: Record<string, unknown>;
+	scenarios?: Record<string, unknown>;
 }
 
-interface Manifest {
-	journeys?: Record<string, ManifestJourney>;
-	scenarios?: Record<string, unknown>;
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
 function hashContent(content: string): string {
@@ -95,7 +93,7 @@ async function readManifest(
 	try {
 		const content = await fs.readFile(manifestPath, "utf-8");
 		const parsed = yaml.parse(content);
-		if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+		if (!isRecord(parsed)) {
 			issues.push(
 				issue(
 					"manifest_invalid",
@@ -109,17 +107,26 @@ async function readManifest(
 		}
 
 		const manifest = parsed as Manifest;
-		if (
-			manifest.journeys !== undefined &&
-			(typeof manifest.journeys !== "object" ||
-				Array.isArray(manifest.journeys))
-		) {
+		if (manifest.journeys !== undefined && !isRecord(manifest.journeys)) {
 			issues.push(
 				issue(
 					"manifest_invalid",
 					"critical",
 					"specs/.udd/manifest.yml",
 					"Manifest journeys must be a mapping.",
+					"Run 'udd sync' after checking the manifest file.",
+				),
+			);
+			return null;
+		}
+
+		if (manifest.scenarios !== undefined && !isRecord(manifest.scenarios)) {
+			issues.push(
+				issue(
+					"manifest_invalid",
+					"critical",
+					"specs/.udd/manifest.yml",
+					"Manifest scenarios must be a mapping.",
 					"Run 'udd sync' after checking the manifest file.",
 				),
 			);
@@ -164,7 +171,9 @@ function extractJourneyScenarioPaths(content: string): string[] {
 			continue;
 		}
 
-		const unquoted = line.match(/(?:→|->)\s*(specs\/[^\s]+)/);
+		const unquoted = line.match(
+			/(?:→|->)\s*(specs\/[a-zA-Z0-9_\-./]+?\.feature)\b/,
+		);
 		if (unquoted?.[1]) {
 			paths.add(unquoted[1]);
 		}
@@ -183,7 +192,7 @@ async function inspectJourneys(
 
 	for (const [key, entry] of Object.entries(manifestJourneys)) {
 		const manifestJourneyPath =
-			typeof entry.path === "string"
+			isRecord(entry) && typeof entry.path === "string"
 				? entry.path
 				: posixPath("product", "journeys", `${key}.md`);
 		if (!(await exists(path.join(rootDir, manifestJourneyPath)))) {
@@ -238,7 +247,11 @@ async function inspectJourneys(
 		const key = path.basename(file, ".md");
 		const manifestEntry = manifest?.journeys?.[key];
 
-		if (manifestEntry?.hash && manifestEntry.hash !== hash) {
+		if (
+			isRecord(manifestEntry) &&
+			typeof manifestEntry.hash === "string" &&
+			manifestEntry.hash !== hash
+		) {
 			issues.push(
 				issue(
 					"journey_stale",
