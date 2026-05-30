@@ -5,6 +5,11 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { glob } from "glob";
 import yaml from "yaml";
+import {
+	getCurrentPhase,
+	getPhaseFromFeature,
+	getPhaseNames,
+} from "./phase.js";
 
 const execAsync = promisify(exec);
 
@@ -115,21 +120,8 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 	const rootDir = process.cwd();
 	const gitStatus = await getGitStatus();
 
-	// Read current phase from VISION.md
-	let currentPhase = 1;
-	let phases: Record<string, string> = {};
-	try {
-		const visionPath = path.join(rootDir, "specs/VISION.md");
-		const visionContent = await fs.readFile(visionPath, "utf-8");
-		const frontmatterMatch = visionContent.match(/^---\n([\s\S]*?)\n---/);
-		if (frontmatterMatch) {
-			const frontmatter = yaml.parse(frontmatterMatch[1]);
-			currentPhase = frontmatter.current_phase || 1;
-			phases = frontmatter.phases || {};
-		}
-	} catch {
-		// Default to phase 1 if VISION.md is missing
-	}
+	const currentPhase = getCurrentPhase(rootDir);
+	const phases = getPhaseNames(rootDir);
 
 	// Check if product/ directory exists (V2 model)
 	let hasProductDir = false;
@@ -285,15 +277,7 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 			let scenarioPhase: number | undefined;
 			try {
 				const featureContent = await fs.readFile(absScenarioPath, "utf-8");
-				// @phase:N must appear before the Feature: keyword to be a tag
-				const featureIndex = featureContent.indexOf("Feature:");
-				if (featureIndex !== -1) {
-					const preamble = featureContent.substring(0, featureIndex);
-					const phaseMatch = preamble.match(/@phase:(\d+)/);
-					if (phaseMatch) {
-						scenarioPhase = Number.parseInt(phaseMatch[1], 10);
-					}
-				}
+				scenarioPhase = getPhaseFromFeature(featureContent);
 			} catch {
 				// Ignore read errors
 			}

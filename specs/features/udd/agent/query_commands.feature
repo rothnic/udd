@@ -22,6 +22,10 @@ Feature: Query Commands for Agent Access
     And the JSON should contain "features" key
     And each feature should have "id", "path", and "scenarios" fields
 
+  Scenario: Query Features Uses Roadmap Phase
+    When I run "udd query features --json"
+    Then phase 3 scenarios should not be reported as deferred
+
   Scenario: Query Status with JSON Output
     When I run "udd query status --json"
     Then the output should be valid JSON

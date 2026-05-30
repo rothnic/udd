@@ -6,6 +6,10 @@ import chalk from "chalk";
 import { Command } from "commander";
 import yaml from "yaml";
 import { userWarn } from "../lib/cli-error.js";
+import {
+	loadUseCaseScenarioPaths,
+	resolveJourneyReference,
+} from "../lib/trace.js";
 
 interface JourneyStep {
 	description: string;
@@ -226,6 +230,12 @@ async function scenarioExists(
 	}
 }
 
+function testPathForScenario(scenarioPath: string): string {
+	return scenarioPath
+		.replace(/^specs\//, "tests/")
+		.replace(/\.feature$/, ".e2e.test.ts");
+}
+
 function generateScenarioContent(journey: Journey, step: JourneyStep): string {
 	const featureName = journey.name;
 	const scenarioName = step.description;
@@ -341,6 +351,7 @@ export const syncCommand = new Command("sync")
 		let changesDetected = 0;
 		let scenariosCreated = 0;
 		const updatedManifest = { ...manifest };
+		const useCaseScenarios = await loadUseCaseScenarioPaths(rootDir);
 
 		for (const file of mdFiles) {
 			const journeyPath = path.join(journeysDir, file);
@@ -376,55 +387,77 @@ export const syncCommand = new Command("sync")
 					continue;
 				}
 
-				const exists = await scenarioExists(rootDir, step.scenarioPath);
-				scenarios.push(step.scenarioPath);
+				const resolvedPaths = resolveJourneyReference(
+					step.scenarioPath,
+					useCaseScenarios,
+				);
+				const scenarioPaths =
+					resolvedPaths.length > 0 ? resolvedPaths : [step.scenarioPath];
 
-				if (exists) {
-					console.log(chalk.dim(`  ✓ ${step.scenarioPath} (exists)`));
-				} else {
-					console.log(chalk.yellow(`  → ${step.scenarioPath} (missing)`));
+				if (
+					resolvedPaths.length === 0 &&
+					!step.scenarioPath.endsWith(".feature")
+				) {
+					userWarn(
+						`Could not resolve journey reference '${step.scenarioPath}' to scenario files`,
+					);
+					continue;
+				}
 
-					if (options.dryRun) {
-						console.log(chalk.dim("    (dry-run: would create)"));
+				for (const scenarioPath of scenarioPaths) {
+					if (!scenarioPath.endsWith(".feature")) {
+						userWarn(
+							`Skipping non-feature journey reference '${scenarioPath}'`,
+						);
 						continue;
 					}
+					const exists = await scenarioExists(rootDir, scenarioPath);
+					scenarios.push(scenarioPath);
 
-					const shouldCreate =
-						options.auto ||
-						(await confirm({
-							message: `Create ${step.scenarioPath}?`,
-							default: true,
-						}));
+					if (exists) {
+						console.log(chalk.dim(`  ✓ ${scenarioPath} (exists)`));
+					} else {
+						console.log(chalk.yellow(`  → ${scenarioPath} (missing)`));
 
-					if (shouldCreate) {
-						// Create scenario file
-						const scenarioFullPath = path.join(rootDir, step.scenarioPath);
-						await fs.mkdir(path.dirname(scenarioFullPath), { recursive: true });
-						const scenarioContent = generateScenarioContent(journey, step);
-						await fs.writeFile(scenarioFullPath, scenarioContent);
-						console.log(chalk.green(`    ✓ Created ${step.scenarioPath}`));
+						if (options.dryRun) {
+							console.log(chalk.dim("    (dry-run: would create)"));
+							continue;
+						}
 
-						// Create test file
-						const testPath = step.scenarioPath
-							.replace("specs/", "tests/")
-							.replace(".feature", ".e2e.test.ts");
-						const testFullPath = path.join(rootDir, testPath);
-						await fs.mkdir(path.dirname(testFullPath), { recursive: true });
-						const testContent = generateTestContent(
-							step.scenarioPath,
-							step.description,
-						);
-						await fs.writeFile(testFullPath, testContent);
-						console.log(chalk.green(`    ✓ Created ${testPath}`));
+						const shouldCreate =
+							options.auto ||
+							(await confirm({
+								message: `Create ${scenarioPath}?`,
+								default: true,
+							}));
 
-						scenariosCreated++;
+						if (shouldCreate) {
+							const scenarioFullPath = path.join(rootDir, scenarioPath);
+							await fs.mkdir(path.dirname(scenarioFullPath), {
+								recursive: true,
+							});
+							const scenarioContent = generateScenarioContent(journey, step);
+							await fs.writeFile(scenarioFullPath, scenarioContent);
+							console.log(chalk.green(`    ✓ Created ${scenarioPath}`));
 
-						// Update manifest scenarios
-						updatedManifest.scenarios[step.scenarioPath] = {
-							hash: hashContent(scenarioContent),
-							test: testPath,
-							status: "pending",
-						};
+							const testPath = testPathForScenario(scenarioPath);
+							const testFullPath = path.join(rootDir, testPath);
+							await fs.mkdir(path.dirname(testFullPath), { recursive: true });
+							const testContent = generateTestContent(
+								scenarioPath,
+								step.description,
+							);
+							await fs.writeFile(testFullPath, testContent);
+							console.log(chalk.green(`    ✓ Created ${testPath}`));
+
+							scenariosCreated++;
+
+							updatedManifest.scenarios[scenarioPath] = {
+								hash: hashContent(scenarioContent),
+								test: testPath,
+								status: "pending",
+							};
+						}
 					}
 				}
 			}

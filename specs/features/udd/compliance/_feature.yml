@@ -1,0 +1,8 @@
+id: udd/compliance
+area: udd
+name: Compliance
+summary: Phase and traceability validation for keeping specs aligned with roadmap state
+use_cases:
+  - validate_phase_consistency
+phase: 3
+kind: core

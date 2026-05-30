@@ -105,6 +105,39 @@ describeFeature(feature, ({ Scenario }) => {
 		});
 	});
 
+	Scenario("Query Features Uses Roadmap Phase", ({ When, Then }) => {
+		let stdout: string;
+
+		When('I run "udd query features --json"', async () => {
+			const result = await runUdd("query features --json");
+			stdout = result.stdout;
+		});
+
+		Then("phase 3 scenarios should not be reported as deferred", () => {
+			const json = JSON.parse(stdout);
+			const compliance = json.features.find(
+				(feature: { id: string }) => feature.id === "udd/compliance",
+			);
+			expect(compliance).toBeDefined();
+			expect(
+				compliance.scenarios.map(
+					(scenario: { slug: string; status: string }) => [
+						scenario.slug,
+						scenario.status,
+					],
+				),
+			).not.toContainEqual(["traceability_validation", "deferred"]);
+			expect(
+				compliance.scenarios.map(
+					(scenario: { slug: string; status: string }) => [
+						scenario.slug,
+						scenario.status,
+					],
+				),
+			).not.toContainEqual(["phase-consistency-validation", "deferred"]);
+		});
+	});
+
 	Scenario("Query Status with JSON Output", ({ When, Then, And }) => {
 		let stdout: string;
 

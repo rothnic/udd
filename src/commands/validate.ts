@@ -3,6 +3,7 @@ import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
 import { glob } from "glob";
+import { validatePhaseConsistency } from "../lib/phase.js";
 
 export const validateCommand = new Command("validate")
 	.description("Check feature scenario completeness")
@@ -101,6 +102,36 @@ export const validateCommand = new Command("validate")
 		console.log(`Files analyzed: ${results.length}`);
 		console.log(`Average completeness: ${summaryColor(`${avgScore}%`)}`);
 
+		let hasPhaseErrors = false;
+		try {
+			const phaseReport = validatePhaseConsistency(rootDir);
+			const phaseErrors = phaseReport.issues.filter(
+				(issue) => issue.level === "error",
+			);
+			hasPhaseErrors = phaseErrors.length > 0;
+			if (phaseReport.issues.length > 0) {
+				console.log(chalk.blue.bold("\n🧭 Phase Consistency\n"));
+				for (const issue of phaseReport.issues) {
+					const marker =
+						issue.level === "error" ? chalk.red("✗") : chalk.yellow("!");
+					const location = issue.file ? `${issue.file}: ` : "";
+					console.log(`${marker} ${location}${issue.message}`);
+					if (issue.suggestion) {
+						console.log(chalk.dim(`  ${issue.suggestion}`));
+					}
+				}
+			}
+		} catch (err) {
+			const code =
+				typeof err === "object" && err && "code" in err
+					? (err as { code?: unknown }).code
+					: undefined;
+			if (code !== "ENOENT") {
+				const message = err instanceof Error ? err.message : String(err);
+				console.error(chalk.red(`\n✗ Phase validation error: ${message}`));
+			}
+		}
+
 		// Recommendations
 		if (avgScore < 80) {
 			console.log(chalk.yellow("\n💡 Recommendations:\n"));
@@ -125,7 +156,7 @@ export const validateCommand = new Command("validate")
 			);
 		}
 
-		if (options.strict && hasIssues) {
+		if (options.strict && (hasIssues || hasPhaseErrors)) {
 			console.log(chalk.red("\n✗ Validation failed (strict mode)"));
 			process.exit(1);
 		}

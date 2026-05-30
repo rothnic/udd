@@ -5,22 +5,19 @@ phase: 3
 actors:
   - developer
   - agent
-future_outcomes:
-  - description: Use-cases reference scenarios with matching phase tags
-    follow_up: "#51"
+outcomes:
+  - description: Roadmap owners can inspect and change the current phase from the CLI
     scenarios:
-      - test-linkage
+      - phase-consistency-validation
     scenario_paths:
-      - udd/test-governance/test-linkage
-  - description: Detects mismatches between journey phase and use-case phase
-    follow_up: "#51"
+      - udd/compliance/phase-consistency-validation
+  - description: Validation reports future-phase feature tags without blocking planning work
     scenarios:
-      - sync-dirty-marking
+      - phase-consistency-validation
     scenario_paths:
-      - udd/test-governance/sync-dirty-marking
-  - description: Provides reports for roadmap owners when inconsistencies appear
-    follow_up: "#51"
+      - udd/compliance/phase-consistency-validation
+  - description: Journey references can resolve through use cases to canonical scenario files
     scenarios:
-      - test-status
+      - traceability_validation
     scenario_paths:
-      - udd/test-governance/test-status
+      - udd/compliance/traceability_validation

@@ -23,7 +23,7 @@ features.
 
 1. Read `specs/VISION.md` for stable project goals → `specs/features/udd/compliance/phase-consistency-validation.feature`
 2. Parse `specs/roadmap.yml` to extract current phase and phase definitions
-3. Scan all feature files for @phase:N tags → `tests/e2e/udd/compliance/phase_consistency_validation.e2e.test.ts`
+3. Scan all feature files for @phase:N tags → `specs/features/udd/compliance/phase-consistency-validation.feature`
 4. Compare phase tags against current_phase
 5. Report mismatches and suggest corrections
 6. Validate phase numbering is sequential (no gaps)
@@ -33,7 +33,6 @@ features.
 - Detect when feature @phase tags exceed roadmap current phase
 - Keep roadmap/current-phase decisions grounded in the stable vision
 - Warn when roadmap says Phase 3 but features are tagged Phase 4
-- Suggest which features should be in current phase based on journey links
 - Validate phase numbers are sequential without gaps
 - Validation runs as part of `udd validate --strict`
 
