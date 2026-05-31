@@ -1,0 +1,8 @@
+id: "udd/reference-rebuild"
+area: "udd"
+name: "Reference Rebuild"
+summary: "Reference product proof that behavior survives a controlled rebuild"
+use_cases:
+  - "strategic_program_execution"
+phase: 3
+kind: "core"

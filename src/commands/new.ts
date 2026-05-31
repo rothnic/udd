@@ -2,8 +2,32 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
+import yaml from "yaml";
 
 export const newCommand = new Command("new").description("Scaffold new specs");
+
+function titleFromSlug(slug: string): string {
+	return slug
+		.split(/[_-]/)
+		.map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+		.join(" ");
+}
+
+async function writeFileIfMissing(
+	filePath: string,
+	content: string,
+): Promise<void> {
+	try {
+		await fs.writeFile(filePath, content, { flag: "wx" });
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === "EEXIST") {
+			throw new Error(
+				`${path.relative(process.cwd(), filePath)} already exists`,
+			);
+		}
+		throw error;
+	}
+}
 
 newCommand
 	.command("journey")
@@ -47,66 +71,131 @@ TODO: Define success criteria
 newCommand
 	.command("scenario")
 	.argument("<domain>", "Domain (e.g. auth)")
-	.argument("<action>", "Action slug (e.g. login)")
-	.description("Create a new scenario and test stub")
-	.action(async (domain, action) => {
+	.argument("<feature>", "Feature group or scenario slug")
+	.argument("[slug]", "Scenario slug when using area + feature + slug")
+	.option("--use-case <id>", "Use case id to link in the feature metadata")
+	.description(
+		"Create one canonical scenario file and print the expected E2E test obligation",
+	)
+	.action(async (domain, feature, slug, options: { useCase?: string }) => {
 		const rootDir = process.cwd();
-		const specsDir = path.join(rootDir, "specs", domain);
-		const filePath = path.join(specsDir, `${action}.feature`);
+		const featureGroup = slug ? feature : domain;
+		const scenarioSlug = slug ?? feature;
+		const specsDir = path.join(
+			rootDir,
+			"specs",
+			"features",
+			domain,
+			featureGroup,
+		);
+		const featureMetaPath = path.join(specsDir, "_feature.yml");
+		const filePath = path.join(specsDir, `${scenarioSlug}.feature`);
+		const featureId = `${domain}/${featureGroup}`;
 
-		const scenarioName = action
-			.split("_")
-			.map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-			.join(" ");
+		const scenarioName = titleFromSlug(scenarioSlug);
+		const featureName = titleFromSlug(featureGroup);
 
 		const content = `Feature: ${domain}
 
   Scenario: ${scenarioName}
     Given I am a User
-    When I ${action.replace(/_/g, " ")}
+    When I ${scenarioSlug.replace(/[_-]/g, " ")}
     Then the action is completed successfully
 `;
 
-		const testDir = path.join(rootDir, "tests", domain);
-		const testFilePath = path.join(testDir, `${action}.e2e.test.ts`);
-		const testContent = `import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
-
-const feature = await loadFeature("specs/${domain}/${action}.feature");
-
-describeFeature(feature, ({ Scenario }) => {
-	Scenario("${scenarioName}", ({ Given, When, Then }) => {
-		Given(/I am a (.+)/, (actor: string) => {
-			// TODO: Implement - set up actor context
-		});
-
-		When(/I (.+)/, (action: string) => {
-			// TODO: Implement - perform action
-		});
-
-		Then("the action is completed successfully", () => {
-			// TODO: Implement - verify outcome
-			expect(true).toBe(true);
-		});
-	});
-});
-`;
+		const testFilePath = path.join(
+			rootDir,
+			"tests",
+			"e2e",
+			domain,
+			featureGroup,
+			`${scenarioSlug}.e2e.test.ts`,
+		);
 
 		try {
-			// Create scenario
 			await fs.mkdir(specsDir, { recursive: true });
-			await fs.writeFile(filePath, content);
+			try {
+				await fs.access(featureMetaPath);
+			} catch {
+				await fs.writeFile(
+					featureMetaPath,
+					yaml.stringify({
+						id: featureId,
+						area: domain,
+						name: featureName,
+						summary: `TODO: Describe ${featureName}.`,
+						use_cases: options.useCase ? [options.useCase] : [],
+						kind: "core",
+					}),
+				);
+			}
+			await writeFileIfMissing(filePath, content);
 			console.log(chalk.green(`Created scenario: ${filePath}`));
-
-			// Create test
-			await fs.mkdir(testDir, { recursive: true });
-			await fs.writeFile(testFilePath, testContent);
-			console.log(chalk.green(`Created test: ${testFilePath}`));
+			console.log(chalk.dim(`Expected E2E test: ${testFilePath}`));
+			console.log(
+				chalk.dim(
+					"No test file was created; implement real user-observable assertions before marking this behavior complete.",
+				),
+			);
 		} catch (error) {
-			console.error(chalk.red("Error creating scenario:"), error);
+			const message = error instanceof Error ? error.message : String(error);
+			console.error(chalk.red("Error creating scenario:"), message);
 			process.exit(1);
 		}
 	});
+
+newCommand
+	.command("use-case")
+	.argument("<id>", "Use case id (e.g. export_csv)")
+	.option("--name <name>", "Human-readable use case name")
+	.option("--summary <summary>", "Use case summary")
+	.option("--phase <number>", "Roadmap phase number", "3")
+	.option("--actor <actor>", "Actor for the use case", "User")
+	.description("Create a valid source-of-truth use case stub")
+	.action(
+		async (
+			id: string,
+			options: {
+				name?: string;
+				summary?: string;
+				phase?: string;
+				actor?: string;
+			},
+		) => {
+			const rootDir = process.cwd();
+			const useCasesDir = path.join(rootDir, "specs", "use-cases");
+			const filePath = path.join(useCasesDir, `${id}.yml`);
+			const name = options.name ?? titleFromSlug(id);
+			const content = yaml.stringify({
+				id,
+				name,
+				summary: options.summary ?? `TODO: Describe the ${name} outcome.`,
+				actors: [options.actor ?? "User"],
+				phase: Number(options.phase ?? 3),
+				outcomes: [
+					{
+						description: "TODO: Describe the user-visible outcome.",
+						scenario_paths: [],
+					},
+				],
+			});
+
+			try {
+				await fs.mkdir(useCasesDir, { recursive: true });
+				await writeFileIfMissing(filePath, content);
+				console.log(chalk.green(`Created use case: ${filePath}`));
+				console.log(
+					chalk.dim(
+						"Next: link this use case from specs/roadmap.yml or specs/VISION.md before implementation.",
+					),
+				);
+			} catch (error) {
+				const message = error instanceof Error ? error.message : String(error);
+				console.error(chalk.red("Error creating use case:"), message);
+				process.exit(1);
+			}
+		},
+	);
 
 newCommand
 	.command("feature")

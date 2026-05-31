@@ -24,7 +24,8 @@ export interface TestGateResult {
 	reviewManifestIssues: string[];
 }
 
-export const TEST_REVIEW_MANIFEST = ".udd/test-reviews.yml";
+export const TEST_REVIEW_MANIFEST = "specs/test-reviews.yml";
+export const LOCAL_TEST_REVIEW_CACHE = ".udd/test-reviews.yml";
 
 function toPosix(filePath: string): string {
 	return filePath.replace(/\\/g, "/");

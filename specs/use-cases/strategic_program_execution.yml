@@ -1,0 +1,23 @@
+id: strategic_program_execution
+name: Strategic Program Execution
+summary: Verify the strategic UDD command surfaces and reference rebuild proof from source-controlled scenarios.
+phase: 3
+actors:
+  - maintainer
+  - agent
+outcomes:
+  - description: Maintainers can inspect trace and impact output from deterministic command results.
+    scenarios:
+      - strategic_program_commands
+    scenario_paths:
+      - udd/strategic-program/strategic_program_commands
+  - description: Agents can collect review evidence and repair plans without relying on chat history.
+    scenarios:
+      - strategic_program_commands
+    scenario_paths:
+      - udd/strategic-program/strategic_program_commands
+  - description: Reviewers can run the task-board rebuild proof against two implementations.
+    scenarios:
+      - task_board_rebuild
+    scenario_paths:
+      - udd/reference-rebuild/task_board_rebuild

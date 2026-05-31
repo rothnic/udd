@@ -38,6 +38,12 @@ export interface DiagnosticReport {
 	healthy: boolean;
 	lastCheck: string;
 	summary: DiagnosticSummary;
+	conditions: Array<{
+		id: string;
+		status: "ok" | "missing" | "stale" | "corrupt" | "drifted" | "partial";
+		message: string;
+		file: string;
+	}>;
 	issues: DiagnosticIssue[];
 }
 
@@ -347,6 +353,12 @@ export async function analyzeProjectDiagnostics(
 	const issues: DiagnosticIssue[] = [];
 	const productExists = await exists(path.join(rootDir, "product"));
 	const specsExists = await exists(path.join(rootDir, "specs"));
+	const manifestExists = await exists(
+		path.join(rootDir, "specs", ".udd", "manifest.yml"),
+	);
+	const journeysExists = await exists(
+		path.join(rootDir, "product", "journeys"),
+	);
 
 	if (!productExists) {
 		issues.push(
@@ -389,12 +401,95 @@ export async function analyzeProjectDiagnostics(
 		info: issues.filter((item) => item.severity === "info").length,
 		total: issues.length,
 	};
+	const hasIssue = (type: DiagnosticIssueType) =>
+		issues.some((item) => item.type === type);
+	const conditions: DiagnosticReport["conditions"] = [
+		{
+			id: "initialized",
+			status: productExists && specsExists ? "ok" : "partial",
+			message:
+				productExists && specsExists
+					? "Product and specs directories are present."
+					: "Project initialization is incomplete.",
+			file: ".",
+		},
+		{
+			id: "product_directory",
+			status: productExists ? "ok" : "missing",
+			message: productExists
+				? "Product directory is present."
+				: "Product directory is missing.",
+			file: "product",
+		},
+		{
+			id: "specs_directory",
+			status: specsExists ? "ok" : "missing",
+			message: specsExists
+				? "Specs directory is present."
+				: "Specs directory is missing.",
+			file: "specs",
+		},
+		{
+			id: "manifest_present",
+			status: manifestExists ? "ok" : "missing",
+			message: manifestExists ? "Manifest exists." : "Manifest is missing.",
+			file: "specs/.udd/manifest.yml",
+		},
+		{
+			id: "manifest_valid",
+			status: hasIssue("manifest_invalid") ? "corrupt" : "ok",
+			message: hasIssue("manifest_invalid")
+				? "Manifest is corrupt or invalid."
+				: "Manifest is parseable.",
+			file: "specs/.udd/manifest.yml",
+		},
+		{
+			id: "journeys_present",
+			status: journeysExists ? "ok" : "missing",
+			message: journeysExists
+				? "Journey directory is present."
+				: "Journey directory is missing.",
+			file: "product/journeys",
+		},
+		{
+			id: "journey_sync",
+			status: hasIssue("journey_stale") ? "stale" : "ok",
+			message: hasIssue("journey_stale")
+				? "One or more journeys changed after manifest generation."
+				: "Journey hashes match the manifest.",
+			file: "product/journeys",
+		},
+		{
+			id: "scenario_links",
+			status: hasIssue("missing_scenario") ? "drifted" : "ok",
+			message: hasIssue("missing_scenario")
+				? "One or more scenario links point to missing files."
+				: "Scenario links resolve.",
+			file: "specs/features",
+		},
+		{
+			id: "orphan_scenarios",
+			status: hasIssue("orphan_scenario") ? "drifted" : "ok",
+			message: hasIssue("orphan_scenario")
+				? "One or more scenarios are not linked from source-of-truth artifacts."
+				: "No orphan scenarios detected.",
+			file: "specs/features",
+		},
+		{
+			id: "generated_state",
+			status: "ok",
+			message:
+				"Generated local state is advisory and not treated as source-of-truth evidence.",
+			file: ".udd",
+		},
+	];
 
 	return {
 		status: issues.length === 0 ? "healthy" : "drift-detected",
 		healthy: issues.length === 0,
 		lastCheck: new Date().toISOString(),
 		summary,
+		conditions,
 		issues,
 	};
 }

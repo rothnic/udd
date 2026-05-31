@@ -1,0 +1,12 @@
+id: prioritize_work
+name: Prioritize Work
+summary: Rank visible work so the team knows what to pull next.
+actors: [Product manager]
+outcomes:
+  - description: Work can be prioritized and reordered.
+    scenarios:
+      - set_priority
+      - reorder_queue
+    scenario_paths:
+      - task-board/prioritize/set_priority
+      - task-board/prioritize/reorder_queue

@@ -1,0 +1,12 @@
+id: assign_work
+name: Assign Work
+summary: Assign a task owner without hiding unassigned work.
+actors: [Engineering lead, Engineer]
+outcomes:
+  - description: Tasks can be assigned and unassigned visibly.
+    scenarios:
+      - assign_owner
+      - show_unassigned
+    scenario_paths:
+      - task-board/assign/assign_owner
+      - task-board/assign/show_unassigned

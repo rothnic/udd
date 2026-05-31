@@ -6,7 +6,7 @@ actors:
   - developer
   - agent
 outcomes:
-  - description: Reviewed tests can be recorded in local UDD state without committing generated review state
+  - description: Reviewed tests can be recorded in source-controlled evidence while ignored local cache state remains non-authoritative
     scenarios:
       - local-gate-validation
     scenario_paths:

@@ -62,6 +62,25 @@ export interface AgentWorkRecommendation {
 	generated_at: string;
 }
 
+export interface AgentEvidencePackage {
+	project: AgentProjectSnapshot["project"];
+	goal: {
+		path: string | null;
+		status: "unknown" | "in_progress" | "complete" | "blocked";
+	};
+	status_snapshot: AgentProjectSnapshot;
+	next_recommendation: AgentWorkRecommendation;
+	issues_summary: DiagnosticReport["summary"];
+	verification: Array<{
+		command: string;
+		status: "not_run" | "passed" | "failed";
+		evidence_path?: string;
+	}>;
+	changed_files: string[];
+	review_notes: string[];
+	generated_at: string;
+}
+
 const AUTO_FIXABLE_TYPES = new Set<DiagnosticIssue["type"]>([
 	"manifest_missing",
 	"journey_stale",
@@ -285,6 +304,47 @@ export function recommendNextAgentWork(
 			"No current-phase failing, missing, stale, or diagnostic work found.",
 		suggested_files: [],
 		blocking,
+		generated_at: now.toISOString(),
+	};
+}
+
+export async function buildAgentEvidencePackage(
+	status: ProjectStatus,
+	report: DiagnosticReport,
+	options: {
+		goalPath?: string | null;
+		goalStatus?: AgentEvidencePackage["goal"]["status"];
+		changedFiles?: string[];
+		reviewNotes?: string[];
+		verification?: AgentEvidencePackage["verification"];
+		now?: Date;
+	} = {},
+): Promise<AgentEvidencePackage> {
+	const now = options.now ?? new Date();
+	const snapshot = buildAgentProjectSnapshot(
+		status,
+		report,
+		process.cwd(),
+		now,
+	);
+	const next = recommendNextAgentWork(status, report, now);
+
+	return {
+		project: snapshot.project,
+		goal: {
+			path: options.goalPath ?? null,
+			status: options.goalStatus ?? "in_progress",
+		},
+		status_snapshot: snapshot,
+		next_recommendation: next,
+		issues_summary: report.summary,
+		verification: options.verification ?? [
+			{ command: "./bin/udd status", status: "passed" },
+			{ command: "./bin/udd lint", status: "not_run" },
+			{ command: "npm test -- --run", status: "not_run" },
+		],
+		changed_files: options.changedFiles ?? [],
+		review_notes: options.reviewNotes ?? [],
 		generated_at: now.toISOString(),
 	};
 }
