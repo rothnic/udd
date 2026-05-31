@@ -12,6 +12,9 @@ Autonomous iteration loop for UDD projects. Use this to drive continuous progres
 ### Status (JSON)
 !`./bin/udd status --json`
 
+### OpenCode Adapter Recommendation
+!`./bin/udd opencode next --json`
+
 ### Git State
 !`git status --short`
 
@@ -27,6 +30,8 @@ From the JSON status above, identify:
 3. Any `missing` scenarios - these need test files
 4. Any `stale` scenarios - run `/udd/test` first
 5. Git state - commit completed work before continuing
+6. OpenCode recommendation - use it only when it agrees with UDD status and the
+   current user request.
 
 ### Step 2: Check Completion
 

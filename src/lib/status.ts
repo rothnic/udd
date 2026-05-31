@@ -31,6 +31,7 @@ export interface RequirementStatus {
 }
 
 export interface FeatureStatus {
+	path: string;
 	scenarios: Record<string, ScenarioStatus>;
 	requirements: Record<string, RequirementStatus>;
 }
@@ -256,9 +257,14 @@ export async function getProjectStatus(): Promise<ProjectStatus> {
 		}
 		const data = yaml.parse(content) as { id: string };
 		const featureId = data.id;
+		const featurePath = path
+			.dirname(file)
+			.replace(/\\/g, "/")
+			.replace(/^specs\/features\//, "");
 
 		status.active_features.push(featureId);
 		status.features[featureId] = {
+			path: featurePath,
 			scenarios: {},
 			requirements: {},
 		};

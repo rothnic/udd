@@ -20,21 +20,17 @@ outcomes:
       - codex_hooks
     scenario_paths:
       - udd/cli/codex_hooks
-future_outcomes:
   - description: OpenCode adapter can check deep status
-    follow_up: "#54"
     scenarios:
       - status_deep
     scenario_paths:
       - opencode/tools/status_deep
   - description: OpenCode adapter can get next recommendation
-    follow_up: "#54"
     scenarios:
       - next_recommendation
     scenario_paths:
       - opencode/tools/next_recommendation
   - description: OpenCode adapter can list all issues
-    follow_up: "#54"
     scenarios:
       - issues_list
     scenario_paths:
