@@ -11,6 +11,10 @@ Run the UDD status command and provide a concise assessment.
 
 !`./bin/udd status`
 
+## Execute OpenCode Adapter Status
+
+!`./bin/udd opencode status`
+
 ## Analysis
 
 Based on the status output:
@@ -19,6 +23,8 @@ Based on the status output:
 2. **Health Check**: Any unsatisfied outcomes or failing scenarios?
 3. **Stale Tests**: Are test results current or stale?
 4. **Git State**: Is the working directory clean?
+5. **Adapter State**: Does `udd opencode status` show the same phase, health,
+   and issue counts from shared UDD state?
 
 ## Summary
 

@@ -130,20 +130,16 @@ phases:
           - status_prompt
           - guide_user
           - codex_hooks
-        future_scenarios:
-          follow_up: "#54"
-          scenarios:
-            - status_deep
-            - next_recommendation
-            - issues_list
-          scenario_paths:
-            - opencode/tools/status_deep
-            - opencode/tools/next_recommendation
-            - opencode/tools/issues_list
+          - status_deep
+          - next_recommendation
+          - issues_list
         scenario_paths:
           - udd/agent/status_prompt
           - udd/agent/guide_user
           - udd/cli/codex_hooks
+          - opencode/tools/status_deep
+          - opencode/tools/next_recommendation
+          - opencode/tools/issues_list
       - id: capture_ideas
         capability: idea-management
         increment: v1-basic

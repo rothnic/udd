@@ -8,6 +8,7 @@ import { inboxCommand } from "../src/commands/inbox.js";
 import { initCommand } from "../src/commands/init.js";
 import { lintCommand } from "../src/commands/lint.js";
 import { newCommand } from "../src/commands/new.js";
+import { opencodeCommand } from "../src/commands/opencode.js";
 import { phaseCommand } from "../src/commands/phase.js";
 import { queryCommand } from "../src/commands/query.js";
 import { statusCommand } from "../src/commands/status.js";
@@ -33,5 +34,6 @@ program.addCommand(testCommand);
 program.addCommand(inboxCommand);
 program.addCommand(queryCommand);
 program.addCommand(hooksCommand);
+program.addCommand(opencodeCommand);
 
 program.parse(process.argv);
