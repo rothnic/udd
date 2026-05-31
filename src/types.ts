@@ -95,3 +95,22 @@ export type FeatureSpec = z.infer<typeof FeatureSpecSchema>;
 export type TechnicalRequirement = z.infer<typeof TechnicalRequirementSchema>;
 export type SpecChange = z.infer<typeof SpecChangeSchema>;
 export type ResearchMetadata = z.infer<typeof ResearchMetadataSchema>;
+
+export const TestReviewStatusSchema = z.enum(["clean", "dirty"]);
+
+export const TestReviewRecordSchema = z.object({
+	path: z.string(),
+	feature: z.string().optional(),
+	status: TestReviewStatusSchema,
+	lastReviewed: z.string().datetime().nullable(),
+	reviewCount: z.number().default(0),
+	dirtyReason: z.string().nullable(),
+});
+
+export const TestReviewManifestSchema = z.object({
+	tests: z.array(TestReviewRecordSchema).default([]),
+});
+
+export type TestReviewStatus = z.infer<typeof TestReviewStatusSchema>;
+export type TestReviewRecord = z.infer<typeof TestReviewRecordSchema>;
+export type TestReviewManifest = z.infer<typeof TestReviewManifestSchema>;
