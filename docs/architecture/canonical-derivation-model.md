@@ -26,9 +26,15 @@ Objectives answer:
 ### Use Case
 
 Use cases live in `specs/use-cases/*.yml`. They group user-visible outcomes and
-link those outcomes to canonical scenario paths.
+link those outcomes to canonical scenario ids and paths.
 
-The current CLI compatibility layer reads use-case outcomes and
+Keep scenario ids separate from file paths across specification files. Store
+canonical ids under `scenarios` and concrete feature-file paths under
+`scenario_paths`. This convention applies anywhere the docs or specs need both
+the stable behavior id and the file lookup path, including roadmap, use-case,
+and requirement artifacts.
+
+The current CLI compatibility layer reads use-case outcomes, `scenarios`, and
 `scenario_paths` to build status and traceability views.
 
 ### Scenario
@@ -51,6 +57,10 @@ Journey files in `product/journeys/*.md` and SysML-informed notes help authors
 ask better product questions. They are valuable context, but they should not
 duplicate the required behavior contract. When a journey changes behavior, the
 author must update the use case or scenario that carries the contract.
+
+Do not hardcode broad journey or use-case classification lists in journey
+markdown. Use `specs/roadmap.yml` as the classification source of truth and
+distinguish current use cases, future use cases, and backlog journeys there.
 
 Current diagnostics can report stale journey mappings and missing scenario
 references, because this repository dogfoods journey-driven discovery. That is a

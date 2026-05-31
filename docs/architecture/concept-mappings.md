@@ -76,7 +76,8 @@ Use component or requirement artifacts when:
 
 ## Naming Guidance
 
-- Use stable snake_case ids for use cases.
+- Use stable snake_case ids for use cases and personas.
+- Keep journey ids in kebab-case to match existing journey filenames.
 - Use path-like scenario ids that match feature locations.
 - Keep phase assignment in `specs/roadmap.yml` and scenario `@phase:N` tags.
 - Avoid generic planning names such as story, epic, or ticket in trace fields
