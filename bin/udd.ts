@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import { discoverCommand } from "../src/commands/discover.js";
+import { doctorCommand } from "../src/commands/doctor.js";
+import { healthCommand } from "../src/commands/health.js";
 import { hooksCommand } from "../src/commands/hooks.js";
 import { inboxCommand } from "../src/commands/inbox.js";
 import { initCommand } from "../src/commands/init.js";
@@ -24,6 +26,8 @@ program.addCommand(statusCommand);
 program.addCommand(newCommand);
 program.addCommand(phaseCommand);
 program.addCommand(discoverCommand);
+program.addCommand(doctorCommand);
+program.addCommand(healthCommand);
 program.addCommand(validateCommand);
 program.addCommand(testCommand);
 program.addCommand(inboxCommand);

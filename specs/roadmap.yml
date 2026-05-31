@@ -227,6 +227,15 @@ phases:
         scenario_paths:
           - udd/compliance/phase-consistency-validation
           - udd/compliance/traceability_validation
+      - id: recover_from_drift
+        capability: recovery-diagnostics
+        increment: v1-diagnostics
+        status: delivered
+        follow_up: "#52"
+        scenarios:
+          - diagnose_project_health
+        scenario_paths:
+          - udd/recovery/diagnose_project_health
   - id: agent-intelligence
     name: Agent Intelligence
     number: 4
@@ -353,6 +362,18 @@ capabilities:
         follow_up: "#51"
         use_cases:
           - validate_phase_consistency
+  recovery-diagnostics:
+    name: Recovery Diagnostics
+    description: Enduring ability to diagnose initialization and traceability drift before recovery work begins
+    current_increment: v1-diagnostics
+    increments:
+      - version: v1-diagnostics
+        phase: opencode-integration
+        number: 3
+        status: delivered
+        follow_up: "#52"
+        use_cases:
+          - recover_from_drift
 validation_rules:
   scenario_phase_must_match_use_case_phase: true
   use_case_phase_must_match_roadmap_phase: true
@@ -369,6 +390,6 @@ backlog_journeys:
     follow_up: "#52"
     reason: Doctor/health recovery and orchestration implementation are deferred.
   - id: recover-from-drift
-    status: future
+    status: partial
     follow_up: "#52"
-    reason: Recovery scenarios and commands are deferred to the diagnostics slice.
+    reason: Doctor/health diagnostics are delivered through recover_from_drift; broader recovery automation remains future work.

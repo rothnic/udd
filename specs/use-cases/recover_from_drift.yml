@@ -1,0 +1,13 @@
+id: recover_from_drift
+name: Recover from Drift
+summary: Detect UDD initialization and traceability drift before remediation work begins
+phase: 3
+actors:
+  - developer
+  - agent
+outcomes:
+  - description: Developers and agents can diagnose initialized, partial, and drifted projects without applying fixes
+    scenarios:
+      - diagnose_project_health
+    scenario_paths:
+      - udd/recovery/diagnose_project_health

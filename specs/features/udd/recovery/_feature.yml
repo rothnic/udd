@@ -1,0 +1,8 @@
+id: udd/recovery
+area: udd
+name: Recovery Diagnostics
+summary: Read-only diagnostics for identifying UDD project health and traceability drift
+use_cases:
+  - recover_from_drift
+phase: 3
+kind: core
