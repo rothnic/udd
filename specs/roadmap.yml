@@ -154,8 +154,12 @@ phases:
       - id: track_test_quality
         capability: test-governance
         increment: v1-basic
-        status: future
+        status: partial
         follow_up: "#55"
+        scenarios:
+          - local-gate-validation
+        scenario_paths:
+          - udd/test-governance/local-gate-validation
         future_scenarios:
           - health-metrics
           - test-scan
@@ -180,8 +184,12 @@ phases:
       - id: manage_test_lifecycle
         capability: test-governance
         increment: v1-basic
-        status: future
+        status: partial
         follow_up: "#55"
+        scenarios:
+          - local-gate-validation
+        scenario_paths:
+          - udd/test-governance/local-gate-validation
         future_scenarios:
           - test-review
           - hooks-installation
@@ -193,8 +201,12 @@ phases:
       - id: enforce_quality_gates
         capability: test-governance
         increment: v1-basic
-        status: future
+        status: partial
         follow_up: "#55"
+        scenarios:
+          - local-gate-validation
+        scenario_paths:
+          - udd/test-governance/local-gate-validation
         future_scenarios:
           - ci-validation
           - test-approval

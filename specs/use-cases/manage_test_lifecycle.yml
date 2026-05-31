@@ -5,6 +5,12 @@ phase: 3
 actors:
   - developer
   - agent
+outcomes:
+  - description: Reviewed tests can be recorded in local UDD state without committing generated review state
+    scenarios:
+      - local-gate-validation
+    scenario_paths:
+      - udd/test-governance/local-gate-validation
 future_outcomes:
   - description: Tests have lifecycle states (draft, active, deprecated)
     follow_up: "#55"

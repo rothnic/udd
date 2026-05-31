@@ -5,6 +5,12 @@ phase: 3
 actors:
   - developer
   - agent
+outcomes:
+  - description: Explicit local test-governance gates report findings and only fail when strict mode is requested
+    scenarios:
+      - local-gate-validation
+    scenario_paths:
+      - udd/test-governance/local-gate-validation
 future_outcomes:
   - description: CI enforces coverage and pass-rate thresholds
     follow_up: "#55"

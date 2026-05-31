@@ -5,6 +5,12 @@ phase: 3
 actors:
   - developer
   - agent
+outcomes:
+  - description: Test inventory scans identify linked, unlinked, orphaned, and stubbed tests before gates are enabled
+    scenarios:
+      - local-gate-validation
+    scenario_paths:
+      - udd/test-governance/local-gate-validation
 future_outcomes:
   - description: Test coverage metrics are available
     follow_up: "#55"
