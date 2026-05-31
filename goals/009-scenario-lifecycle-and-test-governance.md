@@ -31,6 +31,14 @@ gates only when explicitly requested.
   regenerable.
 - Strict and non-strict gate modes.
 
+## Existing Drift To Reconcile
+
+The current `manage_test_lifecycle` use case and
+`local-gate-validation.feature` scenario still describe local review state as
+part of the active governance behavior. This goal must update the use case,
+scenario, and E2E tests together before changing implementation so the
+source-of-truth chain no longer makes hidden local state authoritative.
+
 ## Non-Goals
 
 - CI enforcement by default.

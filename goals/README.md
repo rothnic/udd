@@ -7,11 +7,18 @@ checks, and prepare focused PRs.
 
 ## How To Use
 
-1. Pick the first open goal in numeric order unless a roadmap owner selects a
-   specific strategic goal.
-2. Give the agent the goal path.
-3. Execute only the work described by that goal.
-4. Run the explicit checks and record any deferred work by issue or goal path.
+1. Start with `000-strategic-execution-master-goal.md` for program execution.
+2. Pick the first open implementation goal in numeric order unless a roadmap
+   owner selects a specific strategic goal.
+3. Give the agent the goal path.
+4. Execute only the work described by that goal.
+5. Run the explicit checks and record any deferred work by issue or goal path.
+
+## Master Program Goal
+
+- `000-strategic-execution-master-goal.md`: ordered execution program for goals
+  007-012, including user-facing success criteria, independent review gates,
+  commit checkpoints, and final end-to-end PR requirements.
 
 ## Current Strategic Portfolio
 
