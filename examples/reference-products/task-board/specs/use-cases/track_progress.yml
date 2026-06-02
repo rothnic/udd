@@ -1,0 +1,14 @@
+id: track_progress
+name: Track Progress
+summary: Move tasks through visible workflow states.
+actors: [Engineer]
+outcomes:
+  - description: Progress states are updated and constrained.
+    scenarios:
+      - start_work
+      - block_work
+      - complete_with_note
+    scenario_paths:
+      - task-board/progress/start_work
+      - task-board/progress/block_work
+      - task-board/progress/complete_with_note

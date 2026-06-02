@@ -121,8 +121,8 @@ test("stubbed", () => expect(true).toBe(true));
 				},
 			);
 
-			When('I run "udd test scan --json"', async () => {
-				const result = await runUdd("test scan --json");
+			When('I run "udd test-scan --json"', async () => {
+				const result = await runUdd("test-scan --json");
 				scan = JSON.parse(result.stdout);
 			});
 
@@ -169,8 +169,8 @@ test("login", () => expect(1 + 1).toBe(2));
 				},
 			);
 
-			When('I run "udd test scan --json"', async () => {
-				const result = await runUdd("test scan --json");
+			When('I run "udd test-scan --json"', async () => {
+				const result = await runUdd("test-scan --json");
 				scan = JSON.parse(result.stdout);
 			});
 
@@ -186,14 +186,16 @@ test("login", () => expect(1 + 1).toBe(2));
 		},
 	);
 
-	Scenario("Record a local test review", ({ Given, When, Then, And }) => {
-		let reviewOutput = "";
+	Scenario(
+		"Record a source-controlled test review",
+		({ Given, When, Then, And }) => {
+			let reviewOutput = "";
 
-		Given("the project has a meaningful linked test", async () => {
-			await writeFeature("specs/features/auth/login.feature");
-			await writeTest(
-				"tests/auth/login.e2e.test.ts",
-				`import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
+			Given("the project has a meaningful linked test", async () => {
+				await writeFeature("specs/features/auth/login.feature");
+				await writeTest(
+					"tests/auth/login.e2e.test.ts",
+					`import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
 const feature = await loadFeature("specs/features/auth/login.feature");
 describeFeature(feature, ({ Scenario }) => {
@@ -204,40 +206,41 @@ describeFeature(feature, ({ Scenario }) => {
   });
 });
 `,
-			);
-		});
+				);
+			});
 
-		When('I run "udd test review tests/auth/login.e2e.test.ts"', async () => {
-			const result = await runUdd("test review tests/auth/login.e2e.test.ts");
-			reviewOutput = result.stdout;
-		});
+			When('I run "udd test review tests/auth/login.e2e.test.ts"', async () => {
+				const result = await runUdd("test review tests/auth/login.e2e.test.ts");
+				reviewOutput = result.stdout;
+			});
 
-		Then("the test review manifest records the test as clean", async () => {
-			const manifest = await fs.readFile(".udd/test-reviews.yml", "utf-8");
-			expect(manifest).toContain("path: tests/auth/login.e2e.test.ts");
-			expect(manifest).toContain("status: clean");
-			expect(reviewOutput).toContain("Test reviewed");
-		});
+			Then("the test review manifest records the test as clean", async () => {
+				const manifest = await fs.readFile("specs/test-reviews.yml", "utf-8");
+				expect(manifest).toContain("path: tests/auth/login.e2e.test.ts");
+				expect(manifest).toContain("status: clean");
+				expect(reviewOutput).toContain("Test reviewed");
+			});
 
-		And('"udd test status --json" reports the review record', async () => {
-			const status = JSON.parse((await runUdd("test status --json")).stdout);
-			expect(status.tests).toContainEqual(
-				expect.objectContaining({
-					path: "tests/auth/login.e2e.test.ts",
-					status: "clean",
-				}),
-			);
-		});
-	});
+			And('"udd test status --json" reports the review record', async () => {
+				const status = JSON.parse((await runUdd("test status --json")).stdout);
+				expect(status.tests).toContainEqual(
+					expect.objectContaining({
+						path: "tests/auth/login.e2e.test.ts",
+						status: "clean",
+					}),
+				);
+			});
+		},
+	);
 
 	Scenario("Run an explicit local gate", ({ Given, When, Then }) => {
 		let advisory = "";
 		let strict = "";
 
 		Given("the project has dirty local review state", async () => {
-			await fs.mkdir(".udd", { recursive: true });
+			await fs.mkdir("specs", { recursive: true });
 			await fs.writeFile(
-				".udd/test-reviews.yml",
+				"specs/test-reviews.yml",
 				`tests:
   - path: tests/auth/login.e2e.test.ts
     status: dirty
@@ -248,8 +251,8 @@ describeFeature(feature, ({ Scenario }) => {
 			);
 		});
 
-		When('I run "udd test gate"', async () => {
-			const result = await runUdd("test gate");
+		When('I run "udd gate test-governance"', async () => {
+			const result = await runUdd("gate test-governance");
 			advisory = result.stdout;
 		});
 
@@ -259,8 +262,8 @@ describeFeature(feature, ({ Scenario }) => {
 			expect(advisory).toContain("Advisory only");
 		});
 
-		When('I run "udd test gate --strict"', async () => {
-			const result = await runUddFailure("test gate --strict");
+		When('I run "udd gate test-governance --strict"', async () => {
+			const result = await runUddFailure("gate test-governance --strict");
 			strict = `${result.stdout}\n${result.stderr}`;
 		});
 
@@ -270,26 +273,29 @@ describeFeature(feature, ({ Scenario }) => {
 	});
 
 	Scenario(
-		"Block strict gates on invalid local review state",
+		"Block strict gates on invalid source-controlled review state",
 		({ Given, When, Then }) => {
 			let strict = "";
 
-			Given("the project has an invalid local review manifest", async () => {
-				await fs.mkdir(".udd", { recursive: true });
-				await fs.writeFile(
-					".udd/test-reviews.yml",
-					`tests:
+			Given(
+				"the project has an invalid source-controlled review manifest",
+				async () => {
+					await fs.mkdir("specs", { recursive: true });
+					await fs.writeFile(
+						"specs/test-reviews.yml",
+						`tests:
   - path: tests/auth/login.e2e.test.ts
     status: unknown
     lastReviewed: null
     reviewCount: 1
     dirtyReason: null
 `,
-				);
-			});
+					);
+				},
+			);
 
-			When('I run "udd test gate --strict"', async () => {
-				const result = await runUddFailure("test gate --strict");
+			When('I run "udd gate test-governance --strict"', async () => {
+				const result = await runUddFailure("gate test-governance --strict");
 				strict = `${result.stdout}\n${result.stderr}`;
 			});
 
@@ -297,9 +303,54 @@ describeFeature(feature, ({ Scenario }) => {
 				"the strict gate fails with the review manifest issue listed",
 				() => {
 					expect(strict).toContain("Review manifest issue");
-					expect(strict).toContain(".udd/test-reviews.yml");
+					expect(strict).toContain("specs/test-reviews.yml");
 				},
 			);
+		},
+	);
+
+	Scenario(
+		"Ignore invalid local review cache for gate decisions",
+		({ Given, When, Then }) => {
+			let strict = "";
+			let commandError:
+				| { code: number; stdout: string; stderr: string }
+				| undefined;
+
+			Given(
+				"the project has an invalid ignored local review cache",
+				async () => {
+					await fs.mkdir(".udd", { recursive: true });
+					await fs.writeFile(
+						".udd/test-reviews.yml",
+						`tests:
+  - path: tests/auth/login.e2e.test.ts
+    status: unknown
+    lastReviewed: null
+    reviewCount: 1
+    dirtyReason: null
+`,
+					);
+				},
+			);
+
+			When('I run "udd gate test-governance --strict"', async () => {
+				try {
+					const result = await runUdd("gate test-governance --strict");
+					strict = result.stdout;
+				} catch (error) {
+					commandError = error as {
+						code: number;
+						stdout: string;
+						stderr: string;
+					};
+				}
+			});
+
+			Then("the strict gate does not fail because of local cache state", () => {
+				expect(commandError).toBeUndefined();
+				expect(strict).toContain("Test governance gate passed");
+			});
 		},
 	);
 });

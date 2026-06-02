@@ -1,0 +1,14 @@
+id: capture_work
+name: Capture Work
+summary: Capture incoming work with enough context for prioritization.
+actors: [Product manager, Engineer]
+outcomes:
+  - description: New work item is captured with a title and description.
+    scenarios:
+      - create_item
+      - require_title
+      - tag_source
+    scenario_paths:
+      - task-board/capture/create_item
+      - task-board/capture/require_title
+      - task-board/capture/tag_source

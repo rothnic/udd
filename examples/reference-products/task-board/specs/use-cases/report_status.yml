@@ -1,0 +1,12 @@
+id: report_status
+name: Report Status
+summary: Summarize board health from user-visible task state.
+actors: [Product manager, Stakeholder]
+outcomes:
+  - description: Board reports counts and overdue work clearly.
+    scenarios:
+      - count_by_state
+      - filter_by_owner
+    scenario_paths:
+      - task-board/report/count_by_state
+      - task-board/report/filter_by_owner

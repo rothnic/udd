@@ -1,0 +1,8 @@
+id: "udd/strategic-program"
+area: "udd"
+name: "Strategic Program"
+summary: "Command evidence for the strategic UDD execution program"
+use_cases:
+  - "strategic_program_execution"
+phase: 3
+kind: "core"

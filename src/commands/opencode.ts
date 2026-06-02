@@ -1,12 +1,18 @@
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import chalk from "chalk";
 import { Command } from "commander";
 import {
+	buildAgentEvidencePackage,
 	buildAgentIssueList,
 	buildAgentProjectSnapshot,
 	recommendNextAgentWork,
 } from "../lib/agent-integration.js";
 import { analyzeProjectDiagnostics } from "../lib/diagnostics.js";
 import { getProjectStatus } from "../lib/status.js";
+import { validateSpecs } from "../lib/validator.js";
+
+const execFileAsync = promisify(execFile);
 
 async function getAgentInputs() {
 	const [status, diagnostics] = await Promise.all([
@@ -15,6 +21,19 @@ async function getAgentInputs() {
 	]);
 
 	return { status, diagnostics };
+}
+
+async function getChangedFiles(): Promise<string[]> {
+	try {
+		const { stdout } = await execFileAsync("git", ["status", "--porcelain"]);
+		return stdout
+			.split("\n")
+			.map((line) => line.trim())
+			.filter(Boolean)
+			.map((line) => line.replace(/^.. /, ""));
+	} catch {
+		return [];
+	}
 }
 
 export const opencodeCommand = new Command("opencode").description(
@@ -126,4 +145,50 @@ opencodeCommand
 			console.log(issue.message);
 			console.log(chalk.dim(`Next: ${issue.recommendation}`));
 		}
+	});
+
+opencodeCommand
+	.command("evidence")
+	.description("Build an adapter-neutral review evidence package")
+	.option("--json", "Output JSON for agent consumption")
+	.option("--goal <path>", "Goal file path this evidence supports")
+	.action(async (options: { json?: boolean; goal?: string }) => {
+		const { status, diagnostics } = await getAgentInputs();
+		const lint = await validateSpecs();
+		const evidence = await buildAgentEvidencePackage(status, diagnostics, {
+			goalPath: options.goal,
+			goalStatus:
+				diagnostics.summary.critical === 0 ? "in_progress" : "blocked",
+			changedFiles: await getChangedFiles(),
+			verification: [
+				{ command: "./bin/udd status", status: "passed" },
+				{
+					command: "./bin/udd lint",
+					status: lint.valid ? "passed" : "failed",
+				},
+				{
+					command: "npm test -- --run",
+					status: "not_run",
+				},
+			],
+			reviewNotes: [
+				"Adapter-neutral evidence package generated from shared UDD project facts.",
+				"Test status is not inferred from generated local state; attach explicit command output in PR evidence.",
+			],
+		});
+
+		if (options.json) {
+			console.log(JSON.stringify(evidence, null, 2));
+			return;
+		}
+
+		console.log(chalk.bold("OpenCode Evidence"));
+		console.log(chalk.dim("================="));
+		console.log("");
+		console.log(`Project: ${evidence.project.name}`);
+		console.log(`Goal: ${evidence.goal.path ?? "not specified"}`);
+		console.log(
+			`Issues: ${evidence.issues_summary.total} total (${evidence.issues_summary.critical} critical, ${evidence.issues_summary.warning} warning, ${evidence.issues_summary.info} info)`,
+		);
+		console.log(`Next: ${evidence.next_recommendation.recommended}`);
 	});
