@@ -1,5 +1,8 @@
 import { expect, test } from "vitest";
-import { recommendNextAgentWork } from "../../src/lib/agent-integration.js";
+import {
+	buildAgentEvidencePackage,
+	recommendNextAgentWork,
+} from "../../src/lib/agent-integration.js";
 import type { DiagnosticReport } from "../../src/lib/diagnostics.js";
 import type { ProjectStatus } from "../../src/lib/status.js";
 
@@ -68,4 +71,53 @@ test("agent next work treats warning diagnostics as blockers", () => {
 		severity: "warning",
 		type: "orphan_scenario",
 	});
+});
+
+test("agent evidence includes changed-file impact recommendations", async () => {
+	const status: ProjectStatus = {
+		git: {
+			branch: "test",
+			clean: false,
+			modified: 1,
+			staged: 0,
+			untracked: 0,
+		},
+		current_phase: 3,
+		phases: { "3": "Agent Integration" },
+		active_features: [],
+		features: {},
+		use_cases: {},
+		orphaned_scenarios: [],
+		journeys: {},
+		hasProductDir: true,
+	};
+	const report: DiagnosticReport = {
+		status: "healthy",
+		healthy: true,
+		lastCheck: "2026-06-03T00:00:00.000Z",
+		summary: {
+			critical: 0,
+			warning: 0,
+			info: 0,
+			total: 0,
+		},
+		conditions: [],
+		issues: [],
+	};
+
+	const evidence = await buildAgentEvidencePackage(status, report, {
+		changedFiles: ["specs/features/udd/recovery/plan_repair.feature"],
+		now: new Date("2026-06-03T00:00:00.000Z"),
+	});
+
+	expect(evidence.changed_file_impacts).toContainEqual(
+		expect.objectContaining({
+			path: "specs/features/udd/recovery/plan_repair.feature",
+			recommended_commands: expect.arrayContaining([
+				expect.stringContaining(
+					"tests/e2e/udd/recovery/plan_repair.e2e.test.ts",
+				),
+			]),
+		}),
+	);
 });
