@@ -38,6 +38,7 @@ export interface TraceDiagnostic {
 	type:
 		| "missing_scenario"
 		| "missing_test"
+		| "stale_scenario"
 		| "orphan_scenario"
 		| "orphan_test"
 		| "duplicate_scenario"
@@ -385,6 +386,13 @@ export async function buildTraceGraph(
 			nodir: true,
 		})
 	).sort();
+	let resultsMtime: number | undefined;
+	try {
+		const stats = await fs.stat(path.join(rootDir, ".udd/results.json"));
+		resultsMtime = stats.mtimeMs;
+	} catch {
+		// Missing generated results means linked scenarios need a fresh test run.
+	}
 	const testsByScenario = new Map<string, string[]>();
 	for (const file of testFiles) {
 		const content = await fs.readFile(path.join(rootDir, file), "utf-8");
@@ -429,6 +437,42 @@ export async function buildTraceGraph(
 				message: `Scenario ${scenario} has no linked E2E test.`,
 				source: { path: scenarioIdToPath(scenario) },
 			});
+		}
+		if (testsByScenario.has(scenario) && !futureScenarioPaths.has(scenario)) {
+			const scenarioPath = scenarioIdToPath(scenario);
+			let staleReason: string | undefined;
+			if (resultsMtime === undefined) {
+				staleReason =
+					"No generated test results exist for this linked scenario.";
+			} else {
+				try {
+					const [scenarioStats, linkedTestStats] = await Promise.all([
+						fs.stat(path.join(rootDir, scenarioPath)),
+						Promise.all(
+							(testsByScenario.get(scenario) ?? []).map((testPath) =>
+								fs.stat(path.join(rootDir, testPath)),
+							),
+						),
+					]);
+					if (
+						scenarioStats.mtimeMs > resultsMtime ||
+						linkedTestStats.some((stats) => stats.mtimeMs > resultsMtime)
+					) {
+						staleReason =
+							"Scenario or linked test changed after generated test results.";
+					}
+				} catch {
+					// Missing scenario/test diagnostics are already emitted elsewhere.
+				}
+			}
+			if (staleReason) {
+				diagnostics.push({
+					type: "stale_scenario",
+					severity: "info",
+					message: `Scenario ${scenario} is stale: ${staleReason}`,
+					source: { path: scenarioPath },
+				});
+			}
 		}
 		if (futureScenarioPaths.has(scenario)) {
 			diagnostics.push({

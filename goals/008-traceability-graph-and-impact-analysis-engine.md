@@ -50,22 +50,38 @@ without duplicating requirements across artifact layers.
 
 ## Tasks
 
-- [ ] Update use cases, feature scenarios, and failing E2E tests for trace and
+## Completion Evidence
+
+Recorded on 2026-06-04 in
+`docs/project/reviews/2026-06-04/goal-008-completion-evidence.md`.
+
+Goal 008 is complete because PR #67 added the shared trace graph engine,
+`udd trace --json`, `udd impact <path>`, source-controlled strategic-program
+feature/E2E proof, deterministic graph output, source file references,
+diagnostics, and targeted test recommendations. The 2026-06-04 completion PR
+adds the remaining graph fixture coverage, stale-scenario graph diagnostics, and
+practical status/lint graph consumption needed to close the original checklist.
+Later Goal 017 extends this foundation with richer regression recommendations;
+that upgrade is separate from the Goal 008 baseline.
+
+## Tasks
+
+- [x] Update use cases, feature scenarios, and failing E2E tests for trace and
       impact behavior before implementing graph commands.
-- [ ] Define graph node and edge types for objective, capability, phase, use
+- [x] Define graph node and edge types for objective, capability, phase, use
       case, outcome, scenario, and test.
-- [ ] Build parsers that preserve source file and line references.
-- [ ] Add deterministic graph serialization for CLI and agent consumers.
-- [ ] Implement orphan scenario detection through graph traversal.
-- [ ] Implement missing test and missing scenario diagnostics.
-- [ ] Implement stale scenario classification using existing manifest behavior.
-- [ ] Implement future-phase classification without blocking planning work.
-- [ ] Add impact analysis for changed feature files.
-- [ ] Add impact analysis for changed use-case files.
-- [ ] Add impact analysis for changed roadmap or phase files.
-- [ ] Refactor status/lint to consume the graph where practical.
-- [ ] Add fixtures for partial, invalid, and drifted projects.
-- [ ] Add reviewer examples showing trace output for one current use case.
+- [x] Build parsers that preserve source file and line references.
+- [x] Add deterministic graph serialization for CLI and agent consumers.
+- [x] Implement orphan scenario detection through graph traversal.
+- [x] Implement missing test and missing scenario diagnostics.
+- [x] Implement stale scenario classification using existing manifest behavior.
+- [x] Implement future-phase classification without blocking planning work.
+- [x] Add impact analysis for changed feature files.
+- [x] Add impact analysis for changed use-case files.
+- [x] Add impact analysis for changed roadmap or phase files.
+- [x] Refactor status/lint to consume the graph where practical.
+- [x] Add fixtures for partial, invalid, and drifted projects.
+- [x] Add reviewer examples showing trace output for one current use case.
 
 ## Definition of Done
 
