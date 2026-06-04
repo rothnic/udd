@@ -9,15 +9,17 @@ outcomes:
   - description: Reviewed tests can be recorded in source-controlled evidence while ignored local cache state remains non-authoritative
     scenarios:
       - local-gate-validation
+      - test-review
+      - test-status
     scenario_paths:
       - udd/test-governance/local-gate-validation
-future_outcomes:
-  - description: Tests have lifecycle states (draft, active, deprecated)
-    follow_up: "#55"
-    scenarios:
-      - test-review
-    scenario_paths:
       - udd/test-governance/test-review
+      - udd/test-governance/test-status
+future_outcomes:
+  - description: Tests have lifecycle states beyond reviewed, dirty, and unreviewed
+    follow_up: "#55"
+    scenarios: []
+    scenario_paths: []
   - description: Hooks and CI integrate with lifecycle events
     follow_up: "#55"
     scenarios:

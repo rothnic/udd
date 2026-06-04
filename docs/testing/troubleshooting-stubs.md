@@ -16,10 +16,13 @@ is.
 
 ## Current Practice
 
-Automated test-governance enforcement is planned in the roadmap, but it is not
-the current behavior of `udd doctor` or `udd health-check`. Today, stub
-assertions are prevented by author review, independent review, and targeted
-search.
+`udd test-scan --json` reports stub assertions as test-governance findings with
+source references. `udd gate test-governance` reports the same findings without
+failing by default so teams can adopt the gate gradually. `udd gate
+test-governance --strict` exits non-zero when strict-mode findings are present.
+
+`udd doctor` and `udd health-check` remain project health diagnostics. They do
+not replace the test-governance gate.
 
 Useful local searches:
 
@@ -30,6 +33,15 @@ rg -n "\\b(skip|todo|stub)\\b|\\.skip\\(|\\.todo\\(" specs tests src
 
 Treat search results as review leads, not automatic proof. Some matches may be
 legitimate, and some weak assertions do not match a simple pattern.
+
+Machine-readable governance output includes:
+
+- `summary.stubbed` for detected stub assertions,
+- `summary.reviewed` for clean source-controlled test reviews,
+- `summary.stale` for dirty source-controlled reviews,
+- `summary.missing` for feature files without linked test proof,
+- `summary.gate_blocking` for findings that fail strict mode,
+- `source_references` on test entries and blocking findings.
 
 ## Fixing A Stub
 
@@ -50,9 +62,9 @@ expect(result.exitCode).toBe(0);
 expect(result.stdout).toContain("Project Status");
 ```
 
-## Future Enforcement
+## Future Scope
 
-The roadmap tracks broader test-governance work separately. A future slice can
-make stub detection machine-enforced, phase-aware, and integrated with health
-checks. Until that work lands, docs and PRs should not claim that `udd doctor`
-or `udd health-check` blocks stub assertions.
+Historical flake detection, pass-rate analytics, CI wiring, and impact-based
+targeted regression selection are future roadmap work. Until those land, docs
+and PRs should not claim that governance gates infer changed-file impact or
+historical reliability.

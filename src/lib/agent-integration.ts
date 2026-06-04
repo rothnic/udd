@@ -1,6 +1,13 @@
 import path from "node:path";
 import type { DiagnosticIssue, DiagnosticReport } from "./diagnostics.js";
 import type { FeatureStatus, ProjectStatus, ScenarioStatus } from "./status.js";
+import {
+	buildTestGovernanceReport,
+	checkTestGate,
+	type TestGovernanceSummary,
+	type MissingProofEntry,
+	type TestGateResult,
+} from "./test-governance.js";
 
 export interface ScenarioTotals {
 	total: number;
@@ -71,6 +78,13 @@ export interface AgentEvidencePackage {
 	status_snapshot: AgentProjectSnapshot;
 	next_recommendation: AgentWorkRecommendation;
 	issues_summary: DiagnosticReport["summary"];
+	test_governance: {
+		summary: TestGovernanceSummary;
+		review_manifest_issues: string[];
+		missing_proof: MissingProofEntry[];
+		blocking_findings: TestGateResult["blockingFindings"];
+		next_action: string | null;
+	};
 	verification: Array<{
 		command: string;
 		status: "not_run" | "passed" | "failed";
@@ -327,6 +341,11 @@ export async function buildAgentEvidencePackage(
 		now,
 	);
 	const next = recommendNextAgentWork(status, report, now);
+	const [testGovernance, testGate] = await Promise.all([
+		buildTestGovernanceReport(process.cwd(), now),
+		checkTestGate(process.cwd()),
+	]);
+	const nextGovernanceFinding = testGate.blockingFindings[0];
 
 	return {
 		project: snapshot.project,
@@ -337,6 +356,15 @@ export async function buildAgentEvidencePackage(
 		status_snapshot: snapshot,
 		next_recommendation: next,
 		issues_summary: report.summary,
+			test_governance: {
+				summary: testGovernance.summary,
+				review_manifest_issues: testGovernance.reviews.issues,
+				missing_proof: testGovernance.missing_proof,
+				blocking_findings: testGate.blockingFindings,
+				next_action: nextGovernanceFinding
+					? nextGovernanceFinding.message
+					: null,
+			},
 		verification: options.verification ?? [
 			{ command: "./bin/udd status", status: "passed" },
 			{ command: "./bin/udd lint", status: "not_run" },

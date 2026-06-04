@@ -154,21 +154,29 @@ phases:
         follow_up: "#55"
         scenarios:
           - local-gate-validation
+          - test-scan
+          - health-metrics
         scenario_paths:
           - udd/test-governance/local-gate-validation
-        future_scenarios:
-          - health-metrics
-          - test-scan
-          - test-status
-        future_scenario_paths:
-          - udd/test-governance/health-metrics
           - udd/test-governance/test-scan
-          - udd/test-governance/test-status
+          - udd/test-governance/health-metrics
+        future_scenarios:
+          - flaky-detection
+          - historical-pass-rate
+        future_scenario_paths:
+          - udd/test-governance/flaky-detection
+          - udd/test-governance/historical-pass-rate
       - id: prevent_regression
         capability: test-governance
         increment: v1-basic
-        status: future
-        follow_up: "#55"
+        status: partial
+        follow_up: "goals/017-change-impact-and-regression-upgrade.md"
+        scenarios:
+          - regression-detection
+          - quality-gate
+        scenario_paths:
+          - udd/test-governance/regression-detection
+          - udd/test-governance/quality-gate
         future_scenarios:
           - feature-change-detection
           - dirty-marking
@@ -184,14 +192,16 @@ phases:
         follow_up: "#55"
         scenarios:
           - local-gate-validation
+          - test-review
+          - test-status
         scenario_paths:
           - udd/test-governance/local-gate-validation
+          - udd/test-governance/test-review
+          - udd/test-governance/test-status
         future_scenarios:
-          - test-review
           - hooks-installation
           - pre-commit-validation
         future_scenario_paths:
-          - udd/test-governance/test-review
           - udd/test-governance/hooks-installation
           - udd/test-governance/pre-commit-validation
       - id: enforce_quality_gates
@@ -201,8 +211,10 @@ phases:
         follow_up: "#55"
         scenarios:
           - local-gate-validation
+          - quality-gate
         scenario_paths:
           - udd/test-governance/local-gate-validation
+          - udd/test-governance/quality-gate
         future_scenarios:
           - ci-validation
           - test-approval
@@ -214,16 +226,22 @@ phases:
       - id: monitor_test_health
         capability: test-governance
         increment: v1-basic
-        status: future
+        status: partial
         follow_up: "#55"
+        scenarios:
+          - test-status
+          - health-metrics
+        scenario_paths:
+          - udd/test-governance/test-status
+          - udd/test-governance/health-metrics
         future_scenarios:
           - setup-health-check
-          - test-status
-          - test-scan
+          - degradation-alerts
+          - slow-test-optimization
         future_scenario_paths:
           - udd/test-governance/setup-health-check
-          - udd/test-governance/test-status
-          - udd/test-governance/test-scan
+          - udd/test-governance/degradation-alerts
+          - udd/test-governance/slow-test-optimization
       - id: validate_phase_consistency
         capability: compliance
         increment: v1-basic

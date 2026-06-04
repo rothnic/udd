@@ -6,21 +6,29 @@ phase: 3
 actors:
   - developer
   - agent
+outcomes:
+  - description: Regression-sensitive gates identify stale reviewed tests and block strict mode without relying on local cache state
+    scenarios:
+      - regression-detection
+      - quality-gate
+    scenario_paths:
+      - udd/test-governance/regression-detection
+      - udd/test-governance/quality-gate
 future_outcomes:
   - description: Changed features trigger targeted tests
-    follow_up: "#55"
+    follow_up: "goals/017-change-impact-and-regression-upgrade.md"
     scenarios:
       - feature-change-detection
     scenario_paths:
       - udd/test-governance/feature-change-detection
   - description: Pull requests run regression checks
-    follow_up: "#55"
+    follow_up: "goals/017-change-impact-and-regression-upgrade.md"
     scenarios:
       - ci-validation
     scenario_paths:
       - udd/test-governance/ci-validation
   - description: Support for marking dirty tests when relevant files change
-    follow_up: "#55"
+    follow_up: "goals/017-change-impact-and-regression-upgrade.md"
     scenarios:
       - dirty-marking
     scenario_paths:

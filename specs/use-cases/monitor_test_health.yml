@@ -5,6 +5,14 @@ phase: 3
 actors:
   - developer
   - agent
+outcomes:
+  - description: Governance status reports reviewed, stale, missing, and gate-blocking proof states from source-controlled evidence
+    scenarios:
+      - test-status
+      - health-metrics
+    scenario_paths:
+      - udd/test-governance/test-status
+      - udd/test-governance/health-metrics
 future_outcomes:
   - description: Health checks run periodically
     follow_up: "#55"

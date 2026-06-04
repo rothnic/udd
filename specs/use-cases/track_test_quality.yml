@@ -9,24 +9,21 @@ outcomes:
   - description: Test inventory scans identify linked, unlinked, orphaned, and stubbed tests before gates are enabled
     scenarios:
       - local-gate-validation
+      - test-scan
     scenario_paths:
       - udd/test-governance/local-gate-validation
-future_outcomes:
-  - description: Test coverage metrics are available
-    follow_up: "#55"
+      - udd/test-governance/test-scan
+  - description: Test governance health metrics summarize reviewed, stale, missing, and gate-blocking proof states
     scenarios:
       - health-metrics
     scenario_paths:
       - udd/test-governance/health-metrics
-  - description: Flaky test detection is reported
+future_outcomes:
+  - description: Flaky test detection is reported from historical execution data
     follow_up: "#55"
-    scenarios:
-      - test-scan
-    scenario_paths:
-      - udd/test-governance/test-scan
-  - description: Historical pass rate is tracked
+    scenarios: []
+    scenario_paths: []
+  - description: Historical pass rate is tracked across CI runs
     follow_up: "#55"
-    scenarios:
-      - test-status
-    scenario_paths:
-      - udd/test-governance/test-status
+    scenarios: []
+    scenario_paths: []

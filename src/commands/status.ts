@@ -2,6 +2,7 @@ import chalk from "chalk";
 import { Command } from "commander";
 import { analyzeProjectDiagnostics } from "../lib/diagnostics.js";
 import { getProjectStatus } from "../lib/status.js";
+import { buildTestGovernanceReport } from "../lib/test-governance.js";
 
 export const statusCommand = new Command("status")
 	.description("Summarize current test-based status")
@@ -65,7 +66,10 @@ Recommendations:",
 			}
 
 			if (options.json) {
-				const diagnostics = await analyzeProjectDiagnostics();
+				const [diagnostics, testGovernance] = await Promise.all([
+					analyzeProjectDiagnostics(),
+					buildTestGovernanceReport(),
+				]);
 				console.log(
 					JSON.stringify(
 						{
@@ -77,6 +81,11 @@ Recommendations:",
 								advisory_count: diagnostics.summary.info,
 								blocking_count:
 									diagnostics.summary.critical + diagnostics.summary.warning,
+							},
+							test_governance: {
+								summary: testGovernance.summary,
+								review_manifest_issues: testGovernance.reviews.issues,
+								missing_proof: testGovernance.missing_proof,
 							},
 						},
 						null,

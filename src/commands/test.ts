@@ -3,10 +3,10 @@ import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
 import {
+	buildTestGovernanceReport,
 	checkTestGate,
 	loadTestReviewManifest,
 	reviewTest,
-	scanTests,
 } from "../lib/test-governance.js";
 
 export const testCommand = new Command("test");
@@ -45,44 +45,22 @@ testCommand
 	.description("Scan tests for feature links and stub assertions")
 	.option("--json", "Output scan result as JSON")
 	.action(async (options: { json?: boolean }) => {
-		const entries = await scanTests();
-		const linked = entries.filter((entry) => entry.status === "linked").length;
-		const unlinked = entries.filter(
-			(entry) => entry.status === "unlinked",
-		).length;
-		const orphaned = entries.filter(
-			(entry) => entry.status === "orphaned",
-		).length;
-		const stubbed = entries.filter(
-			(entry) => entry.stubAssertions.length > 0,
-		).length;
+		const report = await buildTestGovernanceReport();
 
 		if (options.json) {
-			console.log(
-				JSON.stringify(
-					{
-						summary: {
-							total: entries.length,
-							linked,
-							unlinked,
-							orphaned,
-							stubbed,
-						},
-						tests: entries,
-					},
-					null,
-					2,
-				),
-			);
+			console.log(JSON.stringify(report, null, 2));
 			return;
 		}
 
 		console.log(chalk.bold("Test Scan"));
 		console.log(chalk.dim("========="));
 		console.log(
-			`Total: ${entries.length}  Linked: ${linked}  Unlinked: ${unlinked}  Orphaned: ${orphaned}  Stubbed: ${stubbed}`,
+			`Total: ${report.summary.total}  Linked: ${report.summary.linked}  Unlinked: ${report.summary.unlinked}  Orphaned: ${report.summary.orphaned}  Stubbed: ${report.summary.stubbed}`,
 		);
-		for (const entry of entries) {
+		console.log(
+			`Reviewed: ${report.summary.reviewed}  Stale: ${report.summary.stale}  Missing: ${report.summary.missing}  Blocking: ${report.summary.gate_blocking}`,
+		);
+		for (const entry of report.tests) {
 			const marker =
 				entry.status === "linked"
 					? chalk.green("✓")
@@ -122,7 +100,22 @@ testCommand
 	.action(async (options: { json?: boolean }) => {
 		const manifest = await loadTestReviewManifest();
 		if (options.json) {
-			console.log(JSON.stringify(manifest, null, 2));
+			const report = await buildTestGovernanceReport();
+			console.log(
+				JSON.stringify(
+					{
+						...manifest,
+						summary: report.summary,
+						tests: report.reviews.tests,
+						scanned_tests: report.tests,
+						missing_proof: report.missing_proof,
+						review_manifest_issues: report.reviews.issues,
+						generated_at: report.generated_at,
+					},
+					null,
+					2,
+				),
+			);
 			return;
 		}
 

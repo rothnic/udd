@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { glob } from "glob";
+import ts from "typescript";
 import yaml from "yaml";
 import {
 	type TestReviewManifest,
@@ -13,6 +14,53 @@ export interface TestScanEntry {
 	feature?: string;
 	stubAssertions: string[];
 	status: "linked" | "unlinked" | "orphaned";
+	proof_state:
+		| "reviewed"
+		| "stale"
+		| "missing_review"
+		| "stubbed"
+		| "orphaned"
+		| "unlinked";
+	review_status?: TestReviewRecord["status"];
+	gate_blocking: boolean;
+	source_references: {
+		test: string;
+		feature?: string;
+		review_manifest?: string;
+	};
+}
+
+export interface MissingProofEntry {
+	feature: string;
+	proof_state: "missing";
+	gate_blocking: false;
+	source_references: {
+		feature: string;
+	};
+}
+
+export interface TestGovernanceSummary {
+	total: number;
+	linked: number;
+	unlinked: number;
+	orphaned: number;
+	stubbed: number;
+	reviewed: number;
+	stale: number;
+	missing: number;
+	gate_blocking: number;
+}
+
+export interface TestGovernanceReport {
+	summary: TestGovernanceSummary;
+	tests: TestScanEntry[];
+	missing_proof: MissingProofEntry[];
+	reviews: {
+		source: string;
+		tests: TestReviewRecord[];
+		issues: string[];
+	};
+	generated_at: string;
 }
 
 export interface TestGateResult {
@@ -22,6 +70,18 @@ export interface TestGateResult {
 	stubbedTests: TestScanEntry[];
 	orphanedTests: TestScanEntry[];
 	reviewManifestIssues: string[];
+	summary: TestGovernanceSummary;
+	blockingFindings: Array<{
+		type:
+			| "review_manifest"
+			| "stubbed_test"
+			| "orphaned_test"
+			| "unlinked_test"
+			| "dirty_review";
+		path: string;
+		message: string;
+		source_references: Record<string, string>;
+	}>;
 }
 
 export const TEST_REVIEW_MANIFEST = "specs/test-reviews.yml";
@@ -42,21 +102,49 @@ function normalizeFeatureReference(reference: string): string {
 }
 
 export function detectStubAssertions(content: string): string[] {
-	const patterns = [
-		/expect\(\s*true\s*\)\s*\.\s*(?:toBe|toEqual|toStrictEqual)\s*\(\s*true\s*\)/g,
-		/expect\(\s*false\s*\)\s*\.\s*(?:toBe|toEqual|toStrictEqual)\s*\(\s*false\s*\)/g,
-		/expect\(\s*(['"`])([^'"`]+)\1\s*\)\s*\.\s*(?:toBe|toEqual|toStrictEqual)\s*\(\s*\1\2\1\s*\)/g,
-		/expect\(\s*(\d+)\s*\)\s*\.\s*(?:toBe|toEqual|toStrictEqual)\s*\(\s*\1\s*\)/g,
-	];
-
 	const matches = new Set<string>();
-	for (const pattern of patterns) {
-		for (;;) {
-			const match = pattern.exec(content);
-			if (!match) break;
-			matches.add(match[0]);
-		}
+	const sourceFile = ts.createSourceFile(
+		"test.ts",
+		content,
+		ts.ScriptTarget.Latest,
+		true,
+		ts.ScriptKind.TSX,
+	);
+
+	function literalValue(node: ts.Expression): string | number | boolean | undefined {
+		if (node.kind === ts.SyntaxKind.TrueKeyword) return true;
+		if (node.kind === ts.SyntaxKind.FalseKeyword) return false;
+		if (ts.isStringLiteralLike(node)) return node.text;
+		if (ts.isNumericLiteral(node)) return Number(node.text);
+		return undefined;
 	}
+
+	function visit(node: ts.Node): void {
+		if (
+			ts.isCallExpression(node) &&
+			ts.isPropertyAccessExpression(node.expression) &&
+			["toBe", "toEqual", "toStrictEqual"].includes(node.expression.name.text) &&
+			node.arguments.length === 1
+		) {
+			const matcherTarget = node.expression.expression;
+			if (
+				ts.isCallExpression(matcherTarget) &&
+				ts.isIdentifier(matcherTarget.expression) &&
+				matcherTarget.expression.text === "expect" &&
+				matcherTarget.arguments.length === 1
+			) {
+				const expected = literalValue(node.arguments[0]);
+				const actual = literalValue(matcherTarget.arguments[0]);
+				if (expected !== undefined && actual !== undefined && expected === actual) {
+					matches.add(node.getText(sourceFile));
+				}
+			}
+		}
+
+		ts.forEachChild(node, visit);
+	}
+
+	visit(sourceFile);
 	return [...matches];
 }
 
@@ -107,10 +195,34 @@ export async function scanTests(
 			feature,
 			stubAssertions,
 			status,
+			proof_state:
+				status === "orphaned"
+					? "orphaned"
+					: status === "unlinked"
+						? "unlinked"
+						: stubAssertions.length > 0
+							? "stubbed"
+							: "missing_review",
+			gate_blocking: status === "orphaned" || stubAssertions.length > 0,
+			source_references: {
+				test: toPosix(file),
+				...(feature ? { feature } : {}),
+			},
 		});
 	}
 
 	return entries;
+}
+
+async function findFeatureFiles(rootDir = process.cwd()): Promise<string[]> {
+	return (
+		await glob("specs/features/**/*.feature", {
+			cwd: rootDir,
+			nodir: true,
+		})
+	)
+		.map(toPosix)
+		.sort();
 }
 
 export async function loadTestReviewManifest(
@@ -118,6 +230,87 @@ export async function loadTestReviewManifest(
 ): Promise<TestReviewManifest> {
 	const result = await readTestReviewManifest(rootDir);
 	return result.manifest;
+}
+
+export async function buildTestGovernanceReport(
+	rootDir = process.cwd(),
+	now = new Date(),
+): Promise<TestGovernanceReport> {
+	const [entries, manifestResult, featureFiles] = await Promise.all([
+		scanTests(rootDir),
+		readTestReviewManifest(rootDir),
+		findFeatureFiles(rootDir),
+	]);
+	const reviewByPath = new Map(
+		manifestResult.manifest.tests.map((record) => [record.path, record]),
+	);
+	const linkedFeatures = new Set(
+		entries
+			.map((entry) => entry.feature)
+			.filter((feature): feature is string => Boolean(feature)),
+	);
+	const tests = entries.map((entry) => {
+		const review = reviewByPath.get(entry.path);
+		const proofState: TestScanEntry["proof_state"] =
+			entry.status === "orphaned"
+				? "orphaned"
+				: entry.status === "unlinked"
+					? "unlinked"
+					: entry.stubAssertions.length > 0
+						? "stubbed"
+						: review?.status === "clean"
+							? "reviewed"
+							: review?.status === "dirty"
+								? "stale"
+								: "missing_review";
+			const gateBlocking =
+				entry.status === "orphaned" ||
+				entry.status === "unlinked" ||
+				entry.stubAssertions.length > 0 ||
+				review?.status === "dirty";
+
+		return {
+			...entry,
+			proof_state: proofState,
+			review_status: review?.status,
+			gate_blocking: gateBlocking,
+			source_references: {
+				...entry.source_references,
+				...(review ? { review_manifest: TEST_REVIEW_MANIFEST } : {}),
+			},
+		};
+	});
+	const missingProof = featureFiles
+		.filter((feature) => !linkedFeatures.has(feature))
+		.map((feature) => ({
+			feature,
+			proof_state: "missing" as const,
+			gate_blocking: false as const,
+			source_references: { feature },
+		}));
+	const summary: TestGovernanceSummary = {
+		total: tests.length,
+		linked: tests.filter((entry) => entry.status === "linked").length,
+		unlinked: tests.filter((entry) => entry.status === "unlinked").length,
+		orphaned: tests.filter((entry) => entry.status === "orphaned").length,
+		stubbed: tests.filter((entry) => entry.stubAssertions.length > 0).length,
+		reviewed: tests.filter((entry) => entry.proof_state === "reviewed").length,
+		stale: tests.filter((entry) => entry.proof_state === "stale").length,
+		missing: missingProof.length,
+		gate_blocking: tests.filter((entry) => entry.gate_blocking).length,
+	};
+
+	return {
+		summary,
+		tests,
+		missing_proof: missingProof,
+		reviews: {
+			source: TEST_REVIEW_MANIFEST,
+			tests: manifestResult.manifest.tests,
+			issues: manifestResult.issues,
+		},
+		generated_at: now.toISOString(),
+	};
 }
 
 async function readTestReviewManifest(rootDir = process.cwd()): Promise<{
@@ -174,6 +367,20 @@ export async function reviewTest(
 	}
 
 	const feature = extractFeatureReference(content);
+	if (!feature) {
+		throw new Error(
+			`Cannot review ${normalizedPath}: test is not linked to a feature.`,
+		);
+	}
+
+	try {
+		await fs.access(path.join(rootDir, feature));
+	} catch {
+		throw new Error(
+			`Cannot review ${normalizedPath}: linked feature does not exist (${feature}).`,
+		);
+	}
+
 	const manifest = await loadTestReviewManifest(rootDir);
 	const previous = manifest.tests.find(
 		(entry) => entry.path === normalizedPath,
@@ -198,27 +405,65 @@ export async function reviewTest(
 export async function checkTestGate(
 	rootDir = process.cwd(),
 ): Promise<TestGateResult> {
-	const entries = await scanTests(rootDir);
-	const manifestResult = await readTestReviewManifest(rootDir);
-	const manifest = manifestResult.manifest;
-	const dirtyReviews = manifest.tests.filter(
+	const report = await buildTestGovernanceReport(rootDir);
+	const dirtyReviews = report.reviews.tests.filter(
 		(entry) => entry.status === "dirty",
 	);
-	const stubbedTests = entries.filter(
+	const stubbedTests = report.tests.filter(
 		(entry) => entry.stubAssertions.length > 0,
 	);
-	const orphanedTests = entries.filter((entry) => entry.status === "orphaned");
+	const orphanedTests = report.tests.filter((entry) => entry.status === "orphaned");
+	const unlinkedTests = report.tests.filter((entry) => entry.status === "unlinked");
+	const blockingFindings: TestGateResult["blockingFindings"] = [
+		...report.reviews.issues.map((issue) => ({
+			type: "review_manifest" as const,
+			path: TEST_REVIEW_MANIFEST,
+			message: issue,
+			source_references: { review_manifest: TEST_REVIEW_MANIFEST },
+		})),
+		...stubbedTests.map((entry) => ({
+			type: "stubbed_test" as const,
+			path: entry.path,
+			message: `Stub assertions: ${entry.path}`,
+			source_references: entry.source_references,
+		})),
+		...orphanedTests.map((entry) => ({
+			type: "orphaned_test" as const,
+			path: entry.path,
+			message: `Orphaned feature link: ${entry.path} -> ${entry.feature}`,
+			source_references: entry.source_references,
+		})),
+		...unlinkedTests.map((entry) => ({
+			type: "unlinked_test" as const,
+			path: entry.path,
+			message: `Unlinked test proof: ${entry.path}`,
+			source_references: entry.source_references,
+		})),
+		...dirtyReviews.map((entry) => ({
+			type: "dirty_review" as const,
+			path: entry.path,
+			message: `Dirty review: ${entry.path}`,
+			source_references: {
+				test: entry.path,
+				review_manifest: TEST_REVIEW_MANIFEST,
+				...(entry.feature ? { feature: entry.feature } : {}),
+			},
+		})),
+	];
 
 	return {
 		passed:
-			manifestResult.issues.length === 0 &&
-			dirtyReviews.length === 0 &&
-			stubbedTests.length === 0 &&
-			orphanedTests.length === 0,
-		entries,
+			report.reviews.issues.length === 0 &&
+				dirtyReviews.length === 0 &&
+				stubbedTests.length === 0 &&
+				orphanedTests.length === 0 &&
+				unlinkedTests.length === 0,
+		entries: report.tests,
 		dirtyReviews,
 		stubbedTests,
 		orphanedTests,
-		reviewManifestIssues: manifestResult.issues,
+		reviewManifestIssues: report.reviews.issues,
+		summary: report.summary,
+		blockingFindings,
 	};
 }
