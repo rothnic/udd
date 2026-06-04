@@ -50,23 +50,34 @@ test obligations before writing implementation code.
 - At least 90% of existing use cases have explicit objective or capability
   linkage, or are listed in a migration exception file.
 
+## Completion Evidence
+
+Recorded on 2026-06-04 in
+`docs/project/reviews/2026-06-04/goal-007-completion-evidence.md`.
+
+Goal 007 is complete because PR #67 added source-controlled proof for the
+authoring workbench: `udd new use-case`, canonical `udd new scenario`, expected
+E2E obligations without fake passing tests, authoring documentation, and
+strategic-program E2E coverage. Remaining future authoring enhancements should
+be routed through new goals or issues instead of reopening this strategic goal.
+
 ## Tasks
 
-- [ ] Define the authoring contract for objective, use case, scenario, and test
+- [x] Define the authoring contract for objective, use case, scenario, and test
       artifacts.
-- [ ] Add or update schemas for source-of-truth artifact validation.
-- [ ] Implement use-case scaffolding with required outcome and scenario fields.
-- [ ] Implement scenario scaffolding that writes one scenario per file.
-- [ ] Generate deterministic expected test paths without creating fake passing
+- [x] Add or update schemas for source-of-truth artifact validation.
+- [x] Implement use-case scaffolding with required outcome and scenario fields.
+- [x] Implement scenario scaffolding that writes one scenario per file.
+- [x] Generate deterministic expected test paths without creating fake passing
       tests.
-- [ ] Add CLI help text that points to the canonical traceability chain.
-- [ ] Document journey/SysML notes as optional discovery context.
-- [ ] Add a red-green worked example for a behavior change.
-- [ ] Add validation for missing or ambiguous objective links.
-- [ ] Add validation for missing or duplicate scenario identifiers.
-- [ ] Add tests for scaffolding, validation, and help output.
-- [ ] Update `udd status` messaging if authoring gaps need clearer labels.
-- [ ] Add migration notes for existing artifacts that cannot be fixed in this
+- [x] Add CLI help text that points to the canonical traceability chain.
+- [x] Document journey/SysML notes as optional discovery context.
+- [x] Add a red-green worked example for a behavior change.
+- [x] Add validation for missing or ambiguous objective links.
+- [x] Add validation for missing or duplicate scenario identifiers.
+- [x] Add tests for scaffolding, validation, and help output.
+- [x] Update `udd status` messaging if authoring gaps need clearer labels.
+- [x] Add migration notes for existing artifacts that cannot be fixed in this
       goal.
 
 ## Definition of Done
@@ -93,4 +104,3 @@ npm test -- --run
 - Blocks if journey files become a mandatory duplicate requirement layer without
   an explicit product decision.
 - Blocks if the implementation commits generated local state.
-
