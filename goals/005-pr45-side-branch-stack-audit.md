@@ -118,22 +118,33 @@ Create or update a durable audit report before opening implementation PRs:
   - Proposed PR sequence.
   - Risks and validation gaps.
 
+## Completion Evidence
+
+Recorded on 2026-06-04 in
+`docs/project/reviews/2026-06-04/goal-005-completion-evidence.md`.
+
+Goal 005 is treated as complete because the durable PR #45 stack audit exists,
+the broad stack PRs remain closed, PR #46 is merged, the preserved source
+branches still exist for follow-up work, and each still-valuable salvage group
+is represented by a follow-up issue. The next executable increment remains
+`goals/006-source-of-truth-foundation.md`.
+
 ## Explicit Checks
 
 The goal is complete only when all of these are true:
 
-- [ ] PR #46 is either merged or explicitly excluded from this stack audit.
-- [ ] The audit report exists at
+- [x] PR #46 is either merged or explicitly excluded from this stack audit.
+- [x] The audit report exists at
       `docs/project/reviews/2026-05-19-pr45-stack-audit/report.md`.
-- [ ] Every file changed between the repository default branch and
+- [x] Every file changed between the repository default branch and
       `origin/codex/source-of-truth-cleanup-base` is covered by a classification
       group in the audit report.
-- [ ] Every still-valuable group is either merged, in an open focused PR, or
+- [x] Every still-valuable group is either merged, in an open focused PR, or
       represented by a follow-up goal/issue with exact branch and file evidence.
-- [ ] No broad side-branch merge PR is open.
-- [ ] No generated/local agent state is proposed for merge unless justified in
+- [x] No broad side-branch merge PR is open.
+- [x] No generated/local agent state is proposed for merge unless justified in
       the audit report.
-- [ ] Each implementation PR produced from this goal has its own scoped tests,
+- [x] Each implementation PR produced from this goal has its own scoped tests,
       review notes, and clear rollback/defer decision.
 
 ## Measurables
