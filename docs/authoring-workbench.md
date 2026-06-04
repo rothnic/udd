@@ -37,3 +37,22 @@ second requirements layer.
 
 UDD scaffolding prints expected test paths but does not create fake passing
 tests. A behavior is not complete until real E2E proof exists.
+
+## Migration Notes
+
+Current source-of-truth linkage coverage is 18 of 19 use cases. The one
+exception is `specs/use-cases/strategic_program_execution.yml`, which is a
+program-level proof use case created to verify Goals 007-012 rather than a
+normal product capability. Keep it as a documented exception until the roadmap
+grows a dedicated program governance capability or the strategic-program proof
+is retired.
+
+For existing artifacts that do not fit the normal authoring path, prefer one of
+these decisions before editing behavior:
+
+1. Link the use case to a roadmap capability when it represents current product
+   behavior.
+2. Mark the use case or scenario as future-phase work when it is planned but not
+   current scope.
+3. Record a migration exception with the exact file path and the reason it is
+   not linked yet.
