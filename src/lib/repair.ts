@@ -234,7 +234,7 @@ async function buildManifest(rootDir: string): Promise<string> {
 					.slice(0, 12),
 			};
 			for (const match of content.matchAll(/(?:→|->)\s*`([^`]+\.feature)`/g)) {
-				const scenarioPath = match[1];
+				const scenarioPath = toPosix(match[1]);
 				if (await exists(path.join(rootDir, scenarioPath))) {
 					manifest.scenarios[scenarioPath] = { path: scenarioPath };
 				}
@@ -263,7 +263,7 @@ export async function planRepair(
 	const evidencePath = "docs/project/reviews/repair/latest-repair-evidence.md";
 	const wouldWrite = [
 		...new Set([
-			...proposed.flatMap((action) => action.would_write),
+			...proposed.flatMap((action) => action.would_write).map(toPosix),
 			evidencePath,
 		]),
 	];
@@ -361,7 +361,7 @@ export async function applyRepair(
 		applied,
 		would_write: [
 			...new Set([
-				...applied.flatMap((action) => action.would_write),
+				...applied.flatMap((action) => action.would_write).map(toPosix),
 				toPosix(path.relative(rootDir, evidencePath)),
 			]),
 		],
