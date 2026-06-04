@@ -8,4 +8,5 @@ Feature: OpenCode next recommendation
   Scenario: Next command returns a structured recommendation
     When the OpenCode adapter requests the next recommendation as JSON
     Then the payload includes the recommended item, reason, suggested files, and blockers
+    And the payload explains user impact, verification commands, and pause reasons
     And the recommendation is derived from current UDD status and diagnostics

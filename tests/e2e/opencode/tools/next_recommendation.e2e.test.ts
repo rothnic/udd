@@ -36,6 +36,20 @@ describeFeature(feature, ({ Scenario }) => {
 			);
 
 			And(
+				"the payload explains user impact, verification commands, and pause reasons",
+				() => {
+					expect(payload).toEqual(
+						expect.objectContaining({
+							user_impact: expect.any(String),
+							blocks_work: expect.any(Boolean),
+							verification_commands: expect.any(Array),
+							pause_reasons: expect.any(Array),
+						}),
+					);
+				},
+			);
+
+			And(
 				"the recommendation is derived from current UDD status and diagnostics",
 				() => {
 					expect(payload.reason).not.toHaveLength(0);
