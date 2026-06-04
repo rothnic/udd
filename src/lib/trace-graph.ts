@@ -11,7 +11,8 @@ export type TraceNodeType =
 	| "use_case"
 	| "outcome"
 	| "scenario"
-	| "test";
+	| "test"
+	| "goal";
 
 export interface TraceSource {
 	path: string;
@@ -63,9 +64,28 @@ export interface ImpactResult {
 		outcomes: TraceNode[];
 		scenarios: TraceNode[];
 		tests: TraceNode[];
+		goals: TraceNode[];
 	};
 	edges: TraceEdge[];
 	diagnostics: TraceDiagnostic[];
+	regression_markers: Array<{
+		type:
+			| "direct"
+			| "adjacent"
+			| "missing_proof"
+			| "deferred_future"
+			| "untraceable";
+		path: string;
+		reason: string;
+		confidence: "high" | "medium" | "low";
+	}>;
+	recommendations: Array<{
+		command: string;
+		reason: string;
+		confidence: "high" | "medium" | "low";
+		source_paths: string[];
+	}>;
+	recommended_commands: string[];
 }
 
 function toPosix(filePath: string): string {
@@ -158,6 +178,24 @@ export async function buildTraceGraph(
 	const objective = [...nodes.values()].find(
 		(node) => node.type === "objective",
 	);
+	const goalFiles = (await glob("goals/*.md", { cwd: rootDir })).sort();
+	for (const file of goalFiles) {
+		const id = path.basename(file, ".md");
+		addNode(nodes, {
+			id: nodeId("goal", id),
+			type: "goal",
+			label: id,
+			source: { path: file },
+		});
+		if (objective) {
+			addEdge(edges, {
+				from: objective.id,
+				to: nodeId("goal", id),
+				type: "objective_includes_goal",
+				source: { path: file },
+			});
+		}
+	}
 	const capabilityByUseCase = new Map<string, string>();
 	const phaseByUseCase = new Map<
 		string,
@@ -436,8 +474,9 @@ function isSameOrRelatedPath(input: string, sourcePath: string): boolean {
 export async function analyzeImpact(
 	inputPath: string,
 	rootDir = process.cwd(),
+	graph?: TraceGraph,
 ): Promise<ImpactResult> {
-	const graph = await buildTraceGraph(rootDir);
+	graph ??= await buildTraceGraph(rootDir);
 	const byId = new Map(graph.nodes.map((node) => [node.id, node]));
 	const forward = new Map<string, TraceEdge[]>();
 	const reverse = new Map<string, TraceEdge[]>();
@@ -483,6 +522,106 @@ export async function analyzeImpact(
 		.filter((node): node is TraceNode => Boolean(node));
 	const byType = (type: TraceNodeType) =>
 		affectedNodes.filter((node) => node.type === type);
+	const affectedSourcePaths = new Set(
+		affectedNodes.map((node) => normalizePath(node.source.path)),
+	);
+	const diagnostics = graph.diagnostics.filter((diagnostic) =>
+		affectedSourcePaths.has(normalizePath(diagnostic.source.path)),
+	);
+	const tests = byType("test");
+	const scenarios = byType("scenario");
+	const regressionMarkers: ImpactResult["regression_markers"] = [
+		...seeds.map((node) => ({
+			type: "direct" as const,
+			path: node.source.path,
+			reason: `Input resolved directly to ${node.type} ${node.label}.`,
+			confidence: "high" as const,
+		})),
+		...affectedNodes
+			.filter((node) => !seeds.some((seed) => seed.id === node.id))
+			.map((node) => ({
+				type: "adjacent" as const,
+				path: node.source.path,
+				reason: `${node.type} ${node.label} is connected through the trace graph.`,
+				confidence: "medium" as const,
+			})),
+		...diagnostics
+			.filter((diagnostic) => diagnostic.type === "missing_test")
+			.map((diagnostic) => ({
+				type: "missing_proof" as const,
+				path: diagnostic.source.path,
+				reason: diagnostic.message,
+				confidence: "high" as const,
+			})),
+		...scenarios
+			.filter((scenario) => scenario.status === "future-phase")
+			.map((scenario) => ({
+				type: "deferred_future" as const,
+				path: scenario.source.path,
+				reason: `${scenario.label} is marked as future phase work.`,
+				confidence: "medium" as const,
+			})),
+	].sort((left, right) =>
+		`${left.type}:${left.path}:${left.reason}`.localeCompare(
+			`${right.type}:${right.path}:${right.reason}`,
+		),
+	);
+	const testPaths = [...new Set(tests.map((node) => node.source.path))].sort();
+	const recommendations: ImpactResult["recommendations"] = [];
+	if (testPaths.length > 0) {
+		recommendations.push({
+			command: `npm test -- --run ${testPaths.join(" ")}`,
+			reason: "Run affected linked E2E tests.",
+			confidence: "high",
+			source_paths: testPaths,
+		});
+	}
+	for (const marker of regressionMarkers.filter(
+		(item) => item.type === "missing_proof",
+	)) {
+		const testPath = marker.path
+			.replace(/^specs\/features\//, "tests/e2e/")
+			.replace(/\.feature$/, ".e2e.test.ts");
+		recommendations.push({
+			command: `npm test -- --run ${testPath}`,
+			reason: `Create or restore missing proof before trusting ${marker.path}.`,
+			confidence: "medium",
+			source_paths: [marker.path, testPath],
+		});
+	}
+	const changedGoals = byType("goal");
+	if (changedGoals.length > 0) {
+		const goalPaths = changedGoals.map((node) => node.source.path).sort();
+		recommendations.push(
+			{
+				command: "./bin/udd status --json",
+				reason: "Verify goal-plan changes against current project health.",
+				confidence: "medium",
+				source_paths: goalPaths,
+			},
+			{
+				command: "./bin/udd lint",
+				reason: "Validate source-of-truth structure after goal-plan changes.",
+				confidence: "medium",
+				source_paths: goalPaths,
+			},
+		);
+	}
+	if (seeds.length === 0) {
+		regressionMarkers.push({
+			type: "untraceable",
+			path: normalizePath(inputPath),
+			reason:
+				"No trace node resolves for this path; use review judgment and run the nearest relevant tests.",
+			confidence: "low",
+		});
+		recommendations.push({
+			command: "./bin/udd lint",
+			reason: "Fallback validation for untraceable changed files.",
+			confidence: "low",
+			source_paths: [normalizePath(inputPath)],
+		});
+	}
 
 	return {
 		input: inputPath,
@@ -494,14 +633,16 @@ export async function analyzeImpact(
 			outcomes: byType("outcome"),
 			scenarios: byType("scenario"),
 			tests: byType("test"),
+			goals: byType("goal"),
 		},
 		edges: impactEdges.sort((left, right) =>
 			`${left.from}:${left.type}:${left.to}`.localeCompare(
 				`${right.from}:${right.type}:${right.to}`,
 			),
 		),
-		diagnostics: graph.diagnostics.filter((diagnostic) =>
-			isSameOrRelatedPath(inputPath, diagnostic.source.path),
-		),
+		diagnostics,
+		regression_markers: regressionMarkers,
+		recommendations,
+		recommended_commands: recommendations.map((item) => item.command),
 	};
 }

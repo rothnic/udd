@@ -174,15 +174,15 @@ phases:
         scenarios:
           - regression-detection
           - quality-gate
+          - feature-change-detection
         scenario_paths:
           - udd/test-governance/regression-detection
           - udd/test-governance/quality-gate
+          - udd/test-governance/feature-change-detection
         future_scenarios:
-          - feature-change-detection
           - dirty-marking
           - sync-dirty-marking
         future_scenario_paths:
-          - udd/test-governance/feature-change-detection
           - udd/test-governance/dirty-marking
           - udd/test-governance/sync-dirty-marking
       - id: manage_test_lifecycle

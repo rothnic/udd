@@ -23,14 +23,29 @@ async function getAgentInputs() {
 	return { status, diagnostics };
 }
 
+export function parseGitPorcelainChangedFiles(stdout: string): string[] {
+	return [
+		...new Set(
+			stdout
+				.split("\n")
+				.filter((line) => line.trim() !== "")
+				.map((line) => {
+					const status = line.slice(0, 2);
+					const pathPart = line.slice(3).trim();
+					if (status.includes("R") || status.includes("C")) {
+						const renamed = pathPart.match(/^(.*?) -> (.*?)$/);
+						return renamed?.[2] ?? pathPart;
+					}
+					return pathPart;
+				}),
+		),
+	].sort();
+}
+
 async function getChangedFiles(): Promise<string[]> {
 	try {
 		const { stdout } = await execFileAsync("git", ["status", "--porcelain"]);
-		return stdout
-			.split("\n")
-			.map((line) => line.trim())
-			.filter(Boolean)
-			.map((line) => line.replace(/^.. /, ""));
+		return parseGitPorcelainChangedFiles(stdout);
 	} catch {
 		return [];
 	}

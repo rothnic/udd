@@ -8,6 +8,11 @@ import {
 	type MissingProofEntry,
 	type TestGateResult,
 } from "./test-governance.js";
+import {
+	analyzeImpact,
+	buildTraceGraph,
+	type ImpactResult,
+} from "./trace-graph.js";
 
 export interface ScenarioTotals {
 	total: number;
@@ -91,6 +96,12 @@ export interface AgentEvidencePackage {
 		evidence_path?: string;
 	}>;
 	changed_files: string[];
+	changed_file_impacts: Array<{
+		path: string;
+		recommended_commands: string[];
+		regression_markers: ImpactResult["regression_markers"];
+		diagnostics: ImpactResult["diagnostics"];
+	}>;
 	review_notes: string[];
 	generated_at: string;
 }
@@ -346,6 +357,19 @@ export async function buildAgentEvidencePackage(
 		checkTestGate(process.cwd()),
 	]);
 	const nextGovernanceFinding = testGate.blockingFindings[0];
+	const changedFiles = options.changedFiles ?? [];
+	const traceGraph = await buildTraceGraph(process.cwd(), now);
+	const changedFileImpacts = await Promise.all(
+		changedFiles.map(async (file) => {
+			const impact = await analyzeImpact(file, process.cwd(), traceGraph);
+			return {
+				path: file,
+				recommended_commands: impact.recommended_commands,
+				regression_markers: impact.regression_markers,
+				diagnostics: impact.diagnostics,
+			};
+		}),
+	);
 
 	return {
 		project: snapshot.project,
@@ -370,7 +394,8 @@ export async function buildAgentEvidencePackage(
 			{ command: "./bin/udd lint", status: "not_run" },
 			{ command: "npm test -- --run", status: "not_run" },
 		],
-		changed_files: options.changedFiles ?? [],
+		changed_files: changedFiles,
+		changed_file_impacts: changedFileImpacts,
 		review_notes: options.reviewNotes ?? [],
 		generated_at: now.toISOString(),
 	};

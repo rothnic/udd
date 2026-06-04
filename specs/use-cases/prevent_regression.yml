@@ -14,13 +14,12 @@ outcomes:
     scenario_paths:
       - udd/test-governance/regression-detection
       - udd/test-governance/quality-gate
-future_outcomes:
   - description: Changed features trigger targeted tests
-    follow_up: "goals/017-change-impact-and-regression-upgrade.md"
     scenarios:
       - feature-change-detection
     scenario_paths:
       - udd/test-governance/feature-change-detection
+future_outcomes:
   - description: Pull requests run regression checks
     follow_up: "goals/017-change-impact-and-regression-upgrade.md"
     scenarios:

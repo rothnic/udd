@@ -22,8 +22,10 @@ second requirements layer.
 
 1. Update the existing use-case outcome first.
 2. Update or add exactly one focused scenario file under `specs/features/**`.
-3. Run `udd impact <path>` to see affected behavior.
-4. Update the linked E2E test and run the relevant test before implementation.
+3. Run `udd impact <path> --json` to see affected objectives, use cases,
+   scenarios, tests, regression markers, and recommended verification commands.
+4. Update the linked E2E test and run the recommended command before
+   implementation.
 
 ## Deferred Future-Phase Path
 
