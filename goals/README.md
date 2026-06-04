@@ -7,7 +7,8 @@ checks, and prepare focused PRs.
 
 ## How To Use
 
-1. Start with `000-strategic-execution-master-goal.md` for program execution.
+1. Start with `013-user-gap-upgrade-master-goal.md` for the current upgrade
+   program.
 2. Pick the first open implementation goal in numeric order unless a roadmap
    owner selects a specific strategic goal.
 3. Give the agent the goal path.
@@ -16,14 +17,37 @@ checks, and prepare focused PRs.
 
 ## Master Program Goal
 
+- `013-user-gap-upgrade-master-goal.md`: current upgrade program for goals
+  014-018, based on the 2026-06-02 user-gap review of remote `master`.
 - `000-strategic-execution-master-goal.md`: ordered execution program for goals
   007-012, including user-facing success criteria, independent review gates,
-  commit checkpoints, and final end-to-end PR requirements.
+  commit checkpoints, and final end-to-end PR requirements. This remains
+  strategic-program context.
 
-## Current Strategic Portfolio
+## Current Upgrade Portfolio
 
-Goals 007-012 are the current two-week, team-sized execution portfolio. Each is
-intended to be far-reaching enough for multiple engineers, with explicit
+Goals 014-018 are the current two-week, user-visible upgrade portfolio. They
+start from the finding that current strategic proof exists, but a fresh checkout
+still reports stale scenarios, drift, and a missing manifest as user-facing
+friction.
+
+- `014-status-trust-and-health-baseline.md`: align status, doctor, repair, and
+  evidence so a fresh healthy checkout does not look critically blocked by
+  generated local state.
+- `015-test-governance-upgrade.md`: add canonical scenarios and E2E proof for
+  test inventory, lifecycle, gates, health, and regression prevention.
+- `016-recovery-workflow-upgrade.md`: convert recovery journey drift into a
+  safe, reviewable recovery workflow with dry-run/apply proof.
+- `017-change-impact-and-regression-upgrade.md`: connect trace/impact output to
+  concrete regression decisions and verification commands.
+- `018-agent-operator-upgrade.md`: make agent next-work, evidence, and
+  pause/continue decisions usable from shared adapter-neutral contracts.
+
+## Strategic Program Context
+
+Goals 007-012 are the completed strategic-program context that established the
+current proof surfaces. Each was intended to be far-reaching enough for multiple
+engineers, with explicit
 measurables, 10-15 subtasks, verification commands, and reviewer blocking
 criteria.
 
@@ -51,5 +75,7 @@ criteria.
 
 ## Supporting Reviews
 
+- `docs/project/reviews/2026-06-02/user-gap-upgrade-review.md`: user-perspective
+  review of remote `master` that defines the current upgrade portfolio.
 - `docs/project/reviews/2026-05-31-goal-roadmap-review/report.md`: independent
   review that recommends the current strategic portfolio.
