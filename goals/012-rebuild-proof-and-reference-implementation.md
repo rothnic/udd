@@ -42,23 +42,32 @@ rewrite or alternate implementation path.
 - Rebuild evidence is captured in a browser-readable report.
 - At least 3 intentional behavior changes demonstrate the red-green UDD loop.
 
+## Completion Evidence
+
+- Evidence artifact:
+  `docs/project/reviews/2026-06-04/goal-012-completion-evidence.md`
+- Implementation PR: pending.
+- Reference product proof lives under `examples/reference-products/task-board/`
+  with 5 use cases, 12 scenarios, two implementations, rebuild evidence, and
+  red-green behavior-change notes.
+
 ## Tasks
 
-- [ ] Select a reference product domain with enough realistic behavior.
-- [ ] Write product objective and capability map.
-- [ ] Author at least 5 use cases with measurable outcomes.
-- [ ] Author at least 12 focused feature scenarios.
-- [ ] Implement E2E tests for every scenario.
-- [ ] Build the first reference implementation.
-- [ ] Capture baseline passing evidence.
-- [ ] Create a controlled rebuild or alternate implementation path.
-- [ ] Prove the rebuilt implementation passes the same tests.
-- [ ] Add 3 behavior-change commits or documented steps showing red-green flow.
-- [ ] Record what UDD preserved across the rebuild.
-- [ ] Record what UDD did not capture and why.
-- [ ] Add docs for running the proof locally.
-- [ ] Add reviewer checklist for accepting the proof.
-- [ ] Link proof outcomes back to the strategic roadmap.
+- [x] Select a reference product domain with enough realistic behavior.
+- [x] Write product objective and capability map.
+- [x] Author at least 5 use cases with measurable outcomes.
+- [x] Author at least 12 focused feature scenarios.
+- [x] Implement E2E tests for every scenario.
+- [x] Build the first reference implementation.
+- [x] Capture baseline passing evidence.
+- [x] Create a controlled rebuild or alternate implementation path.
+- [x] Prove the rebuilt implementation passes the same tests.
+- [x] Add 3 behavior-change commits or documented steps showing red-green flow.
+- [x] Record what UDD preserved across the rebuild.
+- [x] Record what UDD did not capture and why.
+- [x] Add docs for running the proof locally.
+- [x] Add reviewer checklist for accepting the proof.
+- [x] Link proof outcomes back to the strategic roadmap.
 
 ## Definition of Done
 
@@ -82,4 +91,3 @@ npm test -- --run
 - Blocks if the rebuilt implementation uses different behavior contracts.
 - Blocks if evidence is only chat history or local generated state.
 - Blocks if the example grows into an unrelated application build.
-
