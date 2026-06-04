@@ -1,4 +1,4 @@
-import { describe, expect, it, afterAll, beforeEach } from "vitest";
+import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { runUdd } from "../../../utils.js";
 import {
 	cleanupProject,
@@ -36,6 +36,27 @@ describe("test governance scan", () => {
 					review_manifest: "specs/test-reviews.yml",
 				}),
 			}),
+		);
+		expect(scan.findings).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					type: "stubbed_test",
+					path: "tests/auth/stubbed.e2e.test.ts",
+					gate_blocking: true,
+					source_references: expect.objectContaining({
+						test: "tests/auth/stubbed.e2e.test.ts",
+						feature: "specs/features/auth/login.feature",
+					}),
+				}),
+				expect.objectContaining({
+					type: "missing_proof",
+					path: "specs/features/reports/export.feature",
+					gate_blocking: false,
+					source_references: expect.objectContaining({
+						feature: "specs/features/reports/export.feature",
+					}),
+				}),
+			]),
 		);
 	});
 });

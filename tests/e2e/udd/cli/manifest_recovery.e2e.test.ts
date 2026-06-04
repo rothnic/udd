@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { buildUddCommand, execAsync, withTempDir } from "../../../utils.js";
 
+// @feature udd/cli/manifest_recovery.feature
 async function runUddInCwd(
 	args: string,
 ): Promise<{ stdout: string; stderr: string; code?: number }> {

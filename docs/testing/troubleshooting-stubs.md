@@ -60,7 +60,8 @@ Machine-readable governance output includes:
 - `summary.stale` for dirty source-controlled reviews,
 - `summary.missing` for feature files without linked test proof,
 - `summary.gate_blocking` for findings that fail strict mode,
-- `source_references` on test entries and blocking findings.
+- `findings` for actionable source-referenced review items,
+- `source_references` on test entries and findings.
 
 ## Fixing A Stub
 

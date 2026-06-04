@@ -59,22 +59,22 @@ Implement missing test-governance coverage across `track_test_quality`,
 
 ## Tasks
 
-- [ ] Update use cases before implementation, moving valid future outcomes into
+- [x] Update use cases before implementation, moving valid future outcomes into
       canonical current scenarios where this goal owns them.
-- [ ] Add feature files for missing governance flows: test scan, test status,
+- [x] Add feature files for missing governance flows: test scan, test status,
       test review, hook/CI gate behavior, health metrics, and regression
       detection.
-- [ ] Inventory every existing governance future outcome and journey-referenced
+- [x] Inventory every existing governance future outcome and journey-referenced
       missing scenario, then classify it as current implementation scope or
       explicit future scope before writing CLI code.
-- [ ] Add E2E tests for every new current governance scenario.
-- [ ] Extend test inventory classification with source references and stable
+- [x] Add E2E tests for every new current governance scenario.
+- [x] Extend test inventory classification with source references and stable
       JSON fields.
-- [ ] Add source-controlled reviewed-test evidence fixtures.
-- [ ] Prove ignored local cache cannot alter gate outcomes.
-- [ ] Implement strict/non-strict gate fixtures for passing and failing cases.
-- [ ] Update status, evidence, and docs to show governance adoption steps.
-- [ ] Record an independent user-perspective review.
+- [x] Add source-controlled reviewed-test evidence fixtures.
+- [x] Prove ignored local cache cannot alter gate outcomes.
+- [x] Implement strict/non-strict gate fixtures for passing and failing cases.
+- [x] Update status, evidence, and docs to show governance adoption steps.
+- [x] Record an independent user-perspective review.
 
 ## Definition of Done
 
@@ -104,3 +104,8 @@ npm test -- --run tests/e2e/udd/test-governance
 - Blocks if local ignored cache can change reviewed or blocking gate state.
 - Blocks if strict and non-strict modes are not clearly different.
 - Blocks if status or evidence cannot explain the next governance action.
+
+## Completion Evidence
+
+Completed on 2026-06-04 with evidence in
+`docs/project/reviews/2026-06-04/goal-015-completion-evidence.md`.

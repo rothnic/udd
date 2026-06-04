@@ -5,6 +5,7 @@ import { promisify } from "node:util";
 import { describe, expect, it } from "vitest";
 import { rootDir, withTempDir } from "../../../utils.js";
 
+// @feature udd/cli/codex_hooks.feature
 const execFileAsync = promisify(execFile);
 
 async function runUddInCwd(args: string[]) {

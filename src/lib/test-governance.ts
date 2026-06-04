@@ -51,10 +51,25 @@ export interface TestGovernanceSummary {
 	gate_blocking: number;
 }
 
+export interface TestGovernanceFinding {
+	type:
+		| "review_manifest"
+		| "stubbed_test"
+		| "orphaned_test"
+		| "unlinked_test"
+		| "dirty_review"
+		| "missing_proof";
+	path: string;
+	message: string;
+	gate_blocking: boolean;
+	source_references: Record<string, string>;
+}
+
 export interface TestGovernanceReport {
 	summary: TestGovernanceSummary;
 	tests: TestScanEntry[];
 	missing_proof: MissingProofEntry[];
+	findings: TestGovernanceFinding[];
 	reviews: {
 		source: string;
 		tests: TestReviewRecord[];
@@ -72,17 +87,7 @@ export interface TestGateResult {
 	unlinkedTests: TestScanEntry[];
 	reviewManifestIssues: string[];
 	summary: TestGovernanceSummary;
-	blockingFindings: Array<{
-		type:
-			| "review_manifest"
-			| "stubbed_test"
-			| "orphaned_test"
-			| "unlinked_test"
-			| "dirty_review";
-		path: string;
-		message: string;
-		source_references: Record<string, string>;
-	}>;
+	blockingFindings: TestGovernanceFinding[];
 }
 
 export const TEST_REVIEW_MANIFEST = "specs/test-reviews.yml";
@@ -309,11 +314,64 @@ export async function buildTestGovernanceReport(
 		missing: missingProof.length,
 		gate_blocking: tests.filter((entry) => entry.gate_blocking).length,
 	};
+	const findings: TestGovernanceFinding[] = [
+		...manifestResult.issues.map((issue) => ({
+			type: "review_manifest" as const,
+			path: TEST_REVIEW_MANIFEST,
+			message: issue,
+			gate_blocking: true,
+			source_references: { review_manifest: TEST_REVIEW_MANIFEST },
+		})),
+		...tests
+			.filter((entry) => entry.stubAssertions.length > 0)
+			.map((entry) => ({
+				type: "stubbed_test" as const,
+				path: entry.path,
+				message: `Stub assertions: ${entry.path}`,
+				gate_blocking: true,
+				source_references: entry.source_references,
+			})),
+		...tests
+			.filter((entry) => entry.status === "orphaned")
+			.map((entry) => ({
+				type: "orphaned_test" as const,
+				path: entry.path,
+				message: `Orphaned feature link: ${entry.path} -> ${entry.feature}`,
+				gate_blocking: true,
+				source_references: entry.source_references,
+			})),
+		...tests
+			.filter((entry) => entry.status === "unlinked")
+			.map((entry) => ({
+				type: "unlinked_test" as const,
+				path: entry.path,
+				message: `Unlinked test proof: ${entry.path}`,
+				gate_blocking: true,
+				source_references: entry.source_references,
+			})),
+		...tests
+			.filter((entry) => entry.proof_state === "stale")
+			.map((entry) => ({
+				type: "dirty_review" as const,
+				path: entry.path,
+				message: `Dirty review: ${entry.path}`,
+				gate_blocking: true,
+				source_references: entry.source_references,
+			})),
+		...missingProof.map((entry) => ({
+			type: "missing_proof" as const,
+			path: entry.feature,
+			message: `Missing test proof: ${entry.feature}`,
+			gate_blocking: false,
+			source_references: entry.source_references,
+		})),
+	];
 
 	return {
 		summary,
 		tests,
 		missing_proof: missingProof,
+		findings,
 		reviews: {
 			source: TEST_REVIEW_MANIFEST,
 			tests: manifestResult.manifest.tests,
@@ -450,42 +508,9 @@ export async function checkTestGate(
 	const unlinkedTests = report.tests.filter(
 		(entry) => entry.status === "unlinked",
 	);
-	const blockingFindings: TestGateResult["blockingFindings"] = [
-		...report.reviews.issues.map((issue) => ({
-			type: "review_manifest" as const,
-			path: TEST_REVIEW_MANIFEST,
-			message: issue,
-			source_references: { review_manifest: TEST_REVIEW_MANIFEST },
-		})),
-		...stubbedTests.map((entry) => ({
-			type: "stubbed_test" as const,
-			path: entry.path,
-			message: `Stub assertions: ${entry.path}`,
-			source_references: entry.source_references,
-		})),
-		...orphanedTests.map((entry) => ({
-			type: "orphaned_test" as const,
-			path: entry.path,
-			message: `Orphaned feature link: ${entry.path} -> ${entry.feature}`,
-			source_references: entry.source_references,
-		})),
-		...unlinkedTests.map((entry) => ({
-			type: "unlinked_test" as const,
-			path: entry.path,
-			message: `Unlinked test proof: ${entry.path}`,
-			source_references: entry.source_references,
-		})),
-		...dirtyReviews.map((entry) => ({
-			type: "dirty_review" as const,
-			path: entry.path,
-			message: `Dirty review: ${entry.path}`,
-			source_references: {
-				test: entry.path,
-				review_manifest: TEST_REVIEW_MANIFEST,
-				...(entry.feature ? { feature: entry.feature } : {}),
-			},
-		})),
-	];
+	const blockingFindings = report.findings.filter(
+		(finding) => finding.gate_blocking,
+	);
 
 	return {
 		passed:

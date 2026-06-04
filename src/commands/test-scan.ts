@@ -23,4 +23,13 @@ export const testScanCommand = new Command("test-scan")
 		console.log(
 			`Reviewed: ${report.summary.reviewed}  Stale: ${report.summary.stale}  Missing: ${report.summary.missing}  Blocking: ${report.summary.gate_blocking}`,
 		);
+		if (report.findings.length > 0) {
+			console.log(chalk.bold("Findings"));
+			for (const finding of report.findings) {
+				const marker = finding.gate_blocking
+					? chalk.red("!")
+					: chalk.yellow("i");
+				console.log(`  ${marker} ${finding.message}`);
+			}
+		}
 	});

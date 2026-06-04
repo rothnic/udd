@@ -225,14 +225,20 @@ function reviewGateNextAction(
 	pauseReasons: AgentPauseReason[],
 	nextGovernanceFinding?: TestGateResult["blockingFindings"][number],
 ): string | null {
+	const criticalPause = pauseReasons.find(
+		(reason) =>
+			reason.type === "missing_specs" || reason.type === "unsafe_repair",
+	);
+	if (criticalPause) return criticalPause.next_action;
+
+	if (nextGovernanceFinding) return nextGovernanceFinding.message;
+
 	const firstPause = pauseReasons.find(
 		(reason) =>
 			reason.type === "unresolved_review_gate" ||
-			reason.type === "unverified_test_claim" ||
-			reason.type === "unsafe_repair" ||
-			reason.type === "missing_specs",
+			reason.type === "unverified_test_claim",
 	);
-	return firstPause?.next_action ?? nextGovernanceFinding?.message ?? null;
+	return firstPause?.next_action ?? null;
 }
 
 function recommendation(

@@ -19,4 +19,4 @@ Feature: Test Governance Scan
     When I run "udd test-scan --json"
     Then the scan summary reports every governance proof state
     And each test entry includes source references and a proof state
-
+    And the scan includes actionable findings with source references
