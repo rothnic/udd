@@ -24,6 +24,23 @@ test-governance --strict` exits non-zero when strict-mode findings are present.
 `udd doctor` and `udd health-check` remain project health diagnostics. They do
 not replace the test-governance gate.
 
+## Proof Scope
+
+Strict test governance is scoped to scenario proof:
+
+- `*.e2e.test.*` files are proof candidates.
+- Non-E2E tests with a `loadFeature(...)` call or `@feature` comment are proof
+  candidates because they explicitly claim scenario coverage.
+- Ordinary unit tests under `tests/lib/` are implementation regression tests.
+  They must still pass in `npm test`, but they are not counted as unlinked user
+  proof unless they explicitly link to a feature.
+- Manual OpenCode integration checks under `tests/e2e/opencode/integration/`
+  are outside the local strict gate because they require an external OpenCode
+  server and are excluded from the normal Vitest run.
+
+When a unit or manual integration test should become user proof, link it to a
+feature scenario or move the behavior into a scenario-backed E2E proof first.
+
 ## CI Opt-In
 
 Goal 009 does not enable repository-wide strict gates by default. Teams that are

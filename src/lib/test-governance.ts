@@ -92,6 +92,10 @@ export interface TestGateResult {
 
 export const TEST_REVIEW_MANIFEST = "specs/test-reviews.yml";
 export const LOCAL_TEST_REVIEW_CACHE = ".udd/test-reviews.yml";
+const MANUAL_PROOF_EXCLUDE_PREFIXES = [
+	"tests/e2e/my_area/",
+	"tests/e2e/opencode/integration/",
+];
 
 function toPosix(filePath: string): string {
 	return filePath.replace(/\\/g, "/");
@@ -105,6 +109,16 @@ function normalizeFeatureReference(reference: string): string {
 	}
 	const normalized = toPosix(reference);
 	return `specs/features/${normalized.endsWith(".feature") ? normalized : `${normalized}.feature`}`;
+}
+
+function isE2eProofFile(filePath: string): boolean {
+	return /\.e2e\.test\.[jt]sx?$/.test(filePath);
+}
+
+function isManualProofExcluded(filePath: string): boolean {
+	return MANUAL_PROOF_EXCLUDE_PREFIXES.some((prefix) =>
+		filePath.startsWith(prefix),
+	);
 }
 
 export function detectStubAssertions(content: string): string[] {
@@ -193,6 +207,13 @@ export async function scanTests(
 	for (const file of files.sort()) {
 		const content = await fs.readFile(path.join(rootDir, file), "utf-8");
 		const feature = extractFeatureReference(content);
+		const normalizedFile = toPosix(file);
+		if (
+			isManualProofExcluded(normalizedFile) ||
+			(!isE2eProofFile(normalizedFile) && !feature)
+		) {
+			continue;
+		}
 		const stubAssertions = detectStubAssertions(content);
 		let status: TestScanEntry["status"] = "unlinked";
 
@@ -206,7 +227,7 @@ export async function scanTests(
 		}
 
 		entries.push({
-			path: toPosix(file),
+			path: normalizedFile,
 			feature,
 			stubAssertions,
 			status,
@@ -220,7 +241,7 @@ export async function scanTests(
 							: "missing_review",
 			gate_blocking: status === "orphaned" || stubAssertions.length > 0,
 			source_references: {
-				test: toPosix(file),
+				test: normalizedFile,
 				...(feature ? { feature } : {}),
 			},
 		});

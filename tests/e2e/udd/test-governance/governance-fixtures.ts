@@ -82,9 +82,21 @@ test("orphaned", () => expect(1 + 1).toBe(2));
 `,
 	);
 	await writeTest(
-		"tests/misc/unlinked.test.ts",
+		"tests/misc/unlinked.e2e.test.ts",
 		`import { expect, test } from "vitest";
 test("unlinked", () => expect(1 + 1).toBe(2));
+`,
+	);
+	await writeTest(
+		"tests/lib/internal-regression.test.ts",
+		`import { expect, test } from "vitest";
+test("implementation detail", () => expect(1 + 1).toBe(2));
+`,
+	);
+	await writeTest(
+		"tests/e2e/opencode/integration/manual.integration.test.ts",
+		`import { expect, test } from "vitest";
+test("manual external integration", () => expect(1 + 1).toBe(2));
 `,
 	);
 	await fs.mkdir("specs", { recursive: true });
