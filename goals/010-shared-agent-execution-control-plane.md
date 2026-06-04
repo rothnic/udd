@@ -46,23 +46,32 @@ evidence collection without reintroducing Codex goal-command coupling.
   and review handoff.
 - Integration docs identify what is adapter-neutral versus adapter-specific.
 
+## Completion Evidence
+
+- Evidence artifact:
+  `docs/project/reviews/2026-06-04/goal-010-completion-evidence.md`
+- Implementation PR: pending.
+- Residual repository-wide test-governance blockers are recorded in the
+  evidence artifact and remain routed to the later governance/recovery upgrade
+  goals.
+
 ## Tasks
 
-- [ ] Update use cases, feature scenarios, and failing E2E tests for shared
+- [x] Update use cases, feature scenarios, and failing E2E tests for shared
       agent commands before implementing adapter changes.
-- [ ] Define shared agent command contracts and JSON schemas.
-- [ ] Implement or update shared status and next-work adapters.
-- [ ] Implement issue/list diagnostics for agent routing.
-- [ ] Add an evidence package format for PR/review handoff.
-- [ ] Audit root-local OpenCode files and classify each as installable,
+- [x] Define shared agent command contracts and JSON schemas.
+- [x] Implement or update shared status and next-work adapters.
+- [x] Implement issue/list diagnostics for agent routing.
+- [x] Add an evidence package format for PR/review handoff.
+- [x] Audit root-local OpenCode files and classify each as installable,
       dogfooding, or removable.
-- [ ] Convert unjustified root-local hooks into installable tooling.
-- [ ] Keep Codex hook guidance aligned with PR #46 behavior.
-- [ ] Remove or avoid Codex goal-command coupling in shared contracts.
-- [ ] Add OpenCode plugin tests for status and next-work commands.
-- [ ] Add integration fixtures for clean, stale, and drifted projects.
-- [ ] Document adapter-neutral versus OpenCode-specific responsibilities.
-- [ ] Add failure-mode guidance for agents when UDD status is noisy.
+- [x] Convert unjustified root-local hooks into installable tooling.
+- [x] Keep Codex hook guidance aligned with PR #46 behavior.
+- [x] Remove or avoid Codex goal-command coupling in shared contracts.
+- [x] Add OpenCode plugin tests for status and next-work commands.
+- [x] Add integration fixtures for clean, stale, and drifted projects.
+- [x] Document adapter-neutral versus OpenCode-specific responsibilities.
+- [x] Add failure-mode guidance for agents when UDD status is noisy.
 
 ## Definition of Done
 

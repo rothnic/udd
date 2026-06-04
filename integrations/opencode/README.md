@@ -29,3 +29,6 @@ keeps OpenCode-specific UX separate from shared UDD source-of-truth behavior.
   source contract.
 - Codex behavior is not defined here; Codex hook installation remains the
   installable external-project tooling from PR #46.
+
+See `root-local-audit.md` for the current root-local file classification and
+the review rule for adding new OpenCode files.

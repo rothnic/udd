@@ -1,10 +1,15 @@
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
-import { runUdd } from "../../../utils.js";
+import {
+	assertMatchesJsonSchema,
+	loadSharedAgentPayloadSchema,
+	runUdd,
+} from "../../../utils.js";
 
 const feature = await loadFeature(
 	"specs/features/opencode/tools/status_deep.feature",
 );
+const sharedAgentPayloadSchema = await loadSharedAgentPayloadSchema();
 
 describeFeature(feature, ({ Scenario }) => {
 	Scenario(
@@ -20,6 +25,11 @@ describeFeature(feature, ({ Scenario }) => {
 			Then(
 				"the payload includes project identity, phase, git state, health, and scenario totals",
 				() => {
+					assertMatchesJsonSchema(
+						payload,
+						sharedAgentPayloadSchema.$defs?.agentProjectSnapshot ?? {},
+						sharedAgentPayloadSchema,
+					);
 					expect(payload.project).toMatchObject({ name: "udd" });
 					expect(payload.phase).toMatchObject({
 						current: 3,
@@ -52,9 +62,16 @@ describeFeature(feature, ({ Scenario }) => {
 			And(
 				"the payload does not define Codex hook or goal-command behavior",
 				() => {
-					const serialized = JSON.stringify(payload);
-					expect(serialized).not.toContain("install-codex");
-					expect(serialized).not.toContain("/goal");
+					expect(payload).not.toHaveProperty("codex_hook");
+					expect(payload).not.toHaveProperty("goal_command");
+					expect(payload).not.toHaveProperty("adapter_commands");
+
+					const serializedWithoutGit = JSON.stringify({
+						...payload,
+						git: undefined,
+					});
+					expect(serializedWithoutGit).not.toContain("install-codex");
+					expect(serializedWithoutGit).not.toContain("/goal");
 				},
 			);
 		},
