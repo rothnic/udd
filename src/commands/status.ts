@@ -3,6 +3,7 @@ import { Command } from "commander";
 import { analyzeProjectDiagnostics } from "../lib/diagnostics.js";
 import { getProjectStatus } from "../lib/status.js";
 import { buildTestGovernanceReport } from "../lib/test-governance.js";
+import { buildTraceGraph } from "../lib/trace-graph.js";
 
 export const statusCommand = new Command("status")
 	.description("Summarize current test-based status")
@@ -66,9 +67,10 @@ Recommendations:",
 			}
 
 			if (options.json) {
-				const [diagnostics, testGovernance] = await Promise.all([
+				const [diagnostics, testGovernance, traceGraph] = await Promise.all([
 					analyzeProjectDiagnostics(),
 					buildTestGovernanceReport(),
+					buildTraceGraph(),
 				]);
 				console.log(
 					JSON.stringify(
@@ -87,12 +89,24 @@ Recommendations:",
 								review_manifest_issues: testGovernance.reviews.issues,
 								missing_proof: testGovernance.missing_proof,
 							},
+							trace: {
+								nodes: traceGraph.nodes.length,
+								edges: traceGraph.edges.length,
+								diagnostics: traceGraph.diagnostics.length,
+								diagnostics_by_type: traceGraph.diagnostics.reduce<
+									Record<string, number>
+								>((counts, diagnostic) => {
+									counts[diagnostic.type] = (counts[diagnostic.type] ?? 0) + 1;
+									return counts;
+								}, {}),
+							},
 						},
 						null,
 						2,
 					),
 				);
 			} else {
+				const traceGraph = await buildTraceGraph();
 				console.log(chalk.bold("Project Status"));
 				console.log(chalk.dim("=============="));
 
@@ -242,6 +256,11 @@ Recommendations:",
 						);
 					}
 				}
+
+				console.log(chalk.bold("\nTrace Graph:"));
+				console.log(
+					`  ${traceGraph.nodes.length} node(s), ${traceGraph.edges.length} edge(s), ${traceGraph.diagnostics.length} diagnostic(s)`,
+				);
 
 				const { git } = status;
 				console.log(chalk.bold("\nGit Status:"));

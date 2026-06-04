@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import { Command } from "commander";
+import { buildTraceGraph } from "../lib/trace-graph.js";
 import { validateSpecs } from "../lib/validator.js";
 
 export const lintCommand = new Command("lint")
@@ -8,7 +9,13 @@ export const lintCommand = new Command("lint")
 		try {
 			const results = await validateSpecs();
 			if (results.valid) {
+				const traceGraph = await buildTraceGraph();
 				console.log(chalk.green("All specs are valid"));
+				console.log(
+					chalk.dim(
+						`Trace graph: ${traceGraph.nodes.length} node(s), ${traceGraph.edges.length} edge(s), ${traceGraph.diagnostics.length} diagnostic(s)`,
+					),
+				);
 				process.exit(0);
 			} else {
 				console.error(chalk.red("Spec validation failed:"));
