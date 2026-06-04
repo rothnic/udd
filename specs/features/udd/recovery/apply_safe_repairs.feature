@@ -12,3 +12,9 @@ Feature: Apply Safe Recovery Repairs
     And the apply repair report should write durable evidence
     And behavior scenario files should not be created
 
+  Scenario: Apply missing expected directory repair
+    Given a temporary project missing the expected journey directory
+    When I run "udd repair --apply --json"
+    Then the apply repair report should create the expected journey directory
+    And the apply repair report should write durable evidence
+    And behavior scenario files should not be created

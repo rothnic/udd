@@ -7,7 +7,9 @@ import { buildUddCommand, execAsync } from "../../../utils.js";
 // @feature udd/recovery/apply_safe_repairs.feature
 describe("recovery safe apply", () => {
 	it("applies only safe reversible repairs in a temp project", async () => {
-		const projectDir = await fs.mkdtemp(path.join(os.tmpdir(), "udd-repair-apply-"));
+		const projectDir = await fs.mkdtemp(
+			path.join(os.tmpdir(), "udd-repair-apply-"),
+		);
 		const previousCwd = process.cwd();
 		try {
 			process.chdir(projectDir);
@@ -60,6 +62,47 @@ describe("recovery safe apply", () => {
 			);
 			expect(doctor.healthy).toBe(true);
 			expect(doctor.summary.warning).toBe(0);
+		} finally {
+			process.chdir(previousCwd);
+			await fs.rm(projectDir, { recursive: true, force: true });
+		}
+	});
+
+	it("creates a missing expected journey directory without behavior rewrites", async () => {
+		const projectDir = await fs.mkdtemp(
+			path.join(os.tmpdir(), "udd-repair-mkdir-"),
+		);
+		const previousCwd = process.cwd();
+		try {
+			process.chdir(projectDir);
+			await fs.mkdir("product", { recursive: true });
+			await fs.mkdir("specs/.udd", { recursive: true });
+			await fs.writeFile(
+				"specs/.udd/manifest.yml",
+				"journeys: {}\nscenarios: {}\n",
+			);
+
+			const report = JSON.parse(
+				(await execAsync(buildUddCommand("repair --apply --json"))).stdout,
+			);
+
+			expect(report.mode).toBe("apply");
+			expect(report.applied).toContainEqual(
+				expect.objectContaining({
+					kind: "mkdir",
+					path: "product/journeys",
+					safe: true,
+					reversible: true,
+				}),
+			);
+			expect(report.would_write).toEqual([
+				"product/journeys",
+				"docs/project/reviews/repair/latest-repair-evidence.md",
+			]);
+			expect(report.evidence.written).toBe(true);
+			await fs.access("product/journeys");
+			await fs.access("docs/project/reviews/repair/latest-repair-evidence.md");
+			await expect(fs.access("specs/features")).rejects.toThrow();
 		} finally {
 			process.chdir(previousCwd);
 			await fs.rm(projectDir, { recursive: true, force: true });
