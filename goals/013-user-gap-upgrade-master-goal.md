@@ -77,16 +77,32 @@ governance, recovery, impact analysis, and agent operation.
 
 ## Tasks
 
-- [ ] Execute Goal 014 and record a dated user-perspective review.
-- [ ] Execute Goal 015 and record a dated user-perspective review.
-- [ ] Execute Goal 016 and record a dated user-perspective review.
-- [ ] Execute Goal 017 and record a dated user-perspective review.
-- [ ] Execute Goal 018 and record a dated user-perspective review.
-- [ ] Keep each goal on a focused branch or reviewable PR slice.
-- [ ] After each goal, update this master goal if the next goal needs a scoped
+- [x] Execute Goal 014 and record a dated user-perspective review.
+- [x] Execute Goal 015 and record a dated user-perspective review.
+- [x] Execute Goal 016 and record a dated user-perspective review.
+- [x] Execute Goal 017 and record a dated user-perspective review.
+- [x] Execute Goal 018 and record a dated user-perspective review.
+- [x] Keep each goal on a focused branch or reviewable PR slice.
+- [x] After each goal, update this master goal if the next goal needs a scoped
       amendment based on verified findings.
-- [ ] At program end, create a summary report linking every goal, review, and
+- [x] At program end, create a summary report linking every goal, review, and
       command-evidence artifact.
+
+## Program Evidence
+
+Program summary:
+[user-gap-upgrade-program-summary.md](../docs/project/reviews/2026-06-03/user-gap-upgrade-program-summary.md)
+
+Command evidence:
+[user-gap-upgrade-command-evidence.md](../docs/project/reviews/2026-06-03/user-gap-upgrade-command-evidence.md)
+
+Merged PRs:
+
+- Goal 014: PR #69, `d4aaed5`
+- Goal 015: PR #70, `119f1ea`
+- Goal 016: PR #71, `0973eff`
+- Goal 017: PR #72, `21fd410`
+- Goal 018: PR #73, `9f53142`
 
 ## Definition of Done
 
