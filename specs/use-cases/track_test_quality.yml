@@ -6,7 +6,7 @@ actors:
   - developer
   - agent
 outcomes:
-  - description: Test inventory scans identify linked, unlinked, orphaned, and stubbed tests before gates are enabled
+  - description: Test inventory scans identify linked, unlinked, orphaned, stubbed, reviewed, stale, missing, and actionable finding states before gates are enabled
     scenarios:
       - local-gate-validation
       - test-scan

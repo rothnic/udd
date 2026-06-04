@@ -1,0 +1,49 @@
+tests:
+  - path: tests/e2e/udd/test-governance/feature-change-detection.e2e.test.ts
+    feature: specs/features/udd/test-governance/feature-change-detection.feature
+    status: clean
+    lastReviewed: "2026-06-04T00:00:00.000Z"
+    reviewCount: 1
+    dirtyReason: null
+  - path: tests/e2e/udd/test-governance/health-metrics.e2e.test.ts
+    feature: specs/features/udd/test-governance/health-metrics.feature
+    status: clean
+    lastReviewed: "2026-06-04T00:00:00.000Z"
+    reviewCount: 1
+    dirtyReason: null
+  - path: tests/e2e/udd/test-governance/local-gate-validation.e2e.test.ts
+    feature: specs/features/udd/test-governance/local-gate-validation.feature
+    status: clean
+    lastReviewed: "2026-06-04T00:00:00.000Z"
+    reviewCount: 1
+    dirtyReason: null
+  - path: tests/e2e/udd/test-governance/quality-gate.e2e.test.ts
+    feature: specs/features/udd/test-governance/quality-gate.feature
+    status: clean
+    lastReviewed: "2026-06-04T00:00:00.000Z"
+    reviewCount: 1
+    dirtyReason: null
+  - path: tests/e2e/udd/test-governance/regression-detection.e2e.test.ts
+    feature: specs/features/udd/test-governance/regression-detection.feature
+    status: clean
+    lastReviewed: "2026-06-04T00:00:00.000Z"
+    reviewCount: 1
+    dirtyReason: null
+  - path: tests/e2e/udd/test-governance/test-review.e2e.test.ts
+    feature: specs/features/udd/test-governance/test-review.feature
+    status: clean
+    lastReviewed: "2026-06-04T00:00:00.000Z"
+    reviewCount: 1
+    dirtyReason: null
+  - path: tests/e2e/udd/test-governance/test-scan.e2e.test.ts
+    feature: specs/features/udd/test-governance/test-scan.feature
+    status: clean
+    lastReviewed: "2026-06-04T00:00:00.000Z"
+    reviewCount: 1
+    dirtyReason: null
+  - path: tests/e2e/udd/test-governance/test-status.e2e.test.ts
+    feature: specs/features/udd/test-governance/test-status.feature
+    status: clean
+    lastReviewed: "2026-06-04T00:00:00.000Z"
+    reviewCount: 1
+    dirtyReason: null

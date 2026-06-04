@@ -19,5 +19,5 @@ Feature: Impact-Driven Regression Selection
     Then the impact output includes goal context and project-health commands
     When I analyze impact for an untraceable implementation file
     Then the impact output labels the path as untraceable with fallback validation
-    When I analyze impact for a scenario with missing proof
-    Then the impact output recommends the expected missing test path
+    When I analyze impact for a scenario with linked proof
+    Then the impact output includes the linked test path

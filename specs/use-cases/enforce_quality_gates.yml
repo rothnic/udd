@@ -6,7 +6,7 @@ actors:
   - developer
   - agent
 outcomes:
-  - description: Explicit local test-governance gates report findings and only fail when strict mode is requested
+  - description: Explicit local test-governance gates report source-referenced findings and only fail when strict mode is requested
     scenarios:
       - local-gate-validation
       - quality-gate

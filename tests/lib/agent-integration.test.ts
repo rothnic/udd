@@ -1,3 +1,4 @@
+import fs from "node:fs/promises";
 import { expect, test } from "vitest";
 import {
 	buildAgentEvidencePackage,
@@ -5,6 +6,7 @@ import {
 } from "../../src/lib/agent-integration.js";
 import type { DiagnosticReport } from "../../src/lib/diagnostics.js";
 import type { ProjectStatus } from "../../src/lib/status.js";
+import { withTempDir } from "../utils.js";
 
 test("agent next work treats warning diagnostics as blockers", () => {
 	const status: ProjectStatus = {
@@ -278,4 +280,140 @@ test("agent evidence includes changed-file impact recommendations", async () => 
 	expect(evidence.handoff.verification_commands).not.toContain(
 		"npm test -- --run",
 	);
+});
+
+test("agent evidence uses one canonical governance next action", async () => {
+	const status: ProjectStatus = {
+		git: {
+			branch: "test",
+			clean: true,
+			modified: 0,
+			staged: 0,
+			untracked: 0,
+		},
+		current_phase: 3,
+		phases: { "3": "Agent Integration" },
+		active_features: [],
+		features: {},
+		use_cases: {},
+		orphaned_scenarios: [],
+		journeys: {},
+		hasProductDir: true,
+	};
+	const report: DiagnosticReport = {
+		status: "healthy",
+		healthy: true,
+		lastCheck: "2026-06-04T00:00:00.000Z",
+		summary: {
+			critical: 0,
+			warning: 0,
+			info: 0,
+			total: 0,
+		},
+		conditions: [],
+		issues: [],
+	};
+
+	await withTempDir(async () => {
+		await fs.mkdir("specs/features/foo", { recursive: true });
+		await fs.writeFile(
+			"specs/features/foo/bar.feature",
+			"Feature: Bar\n\n  Scenario: Bar\n    Given bar exists\n",
+		);
+		await fs.mkdir("tests/foo", { recursive: true });
+		await fs.writeFile(
+			"tests/foo/bar.e2e.test.ts",
+			`// @fea${"ture"} foo/bar.feature
+import { expect, test } from "vitest";
+test("bar", () => {
+  expect(true).toBe(true);
+});
+`,
+		);
+
+		const evidence = await buildAgentEvidencePackage(status, report, {
+			goalPath: "goals/015-test-governance-upgrade.md",
+			now: new Date("2026-06-04T00:00:00.000Z"),
+		});
+		const firstGovernanceFinding =
+			evidence.test_governance.blocking_findings[0];
+
+		expect(firstGovernanceFinding).toBeDefined();
+		expect(evidence.test_governance.next_action).toBe(
+			firstGovernanceFinding.message,
+		);
+		expect(evidence.handoff.next_action).toBe(
+			evidence.test_governance.next_action,
+		);
+	});
+});
+
+test("agent evidence prioritizes critical pause reasons over governance findings", async () => {
+	const status: ProjectStatus = {
+		git: {
+			branch: "test",
+			clean: true,
+			modified: 0,
+			staged: 0,
+			untracked: 0,
+		},
+		current_phase: 3,
+		phases: { "3": "Agent Integration" },
+		active_features: [],
+		features: {},
+		use_cases: {},
+		orphaned_scenarios: [],
+		journeys: {},
+		hasProductDir: false,
+	};
+	const report: DiagnosticReport = {
+		status: "uninitialized",
+		healthy: false,
+		lastCheck: "2026-06-04T00:00:00.000Z",
+		summary: {
+			critical: 1,
+			warning: 0,
+			info: 0,
+			total: 1,
+		},
+		conditions: [],
+		issues: [
+			{
+				id: "critical:product_missing:product",
+				severity: "critical",
+				type: "product_missing",
+				file: "product",
+				message: "Product directory is missing.",
+				recommendation: "Run `udd init` or restore product/.",
+			},
+		],
+	};
+
+	await withTempDir(async () => {
+		await fs.mkdir("specs/features/foo", { recursive: true });
+		await fs.writeFile(
+			"specs/features/foo/bar.feature",
+			"Feature: Bar\n\n  Scenario: Bar\n    Given bar exists\n",
+		);
+		await fs.mkdir("tests/foo", { recursive: true });
+		await fs.writeFile(
+			"tests/foo/bar.e2e.test.ts",
+			`// @fea${"ture"} foo/bar.feature
+import { expect, test } from "vitest";
+test("bar", () => {
+  expect(true).toBe(true);
+});
+`,
+		);
+
+		const evidence = await buildAgentEvidencePackage(status, report, {
+			goalPath: "goals/015-test-governance-upgrade.md",
+			now: new Date("2026-06-04T00:00:00.000Z"),
+		});
+
+		expect(evidence.test_governance.next_action).toContain("Stub assertions");
+		expect(evidence.handoff.next_action).toBe(
+			"Run `udd init` or restore product/.",
+		);
+	});
 });

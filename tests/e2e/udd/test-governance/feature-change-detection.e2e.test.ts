@@ -6,18 +6,33 @@ const feature = await loadFeature(
 	"specs/features/udd/test-governance/feature-change-detection.feature",
 );
 
+interface ImpactResult {
+	affected: {
+		use_cases: Array<Record<string, unknown>>;
+		scenarios: Array<Record<string, unknown>>;
+		tests: Array<Record<string, unknown>>;
+		goals: Array<Record<string, unknown>>;
+	};
+	resolved: Array<Record<string, unknown>>;
+	recommended_commands: string[];
+	regression_markers: Array<Record<string, unknown>>;
+}
+
 // @feature udd/test-governance/feature-change-detection.feature
 describeFeature(feature, ({ Background, Scenario }) => {
 	Background(({ Given }) => {
-		Given("the UDD project has traceable use cases, scenarios, and tests", () => {
-			// The repository fixture itself is the traceable project under test.
-		});
+		Given(
+			"the UDD project has traceable use cases, scenarios, and tests",
+			() => {
+				// The repository fixture itself is the traceable project under test.
+			},
+		);
 	});
 
 	Scenario(
 		"Recommend targeted verification for changed feature, use case, test, goal, and untraceable paths",
 		({ When, Then }) => {
-			let impact: any;
+			let impact = {} as ImpactResult;
 
 			When("I analyze impact for a changed feature file", async () => {
 				impact = JSON.parse(
@@ -132,16 +147,22 @@ describeFeature(feature, ({ Background, Scenario }) => {
 						}),
 					);
 					expect(impact.recommended_commands).toEqual(
-						expect.arrayContaining(["./bin/udd status --json", "./bin/udd lint"]),
+						expect.arrayContaining([
+							"./bin/udd status --json",
+							"./bin/udd lint",
+						]),
 					);
 				},
 			);
 
-			When("I analyze impact for an untraceable implementation file", async () => {
-				impact = JSON.parse(
-					(await runUdd("impact src/lib/trace-graph.ts --json")).stdout,
-				);
-			});
+			When(
+				"I analyze impact for an untraceable implementation file",
+				async () => {
+					impact = JSON.parse(
+						(await runUdd("impact src/lib/trace-graph.ts --json")).stdout,
+					);
+				},
+			);
 
 			Then(
 				"the impact output labels the path as untraceable with fallback validation",
@@ -156,7 +177,7 @@ describeFeature(feature, ({ Background, Scenario }) => {
 				},
 			);
 
-			When("I analyze impact for a scenario with missing proof", async () => {
+			When("I analyze impact for a scenario with linked proof", async () => {
 				impact = JSON.parse(
 					(
 						await runUdd(
@@ -166,17 +187,28 @@ describeFeature(feature, ({ Background, Scenario }) => {
 				);
 			});
 
-			Then("the impact output recommends the expected missing test path", () => {
+			Then("the impact output includes the linked test path", () => {
 				expect(impact.regression_markers).toContainEqual(
 					expect.objectContaining({
-						type: "missing_proof",
+						type: "adjacent",
+						path: "tests/e2e/udd/cli/codex_hooks.e2e.test.ts",
+					}),
+				);
+				expect(impact.affected.tests).toContainEqual(
+					expect.objectContaining({
+						source: expect.objectContaining({
+							path: "tests/e2e/udd/cli/codex_hooks.e2e.test.ts",
+						}),
+					}),
+				);
+				expect(impact.regression_markers).toContainEqual(
+					expect.objectContaining({
+						type: "direct",
 						path: "specs/features/udd/cli/codex_hooks.feature",
 					}),
 				);
 				expect(impact.recommended_commands).toContainEqual(
-					expect.stringContaining(
-						"tests/e2e/udd/cli/codex_hooks.e2e.test.ts",
-					),
+					expect.stringContaining("tests/e2e/udd/cli/codex_hooks.e2e.test.ts"),
 				);
 			});
 		},
