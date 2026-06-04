@@ -77,21 +77,33 @@ Out of scope:
 5. Run scoped validation and fix only issues caused by this slice.
 6. Open one focused PR that references #49 and this goal file.
 
+## Completion Evidence
+
+Recorded on 2026-06-04 in
+`docs/project/reviews/2026-06-04/goal-006-completion-evidence.md`.
+
+Goal 006 is complete because PR #57 merged the focused source-of-truth
+foundation slice for issue #49, imported the scoped product and traceability
+files, excluded generated/local and broad implementation paths, reconciled the
+default branch as `master`, and recorded validation plus review follow-up in the
+PR body. Remaining salvage issues are tracked separately and are not required to
+close this foundation goal.
+
 ## Explicit Checks
 
 The goal is complete only when these are true:
 
-- [ ] The PR diff excludes generated/local artifacts such as `.udd/config.yml`,
+- [x] The PR diff excludes generated/local artifacts such as `.udd/config.yml`,
       `.memsearch.yaml`, and `bun.lock`.
-- [ ] The PR diff excludes broad CLI/test-governance/OpenCode implementation
+- [x] The PR diff excludes broad CLI/test-governance/OpenCode implementation
       changes.
-- [ ] Product intent and roadmap/traceability files are internally consistent.
-- [ ] `specs/VISION.md` no longer conflicts silently with the repository's
+- [x] Product intent and roadmap/traceability files are internally consistent.
+- [x] `specs/VISION.md` no longer conflicts silently with the repository's
       actual default branch.
-- [ ] Each imported journey/use-case file is either referenced by the roadmap or
+- [x] Each imported journey/use-case file is either referenced by the roadmap or
       explicitly marked as backlog/future.
-- [ ] Validation output is recorded in the PR body.
-- [ ] Any deferred source-of-truth decisions are linked to an exact issue or goal.
+- [x] Validation output is recorded in the PR body.
+- [x] Any deferred source-of-truth decisions are linked to an exact issue or goal.
 
 ## Verification Commands
 
