@@ -206,6 +206,12 @@ function fallbackCommandsForUntraceablePath(file: string): string[] {
 		];
 	}
 
+	if (normalized === "src/lib/trace-graph.ts") {
+		return [
+			"npm test -- --run tests/lib/trace-graph.test.ts tests/lib/agent-integration.test.ts tests/e2e/udd/test-governance/feature-change-detection.e2e.test.ts",
+		];
+	}
+
 	if (normalized === "src/commands/opencode.ts") {
 		return [
 			"npm test -- --run tests/e2e/opencode/tools/agent_handoff_evidence.e2e.test.ts tests/e2e/opencode/tools/next_recommendation.e2e.test.ts tests/e2e/opencode/tools/status_deep.e2e.test.ts tests/e2e/opencode/tools/issues_list.e2e.test.ts tests/lib/opencode.test.ts",

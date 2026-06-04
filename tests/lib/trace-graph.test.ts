@@ -182,12 +182,110 @@ test("diagnoses missing scenarios", async () => {
 	expect(diagnosticTypes(graph)).toContain("missing_scenario");
 });
 
+test("ignores malformed use-case outcome and scenario path shapes", async () => {
+	await writeBaseProject();
+	await writeFile(
+		"specs/use-cases/malformed.yml",
+		[
+			"id: malformed",
+			"name: Malformed",
+			"outcomes:",
+			"  - description: Scenario paths are accidentally a scalar",
+			"    scenario_paths: demo/happy",
+			"  - not-a-record",
+			"",
+		].join("\n"),
+	);
+
+	const graph = await buildTraceGraph(projectDir);
+	const diagnosticMessages = graph.diagnostics
+		.map((diagnostic) => diagnostic.message)
+		.join("\n");
+
+	expect(diagnosticMessages).not.toContain("references missing scenario d");
+	expect(diagnosticMessages).not.toContain("Scenario d has no linked E2E test");
+	expect(diagnosticTypes(graph)).not.toContain("duplicate_scenario");
+});
+
 test("diagnoses missing tests", async () => {
 	await writeBaseProject({ writeTests: [] });
 
 	const graph = await buildTraceGraph(projectDir);
 
 	expect(diagnosticTypes(graph)).toContain("missing_test");
+});
+
+test("scopes reference-product nodes to avoid collisions with root specs", async () => {
+	await writeBaseProject();
+	await writeFile(
+		"examples/reference-products/demo/specs/use-cases/demo.yml",
+		[
+			"id: demo",
+			"name: Reference Demo",
+			"outcomes:",
+			"  - description: Reference demo works",
+			"    scenario_paths:",
+			"      - demo/happy",
+			"",
+		].join("\n"),
+	);
+	await writeFile(
+		"examples/reference-products/demo/specs/features/demo/happy.feature",
+		[
+			"Feature: Reference demo",
+			"",
+			"  Scenario: Reference demo works",
+			"    Given a reference demo",
+			"",
+		].join("\n"),
+	);
+
+	const graph = await buildTraceGraph(projectDir);
+	const rootImpact = await analyzeImpact(
+		"specs/use-cases/demo.yml",
+		projectDir,
+		graph,
+	);
+	const referenceImpact = await analyzeImpact(
+		"examples/reference-products/demo/specs/use-cases/demo.yml",
+		projectDir,
+		graph,
+	);
+
+	expect(graph.nodes).toContainEqual(
+		expect.objectContaining({
+			id: "use_case:demo",
+			source: { path: "specs/use-cases/demo.yml" },
+		}),
+	);
+	expect(graph.nodes).toContainEqual(
+		expect.objectContaining({
+			id: "use_case:examples/reference-products/demo:demo",
+			source: {
+				path: "examples/reference-products/demo/specs/use-cases/demo.yml",
+			},
+		}),
+	);
+	expect(rootImpact.affected.scenarios).toContainEqual(
+		expect.objectContaining({
+			id: "scenario:demo/happy",
+			source: { path: "specs/features/demo/happy.feature" },
+		}),
+	);
+	expect(referenceImpact.affected.scenarios).toContainEqual(
+		expect.objectContaining({
+			id: "scenario:examples/reference-products/demo:demo/happy",
+			source: {
+				path: "examples/reference-products/demo/specs/features/demo/happy.feature",
+			},
+		}),
+	);
+	expect(referenceImpact.regression_markers).toContainEqual(
+		expect.objectContaining({
+			type: "missing_proof",
+			path: "examples/reference-products/demo/specs/features/demo/happy.feature",
+		}),
+	);
 });
 
 test("diagnoses orphan scenarios", async () => {
