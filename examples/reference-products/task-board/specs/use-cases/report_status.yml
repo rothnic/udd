@@ -3,7 +3,7 @@ name: Report Status
 summary: Summarize board health from user-visible task state.
 actors: [Product manager, Stakeholder]
 outcomes:
-  - description: Board reports counts and overdue work clearly.
+  - description: Board reports state counts and owner-filtered work clearly.
     scenarios:
       - count_by_state
       - filter_by_owner

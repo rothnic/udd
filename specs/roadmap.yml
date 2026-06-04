@@ -270,6 +270,17 @@ phases:
           - udd/recovery/plan_repair
           - udd/recovery/apply_safe_repairs
           - udd/recovery/refuse_behavior_rewrites
+      - id: strategic_program_execution
+        capability: autonomous-development
+        increment: v1-basic
+        status: delivered
+        follow_up: "goals/012-rebuild-proof-and-reference-implementation.md"
+        scenarios:
+          - strategic_program_commands
+          - task_board_rebuild
+        scenario_paths:
+          - udd/strategic-program/strategic_program_commands
+          - udd/reference-rebuild/task_board_rebuild
   - id: agent-intelligence
     name: Agent Intelligence
     number: 4
@@ -341,6 +352,7 @@ capabilities:
         use_cases:
           - orchestrated_iteration
           - agent_customization
+          - strategic_program_execution
       - version: v2-advanced
         phase: agent-intelligence
         number: 4
