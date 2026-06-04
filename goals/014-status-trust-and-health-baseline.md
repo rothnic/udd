@@ -58,20 +58,20 @@ generated local state, and real blockers.
 
 ## Tasks
 
-- [ ] Update use cases and scenarios for status trust and generated-state
+- [x] Update use cases and scenarios for status trust and generated-state
       classification before implementation.
-- [ ] Add E2E tests for a fresh checkout with valid source-controlled specs and
+- [x] Add E2E tests for a fresh checkout with valid source-controlled specs and
       no manifest.
-- [ ] Add E2E tests for optional journey drift that should not block normal
+- [x] Add E2E tests for optional journey drift that should not block normal
       work.
-- [ ] Reclassify generated manifest absence in doctor/status/evidence output.
-- [ ] Update repair dry-run to preserve safe refresh recommendations without
+- [x] Reclassify generated manifest absence in doctor/status/evidence output.
+- [x] Update repair dry-run to preserve safe refresh recommendations without
       labeling healthy projects as critically blocked.
-- [ ] Update status JSON fields so agents can distinguish blocking debt,
+- [x] Update status JSON fields so agents can distinguish blocking debt,
       advisory drift, and local result staleness.
-- [ ] Update docs to explain healthy checkout, generated state, and optional
+- [x] Update docs to explain healthy checkout, generated state, and optional
       discovery context.
-- [ ] Record before/after evidence under `docs/project/reviews/<date>/`.
+- [x] Record before/after evidence under `docs/project/reviews/<date>/`.
 
 ## Definition of Done
 
@@ -102,3 +102,8 @@ npm test -- --run tests/e2e/udd/strategic-program/strategic_program_commands.e2e
 - Blocks if evidence recommendations send agents to generated-state cleanup
   before explaining user-visible product work.
 - Blocks if the goal lacks fresh-checkout before/after evidence.
+
+## Completion Evidence
+
+Completed on 2026-06-04 with evidence in
+`docs/project/reviews/2026-06-04/goal-014-completion-evidence.md`.
