@@ -196,7 +196,7 @@ from a fresh checkout:
 ./bin/udd doctor --json
 ./bin/udd repair --dry-run --json
 ./bin/udd trace --json
-./bin/udd impact specs/use-cases/run_tests.yml --json
+./bin/udd impact specs/use-cases/capture_ideas.yml --json
 ./bin/udd test-scan --json
 ./bin/udd gate test-governance --strict --json
 ./bin/udd opencode evidence --json --goal goals/019-production-readiness-roadmap.md
