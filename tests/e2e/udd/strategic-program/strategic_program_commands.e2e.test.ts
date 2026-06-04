@@ -58,7 +58,7 @@ describe("strategic program command surfaces", () => {
 			expect(result.applied).toContainEqual(
 				expect.objectContaining({ kind: "refresh_manifest" }),
 			);
-			expect(result.refused).toContainEqual(
+			expect(result.advisory).toContainEqual(
 				expect.objectContaining({ kind: "manual" }),
 			);
 			await fs.access("specs/.udd/manifest.yml");

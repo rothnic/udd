@@ -16,3 +16,18 @@ outcomes:
       - diagnose_project_health
     scenario_paths:
       - udd/recovery/diagnose_project_health
+  - description: Developers and agents can preview ranked safe repairs and manual-review refusals before files are written
+    scenarios:
+      - plan_repair
+    scenario_paths:
+      - udd/recovery/plan_repair
+  - description: Developers and agents can apply only safe generated-state and directory repairs in controlled projects
+    scenarios:
+      - apply_safe_repairs
+    scenario_paths:
+      - udd/recovery/apply_safe_repairs
+  - description: Developers and agents get explicit refusal evidence when recovery would require rewriting behavior specs
+    scenarios:
+      - refuse_behavior_rewrites
+    scenario_paths:
+      - udd/recovery/refuse_behavior_rewrites
