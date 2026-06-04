@@ -9,12 +9,26 @@ import {
 
 export interface RepairAction {
 	id: string;
+	rank: number;
 	kind: "mkdir" | "write_file" | "refresh_manifest" | "manual";
 	safe: boolean;
 	reversible: boolean;
 	path: string;
 	description: string;
 	reason: string;
+	would_write: string[];
+	source_issue: {
+		id: string;
+		type: DiagnosticIssue["type"];
+		severity: DiagnosticIssue["severity"];
+		file: string;
+	};
+	source_issues: Array<{
+		id: string;
+		type: DiagnosticIssue["type"];
+		severity: DiagnosticIssue["severity"];
+		file: string;
+	}>;
 }
 
 export interface RepairReport {
@@ -22,6 +36,8 @@ export interface RepairReport {
 	applied: RepairAction[];
 	proposed: RepairAction[];
 	refused: RepairAction[];
+	advisory: RepairAction[];
+	would_write: string[];
 	evidence: {
 		path: string;
 		written: boolean;
@@ -42,7 +58,16 @@ async function exists(filePath: string): Promise<boolean> {
 	}
 }
 
-function safeActionForIssue(issue: DiagnosticIssue): RepairAction {
+function actionRank(issue: DiagnosticIssue, safe: boolean): number {
+	if (safe && issue.severity === "critical") return 10;
+	if (safe && issue.severity === "warning") return 20;
+	if (safe) return 30;
+	if (issue.severity === "critical") return 60;
+	if (issue.severity === "warning") return 70;
+	return 80;
+}
+
+function actionForIssue(issue: DiagnosticIssue): Omit<RepairAction, "rank"> {
 	if (issue.type === "product_missing" || issue.type === "journeys_missing") {
 		return {
 			id: `mkdir:${issue.file}`,
@@ -52,6 +77,21 @@ function safeActionForIssue(issue: DiagnosticIssue): RepairAction {
 			path: issue.file,
 			description: `Create missing directory ${issue.file}.`,
 			reason: issue.message,
+			would_write: [issue.file],
+			source_issue: {
+				id: issue.id,
+				type: issue.type,
+				severity: issue.severity,
+				file: issue.file,
+			},
+			source_issues: [
+				{
+					id: issue.id,
+					type: issue.type,
+					severity: issue.severity,
+					file: issue.file,
+				},
+			],
 		};
 	}
 
@@ -65,6 +105,21 @@ function safeActionForIssue(issue: DiagnosticIssue): RepairAction {
 			description:
 				"Create missing specs/.udd directory for generated metadata.",
 			reason: issue.message,
+			would_write: ["specs/.udd"],
+			source_issue: {
+				id: issue.id,
+				type: issue.type,
+				severity: issue.severity,
+				file: issue.file,
+			},
+			source_issues: [
+				{
+					id: issue.id,
+					type: issue.type,
+					severity: issue.severity,
+					file: issue.file,
+				},
+			],
 		};
 	}
 
@@ -78,6 +133,21 @@ function safeActionForIssue(issue: DiagnosticIssue): RepairAction {
 			description:
 				"Refresh the generated journey manifest from current journey files.",
 			reason: issue.message,
+			would_write: ["specs/.udd/manifest.yml"],
+			source_issue: {
+				id: issue.id,
+				type: issue.type,
+				severity: issue.severity,
+				file: issue.file,
+			},
+			source_issues: [
+				{
+					id: issue.id,
+					type: issue.type,
+					severity: issue.severity,
+					file: issue.file,
+				},
+			],
 		};
 	}
 
@@ -89,7 +159,51 @@ function safeActionForIssue(issue: DiagnosticIssue): RepairAction {
 		path: issue.file,
 		description: `Manual review required for ${issue.type}; repair will not rewrite behavior specs.`,
 		reason: issue.message,
+		would_write: [],
+		source_issue: {
+			id: issue.id,
+			type: issue.type,
+			severity: issue.severity,
+			file: issue.file,
+		},
+		source_issues: [
+			{
+				id: issue.id,
+				type: issue.type,
+				severity: issue.severity,
+				file: issue.file,
+			},
+		],
 	};
+}
+
+function repairActionForIssue(issue: DiagnosticIssue): RepairAction {
+	const action = actionForIssue(issue);
+	return {
+		...action,
+		rank: actionRank(issue, action.safe),
+	};
+}
+
+function dedupeActions(actions: RepairAction[]): RepairAction[] {
+	const byId = new Map<string, RepairAction>();
+	for (const action of actions) {
+		const existing = byId.get(action.id);
+		if (!existing) {
+			byId.set(action.id, action);
+			continue;
+		}
+
+		byId.set(action.id, {
+			...existing,
+			rank: Math.min(existing.rank, action.rank),
+			reason: `${existing.reason}; ${action.reason}`,
+			source_issues: [...existing.source_issues, ...action.source_issues],
+		});
+	}
+	return [...byId.values()].sort(
+		(left, right) => left.rank - right.rank || left.id.localeCompare(right.id),
+	);
 }
 
 async function buildManifest(rootDir: string): Promise<string> {
@@ -120,7 +234,10 @@ async function buildManifest(rootDir: string): Promise<string> {
 					.slice(0, 12),
 			};
 			for (const match of content.matchAll(/(?:→|->)\s*`([^`]+\.feature)`/g)) {
-				manifest.scenarios[match[1]] = { path: match[1] };
+				const scenarioPath = toPosix(match[1]);
+				if (await exists(path.join(rootDir, scenarioPath))) {
+					manifest.scenarios[scenarioPath] = { path: scenarioPath };
+				}
 			}
 		}
 	}
@@ -132,17 +249,47 @@ export async function planRepair(
 	rootDir = process.cwd(),
 ): Promise<RepairReport> {
 	const diagnostics = await analyzeProjectDiagnostics(rootDir);
-	const actions = diagnostics.issues.map(safeActionForIssue);
+	const advisoryIssues = diagnostics.issues.filter(
+		(issue) => issue.severity === "info" && issue.type === "missing_scenario",
+	);
+	const actionableIssues = diagnostics.issues.filter(
+		(issue) =>
+			!(issue.severity === "info" && issue.type === "missing_scenario"),
+	);
+	const actions = dedupeActions(actionableIssues.map(repairActionForIssue));
+	const advisory = dedupeActions(advisoryIssues.map(repairActionForIssue));
 	const proposed = actions.filter((action) => action.safe);
 	const refused = actions.filter((action) => !action.safe);
+	const evidencePath = "docs/project/reviews/repair/latest-repair-evidence.md";
+	const wouldWrite = [
+		...new Set([
+			...proposed.flatMap((action) => action.would_write).map(toPosix),
+			evidencePath,
+		]),
+	];
 	const markdown = [
 		"# UDD Repair Dry-Run Evidence",
 		"",
+		"## Apply-Mode Writes",
+		...wouldWrite.map((file) => `- ${file}`),
+		"",
 		"## Proposed Safe Actions",
-		...proposed.map((action) => `- ${action.description} (${action.path})`),
+		...proposed.map(
+			(action) =>
+				`- [${action.rank}] ${action.description} (${action.path}) writes: ${action.would_write.join(", ") || "none"}`,
+		),
 		"",
 		"## Refused Unsafe Actions",
-		...refused.map((action) => `- ${action.description} (${action.path})`),
+		...refused.map(
+			(action) =>
+				`- [${action.rank}] ${action.description} (${action.path}) reason: ${action.reason}`,
+		),
+		"",
+		"## Advisory Discovery Context",
+		...advisory.map(
+			(action) =>
+				`- [${action.rank}] ${action.reason} (${action.path}); no repair action proposed unless promoted to current behavior scope.`,
+		),
 		"",
 	].join("\n");
 
@@ -151,8 +298,10 @@ export async function planRepair(
 		applied: [],
 		proposed,
 		refused,
+		advisory,
+		would_write: wouldWrite,
 		evidence: {
-			path: "docs/project/reviews/repair-evidence.md",
+			path: evidencePath,
 			written: false,
 			markdown,
 		},
@@ -210,6 +359,12 @@ export async function applyRepair(
 		...report,
 		mode: "apply",
 		applied,
+		would_write: [
+			...new Set([
+				...applied.flatMap((action) => action.would_write).map(toPosix),
+				toPosix(path.relative(rootDir, evidencePath)),
+			]),
+		],
 		evidence: {
 			path: toPosix(path.relative(rootDir, evidencePath)),
 			written: true,

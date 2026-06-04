@@ -21,10 +21,16 @@ Current command behavior:
   are detected.
 - `udd health-check --json` emits a concise health envelope for automation.
 
-`udd repair --dry-run --json` can plan safe generated-state repairs without
-writing files. `udd repair --apply --json` exists for controlled fixture or
-temp-project repair proof; do not use apply mode against a valuable checkout
-unless the intended writes have been reviewed.
+`udd repair --dry-run --json` plans safe generated-state or directory repairs
+without writing files. Dry-run actions include a rank, source issue, and
+`would_write` list so reviewers can predict apply-mode writes.
+
+`udd repair --apply --json` exists for controlled fixture or temp-project repair
+proof. It applies only safe reversible actions such as creating missing
+directories or refreshing generated manifests, writes durable evidence under
+`docs/project/reviews/repair/`, and refuses behavior-spec rewrites. Do not use
+apply mode against a valuable checkout unless the intended writes have been
+reviewed.
 
 ## Current Drift Signals
 
@@ -91,7 +97,6 @@ Future work may add:
 
 - interactive fix flows,
 - checkpoint files,
-- auto-remediation for unambiguous stale metadata,
 - move/rename helpers that update references.
 
 Those behaviors must be introduced with use cases, scenarios, tests, and CLI

@@ -260,8 +260,14 @@ phases:
         follow_up: "#52"
         scenarios:
           - diagnose_project_health
+          - plan_repair
+          - apply_safe_repairs
+          - refuse_behavior_rewrites
         scenario_paths:
           - udd/recovery/diagnose_project_health
+          - udd/recovery/plan_repair
+          - udd/recovery/apply_safe_repairs
+          - udd/recovery/refuse_behavior_rewrites
   - id: agent-intelligence
     name: Agent Intelligence
     number: 4
@@ -416,6 +422,6 @@ backlog_journeys:
     follow_up: "#52"
     reason: Doctor/health recovery and orchestration implementation are deferred.
   - id: recover-from-drift
-    status: partial
-    follow_up: "#52"
-    reason: Doctor/health diagnostics are delivered through recover_from_drift; broader recovery automation remains future work.
+    status: delivered
+    follow_up: "goals/016-recovery-workflow-upgrade.md"
+    reason: Current recovery diagnostics, repair planning, safe apply, and manual refusal behavior are delivered through recover_from_drift; broader workflow automation remains future work.
