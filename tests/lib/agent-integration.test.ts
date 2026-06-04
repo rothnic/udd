@@ -1,11 +1,13 @@
 import fs from "node:fs/promises";
 import { expect, test } from "vitest";
 import {
+	applyTestGovernanceToRecommendation,
 	buildAgentEvidencePackage,
 	recommendNextAgentWork,
 } from "../../src/lib/agent-integration.js";
 import type { DiagnosticReport } from "../../src/lib/diagnostics.js";
 import type { ProjectStatus } from "../../src/lib/status.js";
+import type { TestGateResult } from "../../src/lib/test-governance.js";
 import { withTempDir } from "../utils.js";
 
 test("agent next work treats warning diagnostics as blockers", () => {
@@ -200,6 +202,95 @@ test("agent next work emits pause reason for missing executable proof", () => {
 			type: "unverified_test_claim",
 			source: "specs/features/udd/example/current.feature",
 		}),
+	);
+});
+
+test("agent next work ranks governance review gates above stale proof refresh", () => {
+	const status: ProjectStatus = {
+		git: {
+			branch: "test",
+			clean: true,
+			modified: 0,
+			staged: 0,
+			untracked: 0,
+		},
+		current_phase: 3,
+		phases: { "3": "Agent Integration" },
+		active_features: ["opencode/tools"],
+		features: {
+			"opencode/tools": {
+				path: "opencode/tools",
+				scenarios: {
+					udd_status_tool: {
+						e2e: "stale",
+						isDeferred: false,
+						phase: 3,
+					},
+				},
+				requirements: {},
+			},
+		},
+		use_cases: {},
+		orphaned_scenarios: [],
+		journeys: {},
+		hasProductDir: true,
+	};
+	const report: DiagnosticReport = {
+		status: "healthy",
+		healthy: true,
+		lastCheck: "2026-06-04T00:00:00.000Z",
+		summary: {
+			critical: 0,
+			warning: 0,
+			info: 0,
+			total: 0,
+		},
+		conditions: [],
+		issues: [],
+	};
+	const gate = {
+		blockingFindings: [
+			{
+				type: "stubbed_test",
+				path: "tests/e2e/opencode/tools/udd_status_tool.e2e.test.ts",
+				message:
+					"Stub assertions: tests/e2e/opencode/tools/udd_status_tool.e2e.test.ts",
+				gate_blocking: true,
+				source_references: {
+					test: "tests/e2e/opencode/tools/udd_status_tool.e2e.test.ts",
+					feature: "specs/features/opencode/tools/udd_status_tool.feature",
+				},
+			},
+		],
+	} as TestGateResult;
+
+	const base = recommendNextAgentWork(
+		status,
+		report,
+		new Date("2026-06-04T00:00:00.000Z"),
+	);
+	const governed = applyTestGovernanceToRecommendation(
+		base,
+		gate,
+		new Date("2026-06-04T00:00:00.000Z"),
+	);
+
+	expect(base.recommended).toBe("opencode/tools/udd_status_tool");
+	expect(governed.recommended).toBe(
+		"tests/e2e/opencode/tools/udd_status_tool.e2e.test.ts",
+	);
+	expect(governed.blocks_work).toBe(true);
+	expect(governed.pause_reasons).toContainEqual(
+		expect.objectContaining({
+			type: "unverified_test_claim",
+			source: "tests/e2e/opencode/tools/udd_status_tool.e2e.test.ts",
+		}),
+	);
+	expect(governed.verification_commands).toEqual(
+		expect.arrayContaining([
+			"./bin/udd test-scan --json",
+			"./bin/udd gate test-governance --strict --json",
+		]),
 	);
 });
 

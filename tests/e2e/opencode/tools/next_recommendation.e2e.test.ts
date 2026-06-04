@@ -46,6 +46,27 @@ describeFeature(feature, ({ Scenario }) => {
 							pause_reasons: expect.any(Array),
 						}),
 					);
+					if ((payload.pause_reasons as unknown[]).length > 0) {
+						expect(payload.blocks_work).toBe(true);
+						expect(payload.user_impact).toMatch(/review|proof|handoff/i);
+					}
+				},
+			);
+
+			And(
+				"review gates outrank stale proof refresh when blocking handoff",
+				() => {
+					if ((payload.pause_reasons as unknown[]).length > 0) {
+						expect(payload.verification_commands).toEqual(
+							expect.arrayContaining([
+								"./bin/udd test-scan --json",
+								"./bin/udd gate test-governance --strict --json",
+							]),
+						);
+						expect(payload.reason).toMatch(
+							/Stub assertions|Unlinked test proof|Dirty review|review/i,
+						);
+					}
 				},
 			);
 

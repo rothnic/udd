@@ -6,7 +6,7 @@ import {
 	buildAgentEvidencePackage,
 	buildAgentIssueList,
 	buildAgentProjectSnapshot,
-	recommendNextAgentWork,
+	recommendNextAgentWorkWithGovernance,
 } from "../lib/agent-integration.js";
 import { analyzeProjectDiagnostics } from "../lib/diagnostics.js";
 import { getProjectStatus } from "../lib/status.js";
@@ -99,7 +99,10 @@ opencodeCommand
 	.option("--json", "Output JSON for agent consumption")
 	.action(async (options) => {
 		const { status, diagnostics } = await getAgentInputs();
-		const recommendation = recommendNextAgentWork(status, diagnostics);
+		const recommendation = await recommendNextAgentWorkWithGovernance(
+			status,
+			diagnostics,
+		);
 
 		if (options.json) {
 			console.log(JSON.stringify(recommendation, null, 2));
