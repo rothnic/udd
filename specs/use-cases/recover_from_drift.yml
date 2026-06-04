@@ -11,3 +11,8 @@ outcomes:
       - diagnose_project_health
     scenario_paths:
       - udd/recovery/diagnose_project_health
+  - description: Developers and agents can distinguish generated-state and optional-discovery advisories from blocking health issues
+    scenarios:
+      - diagnose_project_health
+    scenario_paths:
+      - udd/recovery/diagnose_project_health

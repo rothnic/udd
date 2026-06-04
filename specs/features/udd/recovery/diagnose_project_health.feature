@@ -17,6 +17,10 @@ Feature: Diagnose Project Health
 # Success Criteria:
 #   - Doctor JSON includes a status, issue summary, and issue list.
 #   - Health-check JSON reports a healthy boolean and the same issue summary.
+#   - Generated local metadata absence is advisory when source-controlled specs
+#     are otherwise valid.
+#   - Status JSON exposes health classification so agents can distinguish
+#     blocking debt from advisory discovery drift.
 #   - Real initialized temp projects produce structured diagnostics.
 #   - Partially initialized and drifted temp projects report actionable issues.
 #   - Error handling covers partial initialization without crashing.
@@ -25,8 +29,28 @@ Feature: Diagnose Project Health
   Scenario: Report real initialized project diagnostics
     Given a temporary project initialized with "udd init --yes"
     When I run "udd doctor --json"
-    Then the JSON report should identify the project as "drift-detected"
+    Then the JSON report should identify the project as "healthy"
     And the report should include a "missing_scenario" issue
+    And the "missing_scenario" issue should be advisory
+
+  Scenario: Report generated manifest absence as advisory
+    Given a temporary project with valid source-controlled specs but no generated manifest
+    When I run "udd doctor --json"
+    Then the JSON report should identify the project as "healthy"
+    And the report should include a "manifest_missing" issue
+    And the "manifest_missing" issue should be advisory
+
+  Scenario: Expose health classification in status JSON
+    Given a temporary project with valid source-controlled specs but no generated manifest
+    When I run "udd status --json"
+    Then the status JSON health summary should have zero critical issues
+    And the status JSON should identify advisory discovery issues
+
+  Scenario: Keep legacy status doctor aligned with advisory health
+    Given a temporary project with valid source-controlled specs but no generated manifest
+    When I run "udd status --doctor"
+    Then the status doctor output should identify the project as healthy
+    And the status doctor command should not fail
 
   Scenario: Report partial initialization diagnostics
     Given a temporary project with "specs/.udd" but no "product" directory
@@ -37,8 +61,9 @@ Feature: Diagnose Project Health
   Scenario: Report drifted journey diagnostics
     Given a temporary project with a stale journey manifest entry
     When I run "udd doctor --json"
-    Then the JSON report should identify the project as "drift-detected"
+    Then the JSON report should identify the project as "healthy"
     And the report should include a "journey_stale" issue
+    And the "journey_stale" issue should be advisory
 
   Scenario: Report deleted files still referenced by the manifest
     Given a temporary project with manifest entries for deleted journey and scenario files
