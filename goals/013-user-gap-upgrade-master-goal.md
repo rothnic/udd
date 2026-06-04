@@ -90,19 +90,19 @@ governance, recovery, impact analysis, and agent operation.
 
 ## Program Evidence
 
-Program summary:
-[user-gap-upgrade-program-summary.md](../docs/project/reviews/2026-06-03/user-gap-upgrade-program-summary.md)
+Completion evidence:
+[goal-013-completion-evidence.md](../docs/project/reviews/2026-06-04/goal-013-completion-evidence.md)
 
-Command evidence:
-[user-gap-upgrade-command-evidence.md](../docs/project/reviews/2026-06-03/user-gap-upgrade-command-evidence.md)
+Earlier planning summary:
+[user-gap-upgrade-program-summary.md](../docs/project/reviews/2026-06-03/user-gap-upgrade-program-summary.md)
 
 Merged PRs:
 
-- Goal 014: PR #69, `d4aaed5`
-- Goal 015: PR #70, `119f1ea`
-- Goal 016: PR #71, `0973eff`
-- Goal 017: PR #72, `21fd410`
-- Goal 018: PR #73, `9f53142`
+- Goal 014: PR #83, `4dd624a`
+- Goal 015: PR #84, `1861061`
+- Goal 016: PR #85, `edbd26a`
+- Goal 017: PR #86, `5db8bdd`
+- Goal 018: PR #87, `15b5aca`
 
 ## Definition of Done
 
