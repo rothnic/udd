@@ -1,6 +1,7 @@
+import fs from "node:fs/promises";
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
-import { runUdd } from "../../../utils.js";
+import { runUdd, withTempDir } from "../../../utils.js";
 
 const feature = await loadFeature(
 	"specs/features/udd/test-governance/feature-change-detection.feature",
@@ -211,6 +212,95 @@ describeFeature(feature, ({ Background, Scenario }) => {
 					expect.stringContaining("tests/e2e/udd/cli/codex_hooks.e2e.test.ts"),
 				);
 			});
+
+			When("I analyze impact for a reference-product use case", async () => {
+				impact = JSON.parse(
+					(
+						await runUdd(
+							"impact examples/reference-products/task-board/specs/use-cases/capture_work.yml --json",
+						)
+					).stdout,
+				);
+			});
+
+			Then(
+				"the impact output includes reference-product scenarios and missing proof commands",
+				() => {
+					expect(impact.resolved).toContainEqual(
+						expect.objectContaining({
+							type: "use_case",
+							source: expect.objectContaining({
+								path: "examples/reference-products/task-board/specs/use-cases/capture_work.yml",
+							}),
+						}),
+					);
+					expect(impact.affected.scenarios).toContainEqual(
+						expect.objectContaining({
+							source: expect.objectContaining({
+								path: "examples/reference-products/task-board/specs/features/task-board/capture/create_item.feature",
+							}),
+						}),
+					);
+					expect(impact.regression_markers).toContainEqual(
+						expect.objectContaining({
+							type: "missing_proof",
+							path: "examples/reference-products/task-board/specs/features/task-board/capture/create_item.feature",
+						}),
+					);
+					expect(impact.recommended_commands).toContainEqual(
+						expect.stringContaining(
+							"examples/reference-products/task-board/tests/e2e/task-board/capture/create_item.e2e.test.ts",
+						),
+					);
+				},
+			);
+
+			When("I analyze impact for a scenario with missing proof", async () => {
+				await withTempDir(async () => {
+					await fs.mkdir("specs/use-cases", { recursive: true });
+					await fs.mkdir("specs/features/demo", { recursive: true });
+					await fs.writeFile(
+						"specs/use-cases/demo.yml",
+						[
+							"id: demo",
+							"name: Demo",
+							"outcomes:",
+							"  - description: Demo behavior is specified.",
+							"    scenario_paths:",
+							"      - demo/missing",
+							"",
+						].join("\n"),
+					);
+					await fs.writeFile(
+						"specs/features/demo/missing.feature",
+						[
+							"Feature: Missing proof",
+							"  Scenario: Missing proof",
+							"    Given specified behavior has no linked proof",
+							"",
+						].join("\n"),
+					);
+					impact = JSON.parse(
+						(await runUdd("impact specs/features/demo/missing.feature --json"))
+							.stdout,
+					);
+				});
+			});
+
+			Then(
+				"the impact output recommends the expected missing test path",
+				() => {
+					expect(impact.regression_markers).toContainEqual(
+						expect.objectContaining({
+							type: "missing_proof",
+							path: "specs/features/demo/missing.feature",
+						}),
+					);
+					expect(impact.recommended_commands).toContain(
+						"npm test -- --run tests/e2e/demo/missing.e2e.test.ts",
+					);
+				},
+			);
 		},
 	);
 });

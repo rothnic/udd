@@ -239,6 +239,7 @@ test("agent evidence includes changed-file impact recommendations", async () => 
 		changedFiles: [
 			"specs/features/udd/recovery/plan_repair.feature",
 			"src/lib/agent-integration.ts",
+			"src/lib/trace-graph.ts",
 			"docs\\agent-operator-contract.md",
 		],
 		verification: [
@@ -265,6 +266,15 @@ test("agent evidence includes changed-file impact recommendations", async () => 
 				expect.stringContaining("tests/lib/agent-integration.test.ts"),
 			]),
 		}),
+	);
+	const traceGraphImpact = evidence.changed_file_impacts.find(
+		(impact) => impact.path === "src/lib/trace-graph.ts",
+	);
+	expect(traceGraphImpact?.recommended_commands.join("\n")).toContain(
+		"tests/lib/trace-graph.test.ts",
+	);
+	expect(traceGraphImpact?.recommended_commands.join("\n")).toContain(
+		"tests/e2e/udd/test-governance/feature-change-detection.e2e.test.ts",
 	);
 	expect(evidence.changed_file_impacts).toContainEqual(
 		expect.objectContaining({

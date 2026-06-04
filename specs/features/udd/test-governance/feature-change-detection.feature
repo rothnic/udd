@@ -21,3 +21,7 @@ Feature: Impact-Driven Regression Selection
     Then the impact output labels the path as untraceable with fallback validation
     When I analyze impact for a scenario with linked proof
     Then the impact output includes the linked test path
+    When I analyze impact for a reference-product use case
+    Then the impact output includes reference-product scenarios and missing proof commands
+    When I analyze impact for a scenario with missing proof
+    Then the impact output recommends the expected missing test path

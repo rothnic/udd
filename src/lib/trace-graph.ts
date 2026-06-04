@@ -101,18 +101,73 @@ function normalizePath(filePath: string): string {
 	return toPosix(filePath).replace(/^\.\//, "");
 }
 
-function scenarioIdToPath(id: string): string {
-	return `specs/features/${id}.feature`;
+function scenarioIdToPath(id: string, specRoot = ""): string {
+	return normalizePath(
+		path.posix.join(specRoot, "specs/features", `${id}.feature`),
+	);
 }
 
 function scenarioPathToId(filePath: string): string {
-	return normalizePath(filePath)
-		.replace(/^specs\/features\//, "")
-		.replace(/\.feature$/, "");
+	const normalized = normalizePath(filePath);
+	const marker = "/specs/features/";
+	if (normalized.startsWith("specs/features/")) {
+		return normalized
+			.replace(/^specs\/features\//, "")
+			.replace(/\.feature$/, "");
+	}
+	const markerIndex = normalized.indexOf(marker);
+	if (markerIndex >= 0) {
+		return normalized
+			.slice(markerIndex + marker.length)
+			.replace(/\.feature$/, "");
+	}
+	return normalized.replace(/\.feature$/, "");
+}
+
+function specRootFor(filePath: string): string {
+	const normalized = normalizePath(filePath);
+	for (const marker of ["/specs/use-cases/", "/specs/features/"]) {
+		const markerIndex = normalized.indexOf(marker);
+		if (markerIndex >= 0) {
+			const root = normalized.slice(0, markerIndex);
+			if (isReferenceProductPath(root)) {
+				return root;
+			}
+		}
+	}
+	return "";
+}
+
+function expectedTestPathForScenarioFeature(featurePath: string): string {
+	const normalized = normalizePath(featurePath);
+	const specRoot = specRootFor(normalized);
+	if (specRoot) {
+		const relativeFeature = normalized
+			.slice(specRoot.length)
+			.replace(/^\//, "");
+		return path.posix.join(
+			specRoot,
+			"tests/e2e",
+			relativeFeature
+				.replace(/^specs\/features\//, "")
+				.replace(/\.feature$/, ".e2e.test.ts"),
+		);
+	}
+	return normalized
+		.replace(/^specs\/features\//, "tests/e2e/")
+		.replace(/\.feature$/, ".e2e.test.ts");
+}
+
+function isReferenceProductPath(filePath: string): boolean {
+	return normalizePath(filePath).startsWith("examples/reference-products/");
 }
 
 function nodeId(type: TraceNodeType, id: string): string {
 	return `${type}:${id}`;
+}
+
+function scopedTraceId(id: string, specRoot: string): string {
+	return specRoot ? `${specRoot}:${id}` : id;
 }
 
 function addNode(nodes: Map<string, TraceNode>, node: TraceNode): void {
@@ -159,6 +214,8 @@ export async function buildTraceGraph(
 	const edges: TraceEdge[] = [];
 	const diagnostics: TraceDiagnostic[] = [];
 	const referencedScenarios = new Set<string>();
+	const referencedScenarioSources = new Map<string, string>();
+	const referencedScenarioLabels = new Map<string, string>();
 	const scenarioReferenceCounts = new Map<string, number>();
 
 	const visionPath = "specs/VISION.md";
@@ -265,32 +322,39 @@ export async function buildTraceGraph(
 	}
 
 	const useCaseFiles = (
-		await glob("specs/use-cases/*.yml", { cwd: rootDir })
+		await glob(
+			[
+				"specs/use-cases/*.yml",
+				"examples/reference-products/*/specs/use-cases/*.yml",
+			],
+			{ cwd: rootDir },
+		)
 	).sort();
 	for (const file of useCaseFiles) {
+		const specRoot = specRootFor(file);
 		const parsedData = await readYaml(rootDir, file);
 		if (!isRecord(parsedData) || typeof parsedData.id !== "string") continue;
 		const parsed = parsedData as {
 			id: string;
 			name?: string;
-			outcomes?: Array<{
-				description?: string;
-				scenarios?: string[];
-				scenario_paths?: string[];
-			}>;
+			outcomes?: unknown;
 		};
+		const useCaseNodeId = nodeId(
+			"use_case",
+			scopedTraceId(parsed.id, specRoot),
+		);
 
 		addNode(nodes, {
-			id: nodeId("use_case", parsed.id),
+			id: useCaseNodeId,
 			type: "use_case",
 			label: parsed.name ?? parsed.id,
 			source: { path: file },
 			status: phaseByUseCase.get(parsed.id)?.name,
 		});
-		if (objective) {
+		if (objective && specRoot === "") {
 			addEdge(edges, {
 				from: objective.id,
-				to: nodeId("use_case", parsed.id),
+				to: useCaseNodeId,
 				type: "objective_includes_use_case",
 				source: { path: visionPath },
 			});
@@ -300,42 +364,56 @@ export async function buildTraceGraph(
 		if (capability) {
 			addEdge(edges, {
 				from: nodeId("capability", capability),
-				to: nodeId("use_case", parsed.id),
+				to: useCaseNodeId,
 				type: "capability_contains_use_case",
 				source: { path: "specs/roadmap.yml" },
 			});
 		}
 
-		for (const [index, outcome] of (parsed.outcomes ?? []).entries()) {
-			const id = outcomeId(parsed.id, index);
+		const outcomes = Array.isArray(parsed.outcomes) ? parsed.outcomes : [];
+		for (const [index, outcome] of outcomes.entries()) {
+			if (!isRecord(outcome)) continue;
+			const rawOutcomeId = outcomeId(parsed.id, index);
+			const id = scopedTraceId(rawOutcomeId, specRoot);
 			addNode(nodes, {
 				id: nodeId("outcome", id),
 				type: "outcome",
-				label: outcome.description ?? id,
+				label:
+					typeof outcome.description === "string"
+						? outcome.description
+						: rawOutcomeId,
 				source: { path: file },
 			});
 			addEdge(edges, {
-				from: nodeId("use_case", parsed.id),
+				from: useCaseNodeId,
 				to: nodeId("outcome", id),
 				type: "use_case_has_outcome",
 				source: { path: file },
 			});
 
-			for (const scenarioPath of outcome.scenario_paths ??
-				outcome.scenarios ??
-				[]) {
-				referencedScenarios.add(scenarioPath);
+			const scenarioPaths = Array.isArray(outcome.scenario_paths)
+				? outcome.scenario_paths
+				: Array.isArray(outcome.scenarios)
+					? outcome.scenarios
+					: [];
+			for (const scenarioPath of scenarioPaths) {
+				if (typeof scenarioPath !== "string") continue;
+				const scopedScenarioId = scopedTraceId(scenarioPath, specRoot);
+				referencedScenarios.add(scopedScenarioId);
+				const scenarioSourcePath = scenarioIdToPath(scenarioPath, specRoot);
+				referencedScenarioSources.set(scopedScenarioId, scenarioSourcePath);
+				referencedScenarioLabels.set(scopedScenarioId, scenarioPath);
 				scenarioReferenceCounts.set(
-					scenarioPath,
-					(scenarioReferenceCounts.get(scenarioPath) ?? 0) + 1,
+					scopedScenarioId,
+					(scenarioReferenceCounts.get(scopedScenarioId) ?? 0) + 1,
 				);
 				addEdge(edges, {
 					from: nodeId("outcome", id),
-					to: nodeId("scenario", scenarioPath),
+					to: nodeId("scenario", scopedScenarioId),
 					type: "outcome_requires_scenario",
 					source: { path: file },
 				});
-				if (!(await exists(rootDir, scenarioIdToPath(scenarioPath)))) {
+				if (!(await exists(rootDir, scenarioSourcePath))) {
 					diagnostics.push({
 						type: "missing_scenario",
 						severity: "error",
@@ -348,22 +426,29 @@ export async function buildTraceGraph(
 	}
 
 	const scenarioFiles = (
-		await glob("specs/features/**/*.feature", { cwd: rootDir })
+		await glob(
+			[
+				"specs/features/**/*.feature",
+				"examples/reference-products/*/specs/features/**/*.feature",
+			],
+			{ cwd: rootDir },
+		)
 	).sort();
 	for (const file of scenarioFiles) {
-		const id = scenarioPathToId(file);
+		const rawId = scenarioPathToId(file);
+		const id = scopedTraceId(rawId, specRootFor(file));
 		addNode(nodes, {
 			id: nodeId("scenario", id),
 			type: "scenario",
-			label: id,
+			label: rawId,
 			source: { path: file },
-			status: futureScenarioPaths.has(id) ? "future-phase" : undefined,
+			status: futureScenarioPaths.has(rawId) ? "future-phase" : undefined,
 		});
 		if (!referencedScenarios.has(id)) {
 			diagnostics.push({
 				type: "orphan_scenario",
-				severity: futureScenarioPaths.has(id) ? "info" : "warning",
-				message: `Scenario ${id} is not linked from a use-case outcome.`,
+				severity: futureScenarioPaths.has(rawId) ? "info" : "warning",
+				message: `Scenario ${rawId} is not linked from a use-case outcome.`,
 				source: { path: file },
 			});
 		}
@@ -416,7 +501,10 @@ export async function buildTraceGraph(
 			continue;
 		}
 
-		const scenario = scenarioPathToId(feature);
+		const scenario = scopedTraceId(
+			scenarioPathToId(feature),
+			specRootFor(feature),
+		);
 		testsByScenario.set(scenario, [
 			...(testsByScenario.get(scenario) ?? []),
 			id,
@@ -430,16 +518,20 @@ export async function buildTraceGraph(
 	}
 
 	for (const scenario of referencedScenarios) {
+		const scenarioLabel = referencedScenarioLabels.get(scenario) ?? scenario;
 		if (!testsByScenario.has(scenario) && !futureScenarioPaths.has(scenario)) {
+			const scenarioSourcePath =
+				referencedScenarioSources.get(scenario) ?? scenarioIdToPath(scenario);
 			diagnostics.push({
 				type: "missing_test",
-				severity: "error",
-				message: `Scenario ${scenario} has no linked E2E test.`,
-				source: { path: scenarioIdToPath(scenario) },
+				severity: isReferenceProductPath(scenarioSourcePath) ? "info" : "error",
+				message: `Scenario ${scenarioLabel} has no linked E2E test.`,
+				source: { path: scenarioSourcePath },
 			});
 		}
 		if (testsByScenario.has(scenario) && !futureScenarioPaths.has(scenario)) {
-			const scenarioPath = scenarioIdToPath(scenario);
+			const scenarioPath =
+				referencedScenarioSources.get(scenario) ?? scenarioIdToPath(scenario);
 			let staleReason: string | undefined;
 			if (resultsMtime === undefined) {
 				staleReason =
@@ -478,7 +570,7 @@ export async function buildTraceGraph(
 			diagnostics.push({
 				type: "future_phase",
 				severity: "info",
-				message: `Scenario ${scenario} is planned for a future phase.`,
+				message: `Scenario ${scenarioLabel} is planned for a future phase.`,
 				source: { path: scenarioIdToPath(scenario) },
 			});
 		}
@@ -623,9 +715,7 @@ export async function analyzeImpact(
 	for (const marker of regressionMarkers.filter(
 		(item) => item.type === "missing_proof",
 	)) {
-		const testPath = marker.path
-			.replace(/^specs\/features\//, "tests/e2e/")
-			.replace(/\.feature$/, ".e2e.test.ts");
+		const testPath = expectedTestPathForScenarioFeature(marker.path);
 		recommendations.push({
 			command: `npm test -- --run ${testPath}`,
 			reason: `Create or restore missing proof before trusting ${marker.path}.`,

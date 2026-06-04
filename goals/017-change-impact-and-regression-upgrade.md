@@ -54,17 +54,22 @@ changes.
 
 ## Tasks
 
-- [ ] Update use cases and scenarios for impact-driven regression before
+- [x] Update use cases and scenarios for impact-driven regression before
       implementation.
-- [ ] Extend impact graph output with recommendation fields and confidence
+- [x] Extend impact graph output with recommendation fields and confidence
       levels.
-- [ ] Add tests for changed use-case, feature, test, goal, and reference-product
+- [x] Add tests for changed use-case, feature, test, goal, and reference-product
       paths.
-- [ ] Add missing-proof diagnostics when an affected scenario lacks an E2E test.
-- [ ] Add command recommendation generation for targeted test runs.
-- [ ] Update status and evidence surfaces to include impact-derived next checks.
-- [ ] Document reviewer workflow for using impact output during PR review.
-- [ ] Record an independent user-perspective review.
+- [x] Add missing-proof diagnostics when an affected scenario lacks an E2E test.
+- [x] Add command recommendation generation for targeted test runs.
+- [x] Update status and evidence surfaces to include impact-derived next checks.
+- [x] Document reviewer workflow for using impact output during PR review.
+- [x] Record an independent user-perspective review.
+
+## Completion Evidence
+
+Completed on 2026-06-04 with evidence in
+`docs/project/reviews/2026-06-04/goal-017-completion-evidence.md`.
 
 ## Definition of Done
 
