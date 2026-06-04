@@ -10,6 +10,8 @@ Feature: Apply Safe Recovery Repairs
     When I run "udd repair --apply --json"
     Then the apply repair report should write only safe actions
     And the apply repair report should write durable evidence
+    And the apply repair evidence should summarize applied and refused work
+    And the repaired project should pass final doctor validation
     And behavior scenario files should not be created
 
   Scenario: Apply missing expected directory repair
@@ -17,4 +19,6 @@ Feature: Apply Safe Recovery Repairs
     When I run "udd repair --apply --json"
     Then the apply repair report should create the expected journey directory
     And the apply repair report should write durable evidence
+    And the apply repair evidence should summarize applied and refused work
+    And the repaired project should pass final doctor validation
     And behavior scenario files should not be created
