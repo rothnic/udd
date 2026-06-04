@@ -21,7 +21,7 @@ outcomes:
       - plan_repair
     scenario_paths:
       - udd/recovery/plan_repair
-  - description: Developers and agents can apply only safe generated-state and directory repairs in controlled projects
+  - description: Developers and agents can apply only safe generated-state and directory repairs in controlled projects, then review durable evidence and final validation
     scenarios:
       - apply_safe_repairs
     scenario_paths:

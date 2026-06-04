@@ -57,19 +57,19 @@ work.
 
 ## Tasks
 
-- [ ] Update recovery use cases and scenarios before implementation.
-- [ ] Decide which existing recovery journey steps are current scope, future
+- [x] Update recovery use cases and scenarios before implementation.
+- [x] Decide which existing recovery journey steps are current scope, future
       scope, or optional discovery context.
-- [ ] Add canonical scenarios for diagnose, plan, safe apply, manual refusal,
+- [x] Add canonical scenarios for diagnose, plan, safe apply, manual refusal,
       final validation, and report generation.
-- [ ] Add fixtures for healthy, partial, stale, corrupt, and mixed-version
+- [x] Add fixtures for healthy, partial, stale, corrupt, and mixed-version
       projects.
-- [ ] Implement or refine recovery issue ranking.
-- [ ] Add dry-run evidence that explains every proposed and refused action.
-- [ ] Add apply-mode tests for safe generated-state and directory repairs.
-- [ ] Add refusal tests proving behavior specs are not rewritten automatically.
-- [ ] Update docs and agent evidence guidance for recovery handoff.
-- [ ] Record an independent user-perspective review.
+- [x] Implement or refine recovery issue ranking.
+- [x] Add dry-run evidence that explains every proposed and refused action.
+- [x] Add apply-mode tests for safe generated-state and directory repairs.
+- [x] Add refusal tests proving behavior specs are not rewritten automatically.
+- [x] Update docs and agent evidence guidance for recovery handoff.
+- [x] Record an independent user-perspective review.
 
 ## Definition of Done
 
@@ -99,3 +99,8 @@ npm test -- --run tests/e2e/udd/recovery
   journey scenario references.
 - Blocks if dry-run output cannot be used to predict apply-mode changes.
 - Blocks if recovery evidence is not durable enough for PR review.
+
+## Completion Evidence
+
+Completed on 2026-06-04 with evidence in
+`docs/project/reviews/2026-06-04/goal-016-completion-evidence.md`.

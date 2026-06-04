@@ -53,6 +53,12 @@ describe("recovery safe apply", () => {
 				"docs/project/reviews/repair/latest-repair-evidence.md",
 			]);
 			expect(report.evidence.written).toBe(true);
+			expect(report.evidence.markdown).toContain("UDD Repair Evidence");
+			expect(report.evidence.markdown).toContain("## Applied");
+			expect(report.evidence.markdown).toContain("## Refused");
+			expect(report.evidence.markdown).toContain(
+				"Refresh the generated journey manifest",
+			);
 			await fs.access("docs/project/reviews/repair/latest-repair-evidence.md");
 			await expect(
 				fs.access("specs/features/recovery/missing.feature"),
@@ -100,9 +106,20 @@ describe("recovery safe apply", () => {
 				"docs/project/reviews/repair/latest-repair-evidence.md",
 			]);
 			expect(report.evidence.written).toBe(true);
+			expect(report.evidence.markdown).toContain("UDD Repair Evidence");
+			expect(report.evidence.markdown).toContain("## Applied");
+			expect(report.evidence.markdown).toContain("## Refused");
+			expect(report.evidence.markdown).toContain(
+				"Create missing directory product/journeys",
+			);
 			await fs.access("product/journeys");
 			await fs.access("docs/project/reviews/repair/latest-repair-evidence.md");
 			await expect(fs.access("specs/features")).rejects.toThrow();
+			const doctor = JSON.parse(
+				(await execAsync(buildUddCommand("doctor --json"))).stdout,
+			);
+			expect(doctor.healthy).toBe(true);
+			expect(doctor.summary.warning).toBe(0);
 		} finally {
 			process.chdir(previousCwd);
 			await fs.rm(projectDir, { recursive: true, force: true });
