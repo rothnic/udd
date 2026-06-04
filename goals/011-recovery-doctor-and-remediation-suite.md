@@ -44,23 +44,31 @@ evidence for reviewers to trust the result.
   projects.
 - Every applied repair emits reviewer-visible evidence.
 
+## Completion Evidence
+
+- Evidence artifact:
+  `docs/project/reviews/2026-06-04/goal-011-completion-evidence.md`
+- Implementation PR: pending.
+- Focused verification passed across doctor, dry-run repair, apply-mode repair,
+  behavior rewrite refusal, and strategic-program command smoke tests.
+
 ## Tasks
 
-- [ ] Update use cases, feature scenarios, and failing E2E tests for doctor,
+- [x] Update use cases, feature scenarios, and failing E2E tests for doctor,
       dry-run repair, and apply-mode repair behavior before implementation.
-- [ ] Inventory current doctor and health diagnostics.
-- [ ] Define project health condition taxonomy.
-- [ ] Add fixtures for initialized and partially initialized projects.
-- [ ] Add fixtures for stale manifests and broken scenario links.
-- [ ] Add fixtures for invalid generated or local state.
-- [ ] Implement dry-run remediation planning.
-- [ ] Implement safe repair for missing expected directories.
-- [ ] Implement safe repair for stale generated manifests.
-- [ ] Implement link repair suggestions without rewriting behavior specs.
-- [ ] Add JSON output for doctor and repair commands.
-- [ ] Add human-readable summaries with file references.
-- [ ] Add tests proving dry-run does not mutate files.
-- [ ] Add tests proving apply mode only performs approved repairs.
+- [x] Inventory current doctor and health diagnostics.
+- [x] Define project health condition taxonomy.
+- [x] Add fixtures for initialized and partially initialized projects.
+- [x] Add fixtures for stale manifests and broken scenario links.
+- [x] Add fixtures for invalid generated or local state.
+- [x] Implement dry-run remediation planning.
+- [x] Implement safe repair for missing expected directories.
+- [x] Implement safe repair for stale generated manifests.
+- [x] Implement link repair suggestions without rewriting behavior specs.
+- [x] Add JSON output for doctor and repair commands.
+- [x] Add human-readable summaries with file references.
+- [x] Add tests proving dry-run does not mutate files.
+- [x] Add tests proving apply mode only performs approved repairs.
 
 ## Definition of Done
 
