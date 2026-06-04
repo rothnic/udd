@@ -35,3 +35,9 @@ outcomes:
       - issues_list
     scenario_paths:
       - opencode/tools/issues_list
+  - description: Agents can produce adapter-neutral handoff evidence with next work, proof status, blockers, verification commands, and pause reasons
+    follow_up: "goals/018-agent-operator-upgrade.md"
+    scenarios:
+      - agent_handoff_evidence
+    scenario_paths:
+      - opencode/tools/agent_handoff_evidence
