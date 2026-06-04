@@ -84,7 +84,6 @@ export interface AgentEvidencePackage {
 const AUTO_FIXABLE_TYPES = new Set<DiagnosticIssue["type"]>([
 	"manifest_missing",
 	"journey_stale",
-	"missing_scenario",
 ]);
 
 function isCurrentPhaseScenario(
@@ -191,7 +190,7 @@ export function recommendNextAgentWork(
 	now = new Date(),
 ): AgentWorkRecommendation {
 	const issues = buildAgentIssueList(report);
-	const blocking = issues.filter((issue) => issue.severity === "critical");
+	const blocking = issues.filter((issue) => issue.severity !== "info");
 
 	if (blocking.length > 0) {
 		const firstBlocker = blocking[0];

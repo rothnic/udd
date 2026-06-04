@@ -158,10 +158,10 @@ async function readManifest(
 		issues.push(
 			issue(
 				"manifest_missing",
-				"critical",
+				"info",
 				"specs/.udd/manifest.yml",
-				"Manifest file is missing.",
-				"Run 'udd init' or 'udd sync' to create the manifest.",
+				"Generated manifest file is missing.",
+				"Run 'udd sync' when generated journey metadata is needed.",
 			),
 		);
 		return null;
@@ -261,10 +261,10 @@ async function inspectJourneys(
 			issues.push(
 				issue(
 					"journey_stale",
-					"warning",
+					"info",
 					relJourneyPath,
 					`Journey '${key}' has changed since the manifest was written.`,
-					"Run 'udd sync' after reviewing the journey changes.",
+					"Run 'udd sync' if this optional journey discovery context should refresh generated metadata.",
 				),
 			);
 		}
@@ -284,10 +284,10 @@ async function inspectJourneys(
 				issues.push(
 					issue(
 						"missing_scenario",
-						"warning",
+						"info",
 						scenarioPath,
 						`Journey '${key}' references a missing scenario.`,
-						"Create the scenario or update the journey reference.",
+						"Create the scenario only if this optional journey step is promoted to current source-of-truth scope.",
 					),
 				);
 			}
@@ -403,6 +403,9 @@ export async function analyzeProjectDiagnostics(
 	};
 	const hasIssue = (type: DiagnosticIssueType) =>
 		issues.some((item) => item.type === type);
+	const hasBlockingIssue = (type: DiagnosticIssueType) =>
+		issues.some((item) => item.type === type && item.severity !== "info");
+	const healthy = summary.critical === 0 && summary.warning === 0;
 	const conditions: DiagnosticReport["conditions"] = [
 		{
 			id: "initialized",
@@ -453,18 +456,22 @@ export async function analyzeProjectDiagnostics(
 		},
 		{
 			id: "journey_sync",
-			status: hasIssue("journey_stale") ? "stale" : "ok",
-			message: hasIssue("journey_stale")
+			status: hasBlockingIssue("journey_stale") ? "stale" : "ok",
+			message: hasBlockingIssue("journey_stale")
 				? "One or more journeys changed after manifest generation."
-				: "Journey hashes match the manifest.",
+				: hasIssue("journey_stale")
+					? "Only advisory journey metadata drift detected."
+					: "Journey hashes match the manifest.",
 			file: "product/journeys",
 		},
 		{
 			id: "scenario_links",
-			status: hasIssue("missing_scenario") ? "drifted" : "ok",
-			message: hasIssue("missing_scenario")
+			status: hasBlockingIssue("missing_scenario") ? "drifted" : "ok",
+			message: hasBlockingIssue("missing_scenario")
 				? "One or more scenario links point to missing files."
-				: "Scenario links resolve.",
+				: hasIssue("missing_scenario")
+					? "Only advisory journey-linked missing scenarios detected."
+					: "Scenario links resolve.",
 			file: "specs/features",
 		},
 		{
@@ -485,8 +492,8 @@ export async function analyzeProjectDiagnostics(
 	];
 
 	return {
-		status: issues.length === 0 ? "healthy" : "drift-detected",
-		healthy: issues.length === 0,
+		status: healthy ? "healthy" : "drift-detected",
+		healthy,
 		lastCheck: new Date().toISOString(),
 		summary,
 		conditions,

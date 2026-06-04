@@ -17,12 +17,14 @@ Current command behavior:
 
 - `udd doctor` prints human-readable diagnostic details.
 - `udd doctor --json` emits machine-readable diagnostic details.
-- `udd doctor --strict` exits non-zero when any issue is detected.
+- `udd doctor --strict` exits non-zero when blocking critical or warning issues
+  are detected.
 - `udd health-check --json` emits a concise health envelope for automation.
 
-There is no current `udd doctor --fix`, checkpoint resume, or auto-remediation
-command. Those remain future architecture until a focused implementation slice
-adds and verifies them.
+`udd repair --dry-run --json` can plan safe generated-state repairs without
+writing files. `udd repair --apply --json` exists for controlled fixture or
+temp-project repair proof; do not use apply mode against a valuable checkout
+unless the intended writes have been reviewed.
 
 ## Current Drift Signals
 
@@ -35,13 +37,30 @@ The current diagnostics focus on safe read-only signals, including:
 - manifest references to missing journey or scenario files,
 - orphan scenarios.
 
+Generated-state and optional discovery-context signals are advisory when
+source-controlled specs are otherwise valid:
+
+- missing generated `specs/.udd/manifest.yml`,
+- stale journey hashes,
+- journey-only references to missing scenario files.
+
+Those advisory findings are reported with `severity: "info"` in JSON output and
+do not make `healthy` false. They still appear in summaries so agents and
+reviewers can decide whether to refresh generated metadata or promote optional
+journey steps into current behavior specs.
+
+Blocking health issues remain critical or warning findings. Examples include
+missing source directories, malformed manifests, manifest references to deleted
+files, and orphaned canonical scenario files.
+
 `udd lint` remains the structural spec validator. Recovery diagnostics should be
 read alongside lint and status output rather than treated as a replacement.
 
 ## Recovery Process
 
 1. Run `udd status` to understand the project-wide baseline.
-2. Run `udd doctor --json` or `udd health-check --json` to identify drift.
+2. Run `udd doctor --json` or `udd health-check --json` to identify blocking
+   issues and advisory discovery drift.
 3. Classify each issue as current-slice work, known baseline debt, or future
    follow-up.
 4. Fix source artifacts directly:
@@ -59,8 +78,12 @@ This repository may intentionally contain future or partial journey references
 while salvage work proceeds. A docs-only PR should not try to resolve that
 baseline unless its objective explicitly includes it.
 
-When diagnostics fail because of known baseline drift, record the command output
-and explain why the failure is pre-existing and outside the slice.
+When diagnostics report advisory baseline drift, record the command output only
+when it matters to the slice. Advisory journey metadata is not a reason to block
+normal work by itself.
+
+When diagnostics fail because of blocking baseline drift, record the command
+output and explain why the failure is pre-existing and outside the slice.
 
 ## Future Recovery Architecture
 
