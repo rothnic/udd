@@ -12,10 +12,14 @@ describe("test governance library", () => {
 const fixture = "expect(true).toBe(true)";
 test("real behavior", () => {
   expect(1).toBe(1);
+  expect(null).toBe(null);
 });
 `;
 
-		expect(detectStubAssertions(content)).toEqual(["expect(1).toBe(1)"]);
+		expect(detectStubAssertions(content)).toEqual([
+			"expect(1).toBe(1)",
+			"expect(null).toBe(null)",
+		]);
 	});
 
 	it("does not allow clean reviews for unlinked tests", async () => {
@@ -35,4 +39,3 @@ test("unlinked", () => expect(1 + 1).toBe(2));
 		});
 	});
 });
-

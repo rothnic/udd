@@ -111,9 +111,12 @@ export function detectStubAssertions(content: string): string[] {
 		ts.ScriptKind.TSX,
 	);
 
-	function literalValue(node: ts.Expression): string | number | boolean | undefined {
+	function literalValue(
+		node: ts.Expression,
+	): string | number | boolean | null | undefined {
 		if (node.kind === ts.SyntaxKind.TrueKeyword) return true;
 		if (node.kind === ts.SyntaxKind.FalseKeyword) return false;
+		if (node.kind === ts.SyntaxKind.NullKeyword) return null;
 		if (ts.isStringLiteralLike(node)) return node.text;
 		if (ts.isNumericLiteral(node)) return Number(node.text);
 		return undefined;
