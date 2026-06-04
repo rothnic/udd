@@ -46,14 +46,15 @@ This is the canonical model for status, lint, review, and agent handoff:
 
 Journey files and SysML-informed notes are optional discovery context. They help humans and agents ask better questions, document alternatives, and improve scenario completeness, but they are not a separate enforced layer in the current traceability contract.
 
-## Compatibility Mode
+## Source-Of-Truth Mode
 
-The current repository is in compatibility mode while the Goal 006 foundation work is pending:
+Goal 006 foundation work has landed. The current repository uses the canonical
+source-of-truth chain directly:
 
 - `specs/use-cases/*.yml`, `specs/features/**/*.feature`, and `tests/e2e/**/*.test.ts` are the active enforced chain.
 - `product/journeys/*.md` may be used when a feature benefits from narrative user context.
 - Do not duplicate the same requirement across journey, use case, scenario, and requirement files. Keep the enforceable requirement in the scenario/use-case chain, and keep narrative context as comments or supporting docs.
-- Future foundation work in [`goals/006-source-of-truth-foundation.md`](goals/006-source-of-truth-foundation.md) will import the product and roadmap layer without changing this docs slice into a broad migration.
+- Historical compatibility context remains documented in [`goals/006-source-of-truth-foundation.md`](goals/006-source-of-truth-foundation.md), but new behavior should route through the canonical use-case, scenario, and E2E test chain.
 
 ## Spec-First Change Loop
 
@@ -87,7 +88,7 @@ tests/
     └── udd/cli/inbox/
         └── add_item_via_cli.e2e.test.ts
 
-product/                          # Optional discovery context during compatibility mode
+product/                          # Optional discovery context
 └── journeys/
     └── new_user_onboarding.md
 ```
@@ -179,7 +180,8 @@ cp templates/feature-template.feature specs/features/<domain>/<feature-name>/<fe
 
 ## Optional Journey Format
 
-Journey files are discovery context during compatibility mode. Use them when a narrative user path helps clarify scenarios, then link the steps to canonical scenario files.
+Journey files are discovery context. Use them when a narrative user path helps
+clarify scenarios, then link the steps to canonical scenario files.
 
 ```markdown
 # Journey: New User Onboarding

@@ -84,7 +84,7 @@ expect(result.stdout).toContain("Project Status");
 
 ## Future Scope
 
-Historical flake detection, pass-rate analytics, CI wiring, and impact-based
-targeted regression selection are future roadmap work. Until those land, docs
-and PRs should not claim that governance gates infer changed-file impact or
-historical reliability.
+Historical flake detection, pass-rate analytics, and CI wiring are future
+roadmap work. Change-impact and targeted regression recommendations are
+available through `udd trace` and `udd impact`, but governance gates should not
+claim historical reliability until flake and pass-rate evidence exists.
