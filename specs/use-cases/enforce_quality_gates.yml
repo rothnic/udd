@@ -9,8 +9,10 @@ outcomes:
   - description: Explicit local test-governance gates report findings and only fail when strict mode is requested
     scenarios:
       - local-gate-validation
+      - quality-gate
     scenario_paths:
       - udd/test-governance/local-gate-validation
+      - udd/test-governance/quality-gate
 future_outcomes:
   - description: CI enforces coverage and pass-rate thresholds
     follow_up: "#55"
