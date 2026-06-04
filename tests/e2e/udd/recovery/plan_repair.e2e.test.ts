@@ -7,7 +7,9 @@ import { buildUddCommand, execAsync } from "../../../utils.js";
 // @feature udd/recovery/plan_repair.feature
 describe("recovery repair planning", () => {
 	it("produces ranked dry-run evidence with safe actions and manual refusals", async () => {
-		const projectDir = await fs.mkdtemp(path.join(os.tmpdir(), "udd-repair-plan-"));
+		const projectDir = await fs.mkdtemp(
+			path.join(os.tmpdir(), "udd-repair-plan-"),
+		);
 		const previousCwd = process.cwd();
 		try {
 			process.chdir(projectDir);

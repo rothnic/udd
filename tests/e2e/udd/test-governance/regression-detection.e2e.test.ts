@@ -1,4 +1,4 @@
-import { describe, expect, it, afterAll, beforeEach } from "vitest";
+import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import {
 	cleanupProject,
 	enterProject,
@@ -26,4 +26,3 @@ describe("test governance regression detection", () => {
 		);
 	});
 });
-
