@@ -5,6 +5,7 @@ import { Command } from "commander";
 import {
 	buildTestGovernanceReport,
 	checkTestGate,
+	clearTestReview,
 	loadTestReviewManifest,
 	reviewTest,
 } from "../lib/test-governance.js";
@@ -76,7 +77,7 @@ testCommand
 
 testCommand
 	.command("review")
-	.description("Review a test and record local clean state")
+	.description("Review a test and record source-controlled clean state")
 	.argument("<path>", "Path to the test file")
 	.action(async (testPath: string) => {
 		try {
@@ -95,7 +96,7 @@ testCommand
 
 testCommand
 	.command("status")
-	.description("Show local test review state")
+	.description("Show source-controlled test review state")
 	.option("--json", "Output review state as JSON")
 	.action(async (options: { json?: boolean }) => {
 		const manifest = await loadTestReviewManifest();
@@ -141,6 +142,25 @@ testCommand
 	});
 
 testCommand
+	.command("clear")
+	.description("Clear source-controlled review evidence for one test")
+	.argument("<path>", "Path to the test file")
+	.action(async (testPath: string) => {
+		try {
+			const result = await clearTestReview(testPath);
+			if (result.removed) {
+				console.log(chalk.green(`✓ Cleared test review: ${result.path}`));
+			} else {
+				console.log(chalk.yellow(`No test review found: ${result.path}`));
+			}
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			console.error(chalk.red(`✗ ${message}`));
+			process.exit(1);
+		}
+	});
+
+testCommand
 	.command("gate")
 	.description("Run explicit local test-governance gate checks")
 	.option(
@@ -172,6 +192,9 @@ testCommand
 			console.log(
 				chalk.red(`  Orphaned feature link: ${entry.path} -> ${entry.feature}`),
 			);
+		}
+		for (const entry of result.unlinkedTests) {
+			console.log(chalk.red(`  Unlinked test proof: ${entry.path}`));
 		}
 		for (const entry of result.dirtyReviews) {
 			console.log(chalk.red(`  Dirty review: ${entry.path}`));

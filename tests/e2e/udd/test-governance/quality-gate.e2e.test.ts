@@ -1,4 +1,4 @@
-import { describe, expect, it, afterAll, beforeEach } from "vitest";
+import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { runUdd } from "../../../utils.js";
 import {
 	cleanupProject,
@@ -29,6 +29,25 @@ describe("test governance quality gate", () => {
 		expect(advisory.blockingFindings.length).toBe(4);
 		expect(strict.passed).toBe(false);
 		expect(strict.blockingFindings).toEqual(advisory.blockingFindings);
+	});
+
+	it("lists every blocking finding class in human strict output", async () => {
+		await writeGovernanceFixture();
+
+		const strict = await runUddFailure("gate test-governance --strict");
+
+		expect(strict.stdout).toContain(
+			"Stub assertions: tests/auth/stubbed.e2e.test.ts",
+		);
+		expect(strict.stdout).toContain(
+			"Orphaned feature link: tests/auth/orphaned.test.ts -> specs/features/auth/missing.feature",
+		);
+		expect(strict.stdout).toContain(
+			"Unlinked test proof: tests/misc/unlinked.test.ts",
+		);
+		expect(strict.stdout).toContain(
+			"Dirty review: tests/billing/pay.e2e.test.ts",
+		);
 	});
 
 	it("passes strict gate with reviewed linked non-stub proof", async () => {

@@ -57,24 +57,24 @@ source-of-truth chain no longer makes hidden local state authoritative.
 
 ## Tasks
 
-- [ ] Update use cases, feature scenarios, and failing E2E tests for lifecycle
+- [x] Update use cases, feature scenarios, and failing E2E tests for lifecycle
       and governance behavior before implementation.
-- [ ] Define lifecycle states and allowed state transitions.
-- [ ] Implement test inventory scanning across `tests/e2e`.
-- [ ] Detect feature imports that do not link to known scenario IDs.
-- [ ] Detect stubbed tests using explicit heuristics and reviewer-visible
+- [x] Define lifecycle states and allowed state transitions.
+- [x] Implement test inventory scanning across `tests/e2e`.
+- [x] Detect feature imports that do not link to known scenario IDs.
+- [x] Detect stubbed tests using explicit heuristics and reviewer-visible
       evidence.
-- [ ] Add source-controlled review evidence files or annotations for decisions
+- [x] Add source-controlled review evidence files or annotations for decisions
       that affect gates.
-- [ ] Keep any local review cache non-authoritative, ignored, and regenerable.
-- [ ] Add commands for recording, listing, and clearing review evidence.
-- [ ] Implement non-strict governance gate reporting.
-- [ ] Implement strict governance gate failure behavior.
-- [ ] Integrate lifecycle state into `udd status`.
-- [ ] Add phase-aware treatment for intentionally deferred scenarios.
-- [ ] Add tests for clean, dirty, stubbed, orphaned, and deferred fixtures.
-- [ ] Document how agents should report unresolved test governance debt.
-- [ ] Add CI opt-in documentation without enabling repository-wide strict gates.
+- [x] Keep any local review cache non-authoritative, ignored, and regenerable.
+- [x] Add commands for recording, listing, and clearing review evidence.
+- [x] Implement non-strict governance gate reporting.
+- [x] Implement strict governance gate failure behavior.
+- [x] Integrate lifecycle state into `udd status`.
+- [x] Add phase-aware treatment for intentionally deferred scenarios.
+- [x] Add tests for clean, dirty, stubbed, orphaned, and deferred fixtures.
+- [x] Document how agents should report unresolved test governance debt.
+- [x] Add CI opt-in documentation without enabling repository-wide strict gates.
 
 ## Definition of Done
 
@@ -84,6 +84,13 @@ source-of-truth chain no longer makes hidden local state authoritative.
   source-controlled evidence.
 - Governance gates are useful locally without breaking all existing workflows.
 - Strict mode gives maintainers a credible future CI gate.
+
+## Completion Evidence
+
+- Review artifact:
+  [goal-009-completion-evidence.md](../docs/project/reviews/2026-06-04/goal-009-completion-evidence.md)
+- Focused validation: 8 files, 49 tests passed.
+- Current strict-gate debt remains visible: 24 blocking findings.
 
 ## Verification Commands
 
