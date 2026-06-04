@@ -539,6 +539,55 @@ export function recommendNextAgentWork(
 	);
 }
 
+export function applyTestGovernanceToRecommendation(
+	next: AgentWorkRecommendation,
+	testGate: TestGateResult,
+	now = new Date(),
+): AgentWorkRecommendation {
+	const firstFinding = testGate.blockingFindings[0];
+	if (!firstFinding) return next;
+
+	const sourcePaths = Object.values(firstFinding.source_references);
+	const pauseReason = pauseReasonForGateFinding(firstFinding);
+	return recommendation(
+		{
+			recommended: firstFinding.path,
+			reason: firstFinding.message,
+			user_impact:
+				"Proof governance blocks trustworthy agent handoff until a reviewer resolves the finding.",
+			blocks_work: true,
+			verification_commands: [
+				"./bin/udd test-scan --json",
+				"./bin/udd gate test-governance --strict --json",
+			],
+			suggested_files: sourcePaths.length
+				? sourcePaths.map((path) => ({
+						path,
+						action: firstFinding.message,
+					}))
+				: [
+						{
+							path: firstFinding.path,
+							action: firstFinding.message,
+						},
+					],
+			blocking: next.blocking,
+			pause_reasons: dedupePauseReasons([...next.pause_reasons, pauseReason]),
+		},
+		now,
+	);
+}
+
+export async function recommendNextAgentWorkWithGovernance(
+	status: ProjectStatus,
+	report: DiagnosticReport,
+	now = new Date(),
+): Promise<AgentWorkRecommendation> {
+	const next = recommendNextAgentWork(status, report, now);
+	const testGate = await checkTestGate(process.cwd());
+	return applyTestGovernanceToRecommendation(next, testGate, now);
+}
+
 export async function buildAgentEvidencePackage(
 	status: ProjectStatus,
 	report: DiagnosticReport,
@@ -558,12 +607,13 @@ export async function buildAgentEvidencePackage(
 		process.cwd(),
 		now,
 	);
-	const next = recommendNextAgentWork(status, report, now);
+	const baseNext = recommendNextAgentWork(status, report, now);
 	const [testGovernance, testGate] = await Promise.all([
 		buildTestGovernanceReport(process.cwd(), now),
 		checkTestGate(process.cwd()),
 	]);
 	const nextGovernanceFinding = testGate.blockingFindings[0];
+	const next = applyTestGovernanceToRecommendation(baseNext, testGate, now);
 	const changedFiles = options.changedFiles ?? [];
 	const traceGraph = await buildTraceGraph(process.cwd(), now);
 	const changedFileImpacts = await Promise.all(
@@ -583,10 +633,7 @@ export async function buildAgentEvidencePackage(
 			};
 		}),
 	);
-	const pauseReasons = dedupePauseReasons([
-		...next.pause_reasons,
-		...testGate.blockingFindings.map(pauseReasonForGateFinding),
-	]);
+	const pauseReasons = dedupePauseReasons([...next.pause_reasons]);
 	const verificationCommands = [
 		...new Set([
 			...next.verification_commands,

@@ -59,16 +59,21 @@ history or generated local proof.
 
 ## Tasks
 
-- [ ] Update use cases and scenarios for agent operator behavior before
+- [x] Update use cases and scenarios for agent operator behavior before
       implementation.
-- [ ] Define or amend shared evidence and next-work contracts.
-- [ ] Add E2E tests for clean, stale, drifted, and review-blocked projects.
-- [ ] Add next-work ranking tests that avoid generated-state over-prioritization.
-- [ ] Integrate impact-derived verification recommendations into evidence.
-- [ ] Add pause/continue decision fields for unsafe recovery and missing proof.
-- [ ] Update Codex/OpenCode docs without coupling behavior to either tool.
-- [ ] Add examples of reviewable agent handoff evidence.
-- [ ] Record an independent user-perspective review.
+- [x] Define or amend shared evidence and next-work contracts.
+- [x] Add E2E tests for clean, stale, drifted, and review-blocked projects.
+- [x] Add next-work ranking tests that avoid generated-state over-prioritization.
+- [x] Integrate impact-derived verification recommendations into evidence.
+- [x] Add pause/continue decision fields for unsafe recovery and missing proof.
+- [x] Update Codex/OpenCode docs without coupling behavior to either tool.
+- [x] Add examples of reviewable agent handoff evidence.
+- [x] Record an independent user-perspective review.
+
+## Completion Evidence
+
+Completed on 2026-06-04 with evidence in
+`docs/project/reviews/2026-06-04/goal-018-completion-evidence.md`.
 
 ## Definition of Done
 
