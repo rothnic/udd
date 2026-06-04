@@ -69,6 +69,7 @@ export interface TestGateResult {
 	dirtyReviews: TestReviewRecord[];
 	stubbedTests: TestScanEntry[];
 	orphanedTests: TestScanEntry[];
+	unlinkedTests: TestScanEntry[];
 	reviewManifestIssues: string[];
 	summary: TestGovernanceSummary;
 	blockingFindings: Array<{
@@ -126,7 +127,9 @@ export function detectStubAssertions(content: string): string[] {
 		if (
 			ts.isCallExpression(node) &&
 			ts.isPropertyAccessExpression(node.expression) &&
-			["toBe", "toEqual", "toStrictEqual"].includes(node.expression.name.text) &&
+			["toBe", "toEqual", "toStrictEqual"].includes(
+				node.expression.name.text,
+			) &&
 			node.arguments.length === 1
 		) {
 			const matcherTarget = node.expression.expression;
@@ -138,7 +141,11 @@ export function detectStubAssertions(content: string): string[] {
 			) {
 				const expected = literalValue(node.arguments[0]);
 				const actual = literalValue(matcherTarget.arguments[0]);
-				if (expected !== undefined && actual !== undefined && expected === actual) {
+				if (
+					expected !== undefined &&
+					actual !== undefined &&
+					expected === actual
+				) {
 					matches.add(node.getText(sourceFile));
 				}
 			}
@@ -266,11 +273,11 @@ export async function buildTestGovernanceReport(
 							: review?.status === "dirty"
 								? "stale"
 								: "missing_review";
-			const gateBlocking =
-				entry.status === "orphaned" ||
-				entry.status === "unlinked" ||
-				entry.stubAssertions.length > 0 ||
-				review?.status === "dirty";
+		const gateBlocking =
+			entry.status === "orphaned" ||
+			entry.status === "unlinked" ||
+			entry.stubAssertions.length > 0 ||
+			review?.status === "dirty";
 
 		return {
 			...entry,
@@ -405,6 +412,28 @@ export async function reviewTest(
 	return record;
 }
 
+export async function clearTestReview(
+	testPath: string,
+	rootDir = process.cwd(),
+): Promise<{ path: string; removed: boolean }> {
+	const absolutePath = path.isAbsolute(testPath)
+		? testPath
+		: path.join(rootDir, testPath);
+	const normalizedPath = toPosix(path.relative(rootDir, absolutePath));
+	const manifest = await loadTestReviewManifest(rootDir);
+	const nextTests = manifest.tests.filter(
+		(entry) => entry.path !== normalizedPath,
+	);
+	const removed = nextTests.length !== manifest.tests.length;
+
+	if (removed) {
+		manifest.tests = nextTests;
+		await saveTestReviewManifest(manifest, rootDir);
+	}
+
+	return { path: normalizedPath, removed };
+}
+
 export async function checkTestGate(
 	rootDir = process.cwd(),
 ): Promise<TestGateResult> {
@@ -415,8 +444,12 @@ export async function checkTestGate(
 	const stubbedTests = report.tests.filter(
 		(entry) => entry.stubAssertions.length > 0,
 	);
-	const orphanedTests = report.tests.filter((entry) => entry.status === "orphaned");
-	const unlinkedTests = report.tests.filter((entry) => entry.status === "unlinked");
+	const orphanedTests = report.tests.filter(
+		(entry) => entry.status === "orphaned",
+	);
+	const unlinkedTests = report.tests.filter(
+		(entry) => entry.status === "unlinked",
+	);
 	const blockingFindings: TestGateResult["blockingFindings"] = [
 		...report.reviews.issues.map((issue) => ({
 			type: "review_manifest" as const,
@@ -457,14 +490,15 @@ export async function checkTestGate(
 	return {
 		passed:
 			report.reviews.issues.length === 0 &&
-				dirtyReviews.length === 0 &&
-				stubbedTests.length === 0 &&
-				orphanedTests.length === 0 &&
-				unlinkedTests.length === 0,
+			dirtyReviews.length === 0 &&
+			stubbedTests.length === 0 &&
+			orphanedTests.length === 0 &&
+			unlinkedTests.length === 0,
 		entries: report.tests,
 		dirtyReviews,
 		stubbedTests,
 		orphanedTests,
+		unlinkedTests,
 		reviewManifestIssues: report.reviews.issues,
 		summary: report.summary,
 		blockingFindings,

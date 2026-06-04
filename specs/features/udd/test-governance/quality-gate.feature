@@ -16,6 +16,12 @@ Feature: Test Governance Quality Gate
     Then the strict gate fails with the same blocking findings
 
   @phase:3
+  Scenario: Human strict gate output lists every blocking finding class
+    Given the project has strict-mode governance findings
+    When I run "udd gate test-governance --strict"
+    Then the strict gate output lists stubbed, orphaned, unlinked, and dirty review findings
+
+  @phase:3
   Scenario: Pass strict gate with reviewed linked non-stub proof
     Given the project has reviewed linked non-stub proof
     When I run "udd gate test-governance --strict --json"

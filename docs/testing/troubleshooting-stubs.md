@@ -24,6 +24,25 @@ test-governance --strict` exits non-zero when strict-mode findings are present.
 `udd doctor` and `udd health-check` remain project health diagnostics. They do
 not replace the test-governance gate.
 
+## CI Opt-In
+
+Goal 009 does not enable repository-wide strict gates by default. Teams that are
+ready to enforce governance in CI can opt in by adding an explicit job step:
+
+```bash
+./bin/udd gate test-governance --strict
+```
+
+Use the non-strict command first while triaging existing findings:
+
+```bash
+./bin/udd gate test-governance
+```
+
+Strict mode should only be added after the repository has reviewed linked
+non-stub proof or has accepted the current blocking findings as intentional CI
+failures.
+
 Useful local searches:
 
 ```bash

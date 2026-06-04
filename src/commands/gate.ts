@@ -37,6 +37,9 @@ gateCommand
 				chalk.red(`  Orphaned feature link: ${entry.path} -> ${entry.feature}`),
 			);
 		}
+		for (const entry of result.unlinkedTests) {
+			console.log(chalk.red(`  Unlinked test proof: ${entry.path}`));
+		}
 		for (const entry of result.dirtyReviews) {
 			console.log(chalk.red(`  Dirty review: ${entry.path}`));
 		}

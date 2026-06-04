@@ -117,7 +117,8 @@ async function writeBaseProject(
 		await writeFile(
 			`tests/e2e/${scenario}.e2e.test.ts`,
 			[
-				`// @feature specs/features/${scenario}.feature`,
+				// Keep the generated fixture marker out of this unit test's own scan entry.
+				["// @", "feature specs/features/", scenario, ".feature"].join(""),
 				"import { test } from 'vitest';",
 				`test('${slug}', () => {});`,
 				"",

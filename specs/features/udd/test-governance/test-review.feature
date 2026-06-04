@@ -15,3 +15,10 @@ Feature: Test Review Evidence
     When I run "udd test-scan --json"
     Then the reviewed test is classified as reviewed proof
 
+  @phase:3
+  Scenario: Clear source-controlled review evidence
+    Given the project has reviewed test evidence
+    When I run "udd test clear tests/auth/login.e2e.test.ts"
+    Then the test review manifest no longer records the test
+    When I run "udd test-scan --json"
+    Then the cleared test is classified as missing review
