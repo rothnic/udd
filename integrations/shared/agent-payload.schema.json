@@ -1,0 +1,270 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://udd.dev/schemas/agent-payload.schema.json",
+	"title": "UDD Shared Agent Payloads",
+	"type": "object",
+	"$defs": {
+		"severitySummary": {
+			"type": "object",
+			"required": ["critical", "warning", "info", "total"],
+			"properties": {
+				"critical": { "type": "integer" },
+				"warning": { "type": "integer" },
+				"info": { "type": "integer" },
+				"total": { "type": "integer" }
+			}
+		},
+		"agentIssue": {
+			"type": "object",
+			"required": [
+				"id",
+				"severity",
+				"type",
+				"file",
+				"message",
+				"recommendation",
+				"auto_fixable"
+			],
+			"properties": {
+				"id": { "type": "string" },
+				"severity": { "type": "string" },
+				"type": { "type": "string" },
+				"file": { "type": "string" },
+				"message": { "type": "string" },
+				"recommendation": { "type": "string" },
+				"auto_fixable": { "type": "boolean" }
+			}
+		},
+		"pauseReason": {
+			"type": "object",
+			"required": [
+				"type",
+				"reason",
+				"source",
+				"blocks_continue",
+				"next_action"
+			],
+			"properties": {
+				"type": { "type": "string" },
+				"reason": { "type": "string" },
+				"source": { "type": "string" },
+				"blocks_continue": { "type": "boolean" },
+				"next_action": { "type": "string" }
+			}
+		},
+		"agentProjectSnapshot": {
+			"type": "object",
+			"required": [
+				"project",
+				"phase",
+				"git",
+				"journeys",
+				"scenarios",
+				"health",
+				"issues",
+				"generated_at"
+			],
+			"properties": {
+				"project": {
+					"type": "object",
+					"required": ["name", "root"],
+					"properties": {
+						"name": { "type": "string" },
+						"root": { "type": "string" }
+					}
+				},
+				"phase": {
+					"type": "object",
+					"required": ["current", "name", "all"],
+					"properties": {
+						"current": { "type": "integer" },
+						"name": { "type": "string" },
+						"all": {
+							"type": "object",
+							"additionalProperties": { "type": "string" }
+						}
+					}
+				},
+				"git": {
+					"type": "object",
+					"required": ["branch", "clean", "modified", "staged", "untracked"],
+					"properties": {
+						"branch": { "type": "string" },
+						"clean": { "type": "boolean" },
+						"modified": { "type": "integer" },
+						"staged": { "type": "integer" },
+						"untracked": { "type": "integer" }
+					}
+				},
+				"journeys": { "type": "array", "items": { "type": "object" } },
+				"scenarios": {
+					"type": "object",
+					"required": [
+						"total",
+						"passing",
+						"failing",
+						"missing",
+						"stale",
+						"deferred"
+					],
+					"properties": {
+						"total": { "type": "integer" },
+						"passing": { "type": "integer" },
+						"failing": { "type": "integer" },
+						"missing": { "type": "integer" },
+						"stale": { "type": "integer" },
+						"deferred": { "type": "integer" }
+					}
+				},
+				"health": {
+					"type": "object",
+					"required": ["status", "healthy", "summary"],
+					"properties": {
+						"status": { "type": "string" },
+						"healthy": { "type": "boolean" },
+						"summary": { "$ref": "#/$defs/severitySummary" }
+					}
+				},
+				"issues": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/agentIssue" }
+				},
+				"generated_at": { "type": "string" }
+			}
+		},
+		"workRecommendation": {
+			"type": "object",
+			"required": [
+				"recommended",
+				"reason",
+				"user_impact",
+				"blocks_work",
+				"verification_commands",
+				"suggested_files",
+				"blocking",
+				"pause_reasons",
+				"generated_at"
+			],
+			"properties": {
+				"recommended": { "type": "string" },
+				"reason": { "type": "string" },
+				"user_impact": { "type": "string" },
+				"blocks_work": { "type": "boolean" },
+				"verification_commands": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"suggested_files": { "type": "array", "items": { "type": "object" } },
+				"blocking": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/agentIssue" }
+				},
+				"pause_reasons": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/pauseReason" }
+				},
+				"generated_at": { "type": "string" }
+			}
+		},
+		"agentEvidencePackage": {
+			"type": "object",
+			"required": [
+				"project",
+				"goal",
+				"status_snapshot",
+				"next_recommendation",
+				"issues_summary",
+				"test_governance",
+				"verification",
+				"changed_files",
+				"changed_file_impacts",
+				"pause_reasons",
+				"handoff",
+				"review_notes",
+				"generated_at"
+			],
+			"properties": {
+				"project": {
+					"type": "object",
+					"required": ["name", "root"],
+					"properties": {
+						"name": { "type": "string" },
+						"root": { "type": "string" }
+					}
+				},
+				"goal": {
+					"type": "object",
+					"required": ["path", "status"],
+					"properties": {
+						"path": { "type": ["string", "null"] },
+						"status": { "type": "string" }
+					}
+				},
+				"status_snapshot": { "$ref": "#/$defs/agentProjectSnapshot" },
+				"next_recommendation": { "$ref": "#/$defs/workRecommendation" },
+				"issues_summary": { "$ref": "#/$defs/severitySummary" },
+				"test_governance": { "type": "object" },
+				"verification": { "type": "array", "items": { "type": "object" } },
+				"changed_files": { "type": "array", "items": { "type": "string" } },
+				"changed_file_impacts": {
+					"type": "array",
+					"items": { "type": "object" }
+				},
+				"pause_reasons": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/pauseReason" }
+				},
+				"handoff": {
+					"type": "object",
+					"required": [
+						"summary",
+						"next_action",
+						"proof_status",
+						"blockers",
+						"review_required",
+						"verification_commands"
+					],
+					"properties": {
+						"summary": { "type": "string" },
+						"next_action": { "type": "string" },
+						"proof_status": {
+							"type": "object",
+							"required": [
+								"health",
+								"test_governance_gate",
+								"verification_claims"
+							],
+							"properties": {
+								"health": { "type": "string" },
+								"test_governance_gate": { "type": "string" },
+								"verification_claims": { "type": "string" }
+							}
+						},
+						"blockers": { "type": "array", "items": { "type": "object" } },
+						"review_required": { "type": "boolean" },
+						"verification_commands": {
+							"type": "array",
+							"items": { "type": "string" }
+						}
+					}
+				},
+				"review_notes": { "type": "array", "items": { "type": "string" } },
+				"generated_at": { "type": "string" }
+			}
+		},
+		"issuesList": {
+			"type": "object",
+			"required": ["status", "healthy", "summary", "issues", "generated_at"],
+			"properties": {
+				"status": { "type": "string" },
+				"healthy": { "type": "boolean" },
+				"summary": { "$ref": "#/$defs/severitySummary" },
+				"issues": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/agentIssue" }
+				},
+				"generated_at": { "type": "string" }
+			}
+		}
+	}
+}

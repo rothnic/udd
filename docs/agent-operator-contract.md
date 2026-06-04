@@ -48,3 +48,15 @@ above optional generated journey metadata.
 
 Adapters must not infer proof from `.udd/results.json` or generated local state.
 PRs and handoffs should attach explicit command output for every claimed pass.
+
+## Noisy Status Handling
+
+Agents should separate blocking proof failures from advisory generated-state
+noise:
+
+- Critical or warning diagnostics mean pause, report the blocker, and avoid
+  mutation unless the command explicitly says the repair is safe.
+- Current-phase failing or missing scenarios outrank optional journey drift.
+- Test-governance blockers require review evidence before continuing.
+- Informational optional-discovery drift can be routed as cleanup, but it must
+  not be reported as proof that current product behavior is broken.

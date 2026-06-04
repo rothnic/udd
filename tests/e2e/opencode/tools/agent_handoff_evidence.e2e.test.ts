@@ -1,13 +1,26 @@
 import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
-import { runUdd } from "../../../utils.js";
+import {
+	assertMatchesJsonSchema,
+	loadSharedAgentPayloadSchema,
+	runUdd,
+} from "../../../utils.js";
 
 const feature = await loadFeature(
 	"specs/features/opencode/tools/agent_handoff_evidence.feature",
 );
+const sharedAgentPayloadSchema = await loadSharedAgentPayloadSchema();
 
 interface EvidencePayload {
-	next_recommendation: Record<string, unknown>;
+	status_snapshot: {
+		git?: unknown;
+	};
+	next_recommendation: {
+		verification_commands?: string[];
+		suggested_files?: Array<{ action?: string }>;
+	};
+	verification?: Array<{ command?: string }>;
+	review_notes?: string[];
 	pause_reasons: unknown[];
 	changed_file_impacts: Array<{
 		path: string;
@@ -43,6 +56,11 @@ describeFeature(feature, ({ Scenario }) => {
 			Then(
 				"the evidence includes next work, user impact, blockers, and verification commands",
 				() => {
+					assertMatchesJsonSchema(
+						evidence,
+						sharedAgentPayloadSchema.$defs?.agentEvidencePackage ?? {},
+						sharedAgentPayloadSchema,
+					);
 					expect(evidence.next_recommendation).toEqual(
 						expect.objectContaining({
 							recommended: expect.any(String),
@@ -102,10 +120,32 @@ describeFeature(feature, ({ Scenario }) => {
 			And(
 				"the evidence stays adapter-neutral without Codex-only or OpenCode-only behavior",
 				() => {
-					const serialized = JSON.stringify(evidence);
-					expect(serialized).not.toContain("install-codex");
-					expect(serialized).not.toContain("/goal");
-					expect(serialized).not.toContain("chat history");
+					expect(evidence).not.toHaveProperty("codex_hook");
+					expect(evidence).not.toHaveProperty("goal_command");
+					expect(evidence).not.toHaveProperty("adapter_commands");
+
+					const serializedWithoutGit = JSON.stringify({
+						...evidence,
+						status_snapshot: {
+							...evidence.status_snapshot,
+							git: undefined,
+						},
+						changed_files: undefined,
+						changed_file_impacts: undefined,
+					});
+					const commandLikeFields = [
+						...(evidence.next_recommendation.verification_commands ?? []),
+						...(evidence.next_recommendation.suggested_files ?? []).map(
+							(file) => file.action ?? "",
+						),
+						...(evidence.verification ?? []).map((item) => item.command ?? ""),
+						...evidence.handoff.verification_commands.map(String),
+						...(evidence.review_notes ?? []),
+					].join("\n");
+					expect(serializedWithoutGit).not.toContain("install-codex");
+					expect(serializedWithoutGit).not.toContain("chat history");
+					expect(commandLikeFields).not.toContain("install-codex");
+					expect(commandLikeFields).not.toContain("/goal");
 				},
 			);
 		},
