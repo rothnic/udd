@@ -1,0 +1,12 @@
+id: "udd/test-governance"
+area: "udd"
+name: "Test Governance"
+summary: "Source-controlled test inventory, review, health, and strict governance gates."
+use_cases:
+  - "track_test_quality"
+  - "prevent_regression"
+  - "manage_test_lifecycle"
+  - "enforce_quality_gates"
+  - "monitor_test_health"
+phase: 3
+kind: "core"

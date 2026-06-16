@@ -1,0 +1,13 @@
+id: release_candidate_verification
+name: Release Candidate Verification
+summary: Maintainers can rely on source-controlled CI gates and evidence before changing release-readiness claims.
+phase: 3
+actors:
+  - maintainer
+  - reviewer
+outcomes:
+  - description: CI verifies lint, full tests, strict governance, repair dry-run, and clean package install smoke before release-candidate claims are reviewed.
+    scenarios:
+      - ci_release_gates
+    scenario_paths:
+      - udd/release-candidate/ci_release_gates

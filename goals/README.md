@@ -97,5 +97,8 @@ criteria.
   review of remote `master` that defines the current upgrade portfolio.
 - `docs/project/reviews/2026-06-04/non-alpha-roadmap-evidence.md`: baseline
   evidence for Goal 019 production-readiness planning.
+- `docs/project/optional-discovery-backlog.yml`: classification of optional
+  journey drift and missing-scenario advisories as promoted, deferred, or
+  retired discovery backlog.
 - `docs/project/reviews/2026-05-31-goal-roadmap-review/report.md`: independent
   review that recommends the current strategic portfolio.

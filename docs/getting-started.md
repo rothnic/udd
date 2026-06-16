@@ -5,15 +5,16 @@ This guide walks you through setting up UDD in a new or existing project.
 ## Installation
 
 ```bash
-# In your project
-npm install udd
+# Install the current release candidate from GitHub
+npm install github:rothnic/udd
 
 # Initialize
 udd init
-
-# Alternative if not linked globally
-npm run udd -- init
 ```
+
+The npm registry package is not published yet. When developing from this
+repository checkout, use `npm run udd -- <command>` instead of the installed
+`udd` binary.
 
 ## 1. Initialize Your Project
 
@@ -36,6 +37,8 @@ product/
 ├── changelog.md
 └── journeys/new_user_onboarding.md
 
+specs/VISION.md
+specs/use-cases/new_user_onboarding.yml
 specs/.udd/manifest.yml
 ```
 
@@ -51,9 +54,9 @@ Edit `product/journeys/new_user_onboarding.md`:
 
 ## Steps
 
-1. User signs up → `specs/auth/signup.feature`
-2. User verifies email → `specs/auth/verify.feature`
-3. User creates first item → `specs/items/create.feature`
+1. User signs up → `specs/features/auth/signup.feature`
+2. User verifies email → `specs/features/auth/verify.feature`
+3. User creates first item → `specs/features/items/create.feature`
 
 ## Success
 
@@ -69,8 +72,8 @@ udd sync
 This will:
 1. Parse your journey files
 2. Detect new or changed steps
-3. Propose BDD scenarios for each step
-4. Create test stubs
+3. Propose BDD scenarios for each linked step
+4. Create scenario files and matching E2E test files under `tests/e2e/`
 
 ## 4. Implement and Test
 
@@ -98,7 +101,7 @@ udd sync --dry-run                  # Preview without changes
 udd sync --auto                     # Auto-accept proposals
 udd status                          # Show coverage
 udd new journey <slug>              # Create journey
-udd new scenario <domain> <action>  # Create scenario + test
+udd new scenario <domain> <action>  # Create canonical scenario + print test path
 udd lint                            # Validate specs
 ```
 
@@ -106,8 +109,10 @@ udd lint                            # Validate specs
 
 - **One scenario per file** - keeps files small and focused
 - **Split by variation** - `login_basic.feature`, `login_2fa.feature`
-- **Journeys are requirements** - they describe *what* users accomplish
-- **Scenarios are tests** - they verify *how* the system behaves
+- **Use cases and scenarios are the enforced requirements** - journeys are
+  optional discovery context for describing *what* users accomplish
+- **E2E tests are proof** - they verify the scenario behavior from the user's
+  perspective
 
 
 ## Local Bootstrap Note

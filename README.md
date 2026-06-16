@@ -5,14 +5,24 @@ A spec-first CLI tool where **user-facing scenarios define behavior** and **BDD 
 ## Quick Start
 
 ```bash
-# Initialize in your project
-npm run udd -- init
+# Install the current release candidate from GitHub
+npm install github:rothnic/udd
+
+# Initialize source-of-truth files
+udd init
 
 # Sync journey discovery context to scenarios
-npm run udd -- sync
+udd sync
 
 # Check status
-npm run udd -- status
+udd status
+```
+
+The npm registry package is not published yet. When working from this repository
+checkout instead of an installed GitHub package, use the local wrapper:
+
+```bash
+npm run udd -- <command>
 ```
 
 ## How It Works
@@ -45,6 +55,11 @@ This is the canonical model for status, lint, review, and agent handoff:
 | E2E Test | `tests/e2e/**/*.test.ts` | Required proof that behavior works |
 
 Journey files and SysML-informed notes are optional discovery context. They help humans and agents ask better questions, document alternatives, and improve scenario completeness, but they are not a separate enforced layer in the current traceability contract.
+
+Current optional discovery backlog classifications live in
+[`docs/project/optional-discovery-backlog.yml`](docs/project/optional-discovery-backlog.yml).
+Those entries are advisory unless promoted into use cases, scenarios, and E2E
+proof.
 
 ## Source-Of-Truth Mode
 
@@ -103,7 +118,7 @@ product/                          # Optional discovery context
 | `udd sync` | Detect journey changes and propose scenario updates |
 | `udd status` | Show use-case → scenario → test coverage |
 | `udd new journey <slug>` | Create optional discovery-context journey file |
-| `udd new scenario <domain> <action>` | Create legacy flat scenario + test stub |
+| `udd new scenario <domain> <action>` | Create one canonical scenario and print the expected E2E test path |
 | `udd new feature <domain> <feature-name>` | Create feature file from SysML-informed template |
 | `udd discover feature <domain> <name>` | Interactive feature discovery with SysML principles |
 | `udd phase current/list/set/check` | Inspect, update, and validate roadmap phase state |
@@ -126,15 +141,19 @@ Use `udd discover feature` for guided requirements analysis or see [docs/sysml-i
 UDD provides three different ways to create feature files, each optimized for different workflows:
 
 ### `udd new scenario` - Quick, Simple Scenarios
-**Use when:** You need a basic feature file and test stub quickly.
+**Use when:** You need a basic scenario file and a clear E2E proof obligation quickly.
 ```bash
 udd new scenario auth login
 ```
-- Creates: `specs/auth/login.feature` (simple scenario)
-- Creates: `tests/auth/login.e2e.test.ts` (test stub)
-- Best for: Simple, single-scenario features or when rapid prototyping
+- Creates: `specs/features/auth/auth/login.feature` by default, or
+  `specs/features/<domain>/<feature>/<slug>.feature` when you pass the optional
+  third argument.
+- Prints the expected `tests/e2e/.../*.e2e.test.ts` proof obligation without
+  creating a fake passing test.
+- Best for: Simple, single-scenario behavior contracts.
 - Context: Minimal (just basic Given/When/Then)
-- Compatibility note: this command still writes the older flat path. Prefer `udd new feature` or move the result under `specs/features/` when adding canonical traceable work.
+- Use `--use-case <id>` when the new scenario should be linked from generated
+  feature metadata.
 
 ### `udd new feature` - Template-Based Features
 **Use when:** You want a structured starting point with SysML context sections.
@@ -158,7 +177,7 @@ udd discover feature reporting/csv-export
 - Context: Fully guided with questions about users, alternatives, edge cases
 
 **Summary:**
-- **`new scenario`** = Fast & minimal → `specs/<domain>/` (legacy flat structure)
+- **`new scenario`** = Fast & minimal → canonical `specs/features/...` scenario
 - **`new feature`** = Template with guidance → `specs/features/<domain>/<name>/` (nested structure)
 - **`discover feature`** = Interactive interview → Wherever specified
 

@@ -1,15 +1,14 @@
 {
 	"name": "udd",
 	"version": "2.0.0",
-	"description": "User Driven Development - spec-first CLI where journeys are requirements and BDD scenarios are tests",
+	"description": "User Driven Development - spec-first CLI where use cases and BDD scenarios define behavior",
 	"type": "module",
 	"bin": {
-		"udd": "bin/udd"
+		"udd": "dist/bin/udd.js"
 	},
 	"files": [
-		"bin/",
-		"src/",
-		"scripts/",
+		"dist/",
+		"scripts/patch-vitest-cucumber.mjs",
 		"templates/",
 		"README.md"
 	],
@@ -29,6 +28,7 @@
 	"author": "Nick Roth",
 	"license": "MIT",
 	"scripts": {
+		"build": "tsc --project tsconfig.build.json",
 		"setup": "npm ci && npm run setup:link",
 		"test": "vitest run",
 		"test:ui": "vitest --ui",
@@ -36,8 +36,9 @@
 		"status": "./bin/udd status",
 		"check": "biome check .",
 		"check:fix": "biome check --write .",
-		"prepare": "husky",
-		"postinstall": "node --import ./node_modules/tsx/dist/loader.mjs scripts/patch-vitest-cucumber.ts",
+		"prepare": "npm run build && (husky || true)",
+		"prepack": "npm run build",
+		"postinstall": "node scripts/patch-vitest-cucumber.mjs",
 		"udd": "./bin/udd",
 		"setup:link": "chmod +x bin/udd && npm link",
 		"setup:codex": "bash scripts/codex-setup.sh && ./bin/udd status"
@@ -59,22 +60,22 @@
 		"@inquirer/prompts": "^8.0.1",
 		"@types/glob": "^8.1.0",
 		"@types/node": "^24.10.1",
+		"@amiceli/vitest-cucumber": "^6.1.0",
 		"@vitest/ui": "^4.0.13",
 		"chalk": "^5.6.2",
 		"commander": "^14.0.2",
 		"glob": "^13.0.0",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.9.3",
+		"vitest": "^4.0.13",
 		"yaml": "^2.8.1",
 		"zod": "^4.1.13"
 	},
 	"devDependencies": {
-		"@amiceli/vitest-cucumber": "^6.1.0",
 		"@biomejs/biome": "2.3.7",
 		"@opencode-ai/sdk": "^1.0.112",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.2.7",
-		"tsx": "^4.20.6",
-		"vitest": "^4.0.13"
+		"tsx": "^4.20.6"
 	}
 }

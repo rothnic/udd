@@ -231,6 +231,12 @@ async function scenarioExists(
 }
 
 function testPathForScenario(scenarioPath: string): string {
+	if (scenarioPath.startsWith("specs/features/")) {
+		return scenarioPath
+			.replace(/^specs\/features\//, "tests/e2e/")
+			.replace(/\.feature$/, ".e2e.test.ts");
+	}
+
 	return scenarioPath
 		.replace(/^specs\//, "tests/")
 		.replace(/\.feature$/, ".e2e.test.ts");
@@ -252,25 +258,26 @@ function generateScenarioContent(journey: Journey, step: JourneyStep): string {
 function generateTestContent(
 	scenarioPath: string,
 	scenarioName: string,
+	actor: string,
 ): string {
+	const givenStep = `I am a ${actor || "User"}`;
+	const whenStep = `I ${scenarioName.toLowerCase()}`;
 	return `import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
 
 const feature = await loadFeature("${scenarioPath}");
 
 describeFeature(feature, ({ Scenario }) => {
 	Scenario("${scenarioName}", ({ Given, When, Then }) => {
-		Given(/I am a (.+)/, (actor: string) => {
+		Given(${JSON.stringify(givenStep)}, () => {
 			// TODO: Implement - set up actor context
 		});
 
-		When(/I (.+)/, (action: string) => {
+		When(${JSON.stringify(whenStep)}, () => {
 			// TODO: Implement - perform action
 		});
 
 		Then("the action is completed successfully", () => {
-			// TODO: Implement - verify outcome
-			expect(true).toBe(true);
+			throw new Error("TODO: Implement user-observable proof for this scenario.");
 		});
 	});
 });
@@ -446,6 +453,7 @@ export const syncCommand = new Command("sync")
 							const testContent = generateTestContent(
 								scenarioPath,
 								step.description,
+								journey.actor,
 							);
 							await fs.writeFile(testFullPath, testContent);
 							console.log(chalk.green(`    ✓ Created ${testPath}`));

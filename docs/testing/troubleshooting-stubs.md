@@ -41,24 +41,23 @@ Strict test governance is scoped to scenario proof:
 When a unit or manual integration test should become user proof, link it to a
 feature scenario or move the behavior into a scenario-backed E2E proof first.
 
-## CI Opt-In
+## CI And Strict Mode
 
-Goal 009 does not enable repository-wide strict gates by default. Teams that are
-ready to enforce governance in CI can opt in by adding an explicit job step:
+Strict governance is now part of UDD production-readiness verification. CI and
+release-candidate checks should include:
 
 ```bash
 ./bin/udd gate test-governance --strict
 ```
 
-Use the non-strict command first while triaging existing findings:
+Use the non-strict command for exploratory triage:
 
 ```bash
 ./bin/udd gate test-governance
 ```
 
-Strict mode should only be added after the repository has reviewed linked
-non-stub proof or has accepted the current blocking findings as intentional CI
-failures.
+Strict mode should pass before release-candidate evidence claims that scenario
+proof is clean.
 
 Useful local searches:
 

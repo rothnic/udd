@@ -16,6 +16,7 @@ use_cases:
   - "prevent_regression"
   - "manage_test_lifecycle"
   - "validate_phase_consistency"
+  - "release_candidate_verification"
 success_metrics:
   - "A project can be understood and rebuilt from product intent, scenarios, and traceable requirements without relying on hidden implementation memory."
   - "Current-phase stub tests are blocked before they create false confidence."

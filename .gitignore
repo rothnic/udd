@@ -1,4 +1,5 @@
 node_modules/
+dist/
 .udd/
 .udd/results.json
 .memsearch
