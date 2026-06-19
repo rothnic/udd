@@ -14,14 +14,16 @@ Objective -> Use Case -> Scenario -> E2E Test
 ### Objective
 
 An objective is the reason for the work. In this repository it normally appears
-as a GitHub issue, `goals/*.md`, or a capability increment in
-`specs/roadmap.yml`.
+as a GitHub issue or `goals/*.md`.
 
 Objectives answer:
 
 - Why does this change matter?
-- Which capability or phase owns it?
 - What proof will show it is complete?
+
+`specs/roadmap.yml` is not the narrative objective. It is the phase and
+capability index that says when the use case belongs and which increment owns
+it.
 
 ### Use Case
 
@@ -59,8 +61,9 @@ duplicate the required behavior contract. When a journey changes behavior, the
 author must update the use case or scenario that carries the contract.
 
 Do not hardcode broad journey or use-case classification lists in journey
-markdown. Use `specs/roadmap.yml` as the classification source of truth and
-distinguish current use cases, future use cases, and backlog journeys there.
+markdown. Use `specs/roadmap.yml` as the phase, capability, and increment source
+of truth, and distinguish current use cases, future use cases, and backlog
+journeys there.
 
 Current diagnostics can report stale journey mappings and missing scenario
 references, because this repository dogfoods journey-driven discovery. That is a

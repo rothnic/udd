@@ -14,7 +14,8 @@ promoted into a use case outcome, a Gherkin scenario, and executable proof.
 
 | Artifact | Question it answers | When to edit it |
 | --- | --- | --- |
-| Objective | Why are we doing this work now? | A roadmap, goal, or issue changes scope or phase. |
+| Objective | Why are we doing this work now? | A goal file or issue changes scope, proof, or priority. |
+| Roadmap phase | When does this capability belong? | Phase, increment, or capability ownership changes. |
 | Journey | What path is the user trying to complete? | Discovery needs actor context, alternatives, or cross-feature narrative. |
 | Use case | What user-visible outcome must be true? | An outcome becomes part of the product contract. |
 | Feature scenario | What observable behavior proves the outcome? | A behavior, variant, rule, edge case, or error state becomes testable. |
@@ -56,12 +57,14 @@ the repo, keep it in docs.
 
 This repository should use UDD the way an end user would:
 
-1. Start with an objective in `goals/`, an issue, or `specs/roadmap.yml`.
-2. Update or add a use case outcome in `specs/use-cases/`.
-3. Update or add a Gherkin behavior contract in `specs/features/`.
-4. Add or update the E2E proof under `tests/e2e/`.
-5. Implement only enough code to satisfy the scenario.
-6. Run status, lint, tests, trace, and governance gates.
+1. Start with one objective in `goals/` or a GitHub issue.
+2. Use `specs/roadmap.yml` to place the work in a phase, capability, and
+   increment. Do not use the roadmap as the narrative objective.
+3. Update or add a use case outcome in `specs/use-cases/`.
+4. Update or add a Gherkin behavior contract in `specs/features/`.
+5. Add or update the E2E proof under `tests/e2e/`.
+6. Implement only enough code to satisfy the scenario.
+7. Run status, lint, tests, trace, and governance gates.
 
 The repo currently dogfoods this pattern for CLI setup, status, linting,
 recovery, test governance, agent integration, release-candidate gates, and the
@@ -102,6 +105,36 @@ fully enforce every authoring principle in this document. Known gaps include:
 - journey drift is advisory unless promoted into use cases and scenarios.
 
 Those gaps are future UDD work, not reasons to put behavior only in docs.
+
+## SysML-Informed Design Flow
+
+UDD should stay lighter than full SysML, but its design order should mirror the
+useful MBSE logic:
+
+```text
+Domain model -> Journey -> Use case -> Functional flow -> Scenario -> Sequence -> E2E proof
+```
+
+Use that chain this way:
+
+- Domain model: name the system boundary, external actors, internal actors,
+  major blocks/components, and key information objects.
+- Journey: capture the actor's end-to-end narrative and context. This is
+  discovery context, not the enforceable contract.
+- Use case: name the user-visible functionality at the system boundary and the
+  outcome the actor gets from the system.
+- Functional flow: describe the network of decisions, alternate paths, errors,
+  and handoffs that can occur while satisfying the use case.
+- Scenario: select one concrete path through that flow and express it as
+  Gherkin acceptance behavior.
+- Sequence: when ordering or collaboration matters, detail the specific message
+  exchange among actors, system parts, and external services for that scenario.
+- E2E proof: verify the scenario from the stakeholder perspective.
+
+In SysML terms, this maps approximately to blocks/actors for structure, use case
+diagrams for high-level functionality, activity diagrams for flows of control
+and data, sequence diagrams for a specific collaboration over time, and
+allocation links from behavior back to the components that perform it.
 
 ## How Detail Scales
 

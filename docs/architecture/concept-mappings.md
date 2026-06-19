@@ -9,7 +9,7 @@ with the concepts they represent.
 | UDD concept | Systems-engineering analogue | Current location | Current status |
 | --- | --- | --- | --- |
 | Vision | System purpose and boundaries | `specs/VISION.md` | Stable source for long-term intent |
-| Objective | Planned work item or capability increment | `specs/roadmap.yml`, `goals/*.md`, GitHub issues | Required for scoped work |
+| Objective | Planned work item and proof target | `goals/*.md`, GitHub issues | Required for scoped work |
 | Journey | Concept of operations / discovery narrative | `product/journeys/*.md` | Optional context; dogfooded in this repo |
 | Use case | Functional requirement group | `specs/use-cases/*.yml` | Required behavior grouping |
 | Scenario | Acceptance criterion | `specs/features/**/*.feature` | Required behavior contract |
@@ -54,7 +54,8 @@ Create or update a use case when:
 
 - a user-visible outcome changes,
 - a scenario needs a new canonical home,
-- the roadmap assigns a capability to a different phase or increment.
+- roadmap phase placement reveals that an outcome belongs in a different
+  capability or increment.
 
 Create or update a scenario when:
 

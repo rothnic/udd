@@ -49,7 +49,8 @@ This is the canonical model for status, lint, review, and agent handoff:
 
 | Layer | Canonical artifact | Required for enforcement |
 |-------|--------------------|--------------------------|
-| Objective | Roadmap or goal item | Required when a change is planned as project work |
+| Objective | Goal file or issue | Required when a change is planned as project work |
+| Roadmap phase | `specs/roadmap.yml` | Required for timing, sequencing, and phase ownership |
 | Use Case | `specs/use-cases/*.yml` | Required for traceable outcomes |
 | Scenario | `specs/features/**/*.feature` | Required behavior contract |
 | E2E Test | `tests/e2e/**/*.test.ts` | Required proof that behavior works |
@@ -81,12 +82,15 @@ source-of-truth chain directly:
 
 Use this loop for behavior changes:
 
-1. Start from the objective or goal and identify the affected use case in `specs/use-cases/`.
-2. Modify the scenario in `specs/features/` first so it states the new user-observable behavior.
-3. Run the matching E2E test and confirm it fails for the expected reason.
-4. Implement the smallest behavior change needed to satisfy the scenario.
-5. Run the E2E test again and confirm it passes.
-6. Run `npm run udd -- status` and `npm run udd -- lint` to confirm the use case, scenario, and test links are still coherent.
+1. Start from one objective in `goals/` or a GitHub issue.
+2. Use `specs/roadmap.yml` only to place that objective's use case in a phase,
+   capability, and increment.
+3. Identify or update the affected use case in `specs/use-cases/`.
+4. Modify the scenario in `specs/features/` first so it states the new user-observable behavior.
+5. Run the matching E2E test and confirm it fails for the expected reason.
+6. Implement the smallest behavior change needed to satisfy the scenario.
+7. Run the E2E test again and confirm it passes.
+8. Run `npm run udd -- status` and `npm run udd -- lint` to confirm the use case, scenario, and test links are still coherent.
 
 Example: to change inbox capture behavior, update the relevant outcome in `specs/use-cases/capture_ideas.yml`, update `specs/features/udd/cli/inbox/add_item_via_cli.feature`, then run `npm test -- tests/e2e/udd/cli/inbox/add_item_via_cli.e2e.test.ts` and confirm it fails for the expected behavior gap. Implement the CLI behavior, rerun that test until it passes, then run `npm run udd -- status` and `npm run udd -- lint` to confirm trace links.
 

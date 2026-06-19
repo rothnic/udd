@@ -12,11 +12,13 @@ second requirements layer.
 
 ## New Feature Path
 
-1. Create or identify the roadmap objective or capability.
-2. Run `udd new use-case <id> --name "<name>" --summary "<outcome>"`.
-3. Link the use case from `specs/roadmap.yml` or `specs/VISION.md`.
-4. Run `udd new scenario <area> <feature> <slug> --use-case <id>`.
-5. Implement the printed E2E test obligation with user-observable assertions.
+1. Create or identify one objective in `goals/` or a GitHub issue.
+2. Place the objective's use case in `specs/roadmap.yml` by phase, capability,
+   and increment.
+3. Run `udd new use-case <id> --name "<name>" --summary "<outcome>"`.
+4. Link the use case from `specs/roadmap.yml`.
+5. Run `udd new scenario <area> <feature> <slug> --use-case <id>`.
+6. Implement the printed E2E test obligation with user-observable assertions.
 
 ## Changed Behavior Path
 
