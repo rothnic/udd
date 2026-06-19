@@ -44,7 +44,9 @@ specs/.udd/manifest.yml
 
 ## 2. Define User Journeys
 
-Edit `product/journeys/new_user_onboarding.md`:
+Journey files are optional discovery context. Edit
+`product/journeys/new_user_onboarding.md` when a narrative flow helps clarify
+the user's path:
 
 ```markdown
 # Journey: New User Onboarding
@@ -63,7 +65,27 @@ Edit `product/journeys/new_user_onboarding.md`:
 User has created their first item within 5 minutes.
 ```
 
-## 3. Generate Scenarios
+Then make the enforceable behavior specific in `specs/use-cases/` and
+`specs/features/`. For example, email signup, email verification, Google social
+sign-in, and Google One Tap should become separate scenario files when those
+variants are real product commitments.
+
+```text
+specs/features/auth/signup/email_password.feature
+specs/features/auth/signup/email_verification.feature
+specs/features/auth/signup/social_google.feature
+specs/features/auth/signup/google_one_tap.feature
+```
+
+Use `@phase:N` before `Feature:` when a whole scenario file is planned for a
+future roadmap phase:
+
+```gherkin
+@phase:2
+Feature: Google social signup
+```
+
+## 3. Generate or Refresh Scenarios
 
 ```bash
 udd sync
@@ -108,11 +130,14 @@ udd lint                            # Validate specs
 ## Tips
 
 - **One scenario per file** - keeps files small and focused
-- **Split by variation** - `login_basic.feature`, `login_2fa.feature`
+- **Split by variation** - `email_password.feature`, `social_google.feature`
 - **Use cases and scenarios are the enforced requirements** - journeys are
   optional discovery context for describing *what* users accomplish
 - **E2E tests are proof** - they verify the scenario behavior from the user's
   perspective
+- **Specs are language-neutral, current proof is TypeScript/Vitest** - see
+  [`spec-authoring-model.md`](spec-authoring-model.md) for what an adapter must
+  provide for other languages
 
 
 ## Local Bootstrap Note

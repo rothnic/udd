@@ -61,6 +61,10 @@ Current optional discovery backlog classifications live in
 Those entries are advisory unless promoted into use cases, scenarios, and E2E
 proof.
 
+For the detailed authoring model, including how journeys, use cases, Gherkin
+features, phase tags, variants, and non-TypeScript proof adapters fit together,
+see [`docs/spec-authoring-model.md`](docs/spec-authoring-model.md).
+
 ## Source-Of-Truth Mode
 
 Goal 006 foundation work has landed. The current repository uses the canonical
@@ -68,6 +72,8 @@ source-of-truth chain directly:
 
 - `specs/use-cases/*.yml`, `specs/features/**/*.feature`, and `tests/e2e/**/*.test.ts` are the active enforced chain.
 - `product/journeys/*.md` may be used when a feature benefits from narrative user context.
+- `README.md` and `docs/**` explain the workflow, examples, rationale, and review
+  evidence. They should not be the only place where product behavior is promised.
 - Do not duplicate the same requirement across journey, use case, scenario, and requirement files. Keep the enforceable requirement in the scenario/use-case chain, and keep narrative context as comments or supporting docs.
 - Historical compatibility context remains documented in [`goals/006-source-of-truth-foundation.md`](goals/006-source-of-truth-foundation.md), but new behavior should route through the canonical use-case, scenario, and E2E test chain.
 
@@ -220,14 +226,22 @@ User has created their first task within 5 minutes.
 
 ## Feature Evolution
 
-Split features as they grow:
+Split features as they grow. Keep the use case as the outcome group, and add
+focused scenario files as variants become part of the product contract:
 
 ```
 specs/features/auth/
-├── login_basic.feature       # Email + password
-├── login_2fa.feature         # Two-factor
-└── login_social.feature      # OAuth
+└── signup/
+    ├── email_password.feature       # Phase 1 account creation
+    ├── email_verification.feature   # Phase 1 email ownership
+    ├── social_google.feature        # Later OAuth variant
+    └── google_one_tap.feature       # Later one-tap variant
 ```
+
+Use `@phase:N` before the `Feature:` line when a whole scenario file belongs to
+a future roadmap phase. Update an existing scenario when existing behavior
+changes; add a new scenario when a new variant, rule, edge case, or phase-owned
+behavior appears.
 
 ## vitest-cucumber Integration
 

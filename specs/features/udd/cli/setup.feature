@@ -12,3 +12,5 @@ Feature: UDD CLI
     Then the installed "udd" binary should report the package version
     And the package entrypoints should be available
     And core workflows should run from the installed package
+    And starter authoring guidance should be available from the installed package
+    And generated starter files should explain how behavior detail scales

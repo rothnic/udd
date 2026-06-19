@@ -96,6 +96,10 @@ describeFeature(feature, ({ Scenario }) => {
 			let repairOutput = "";
 			let traceOutput = "";
 			let npmTestFailure = "";
+			let generatedUseCase = "";
+			let generatedJourney = "";
+			let generatedScenario = "";
+			let packagedAuthoringModel = "";
 
 			Given("I have a clean consumer project", async () => {
 				tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "udd-package-"));
@@ -120,6 +124,16 @@ describeFeature(feature, ({ Scenario }) => {
 						"node_modules",
 						".bin",
 						process.platform === "win32" ? "udd.cmd" : "udd",
+					);
+					packagedAuthoringModel = await fs.readFile(
+						path.join(
+							consumerDir,
+							"node_modules",
+							"udd",
+							"docs",
+							"spec-authoring-model.md",
+						),
+						"utf-8",
 					);
 				} catch (error) {
 					installError = error as Error;
@@ -173,6 +187,34 @@ describeFeature(feature, ({ Scenario }) => {
 			And("core workflows should run from the installed package", async () => {
 				await run(uddBin, ["init", "--yes"], { cwd: consumerDir });
 				await run(uddBin, ["sync", "--auto"], { cwd: consumerDir });
+				generatedUseCase = await fs.readFile(
+					path.join(
+						consumerDir,
+						"specs",
+						"use-cases",
+						"new_user_onboarding.yml",
+					),
+					"utf-8",
+				);
+				generatedJourney = await fs.readFile(
+					path.join(
+						consumerDir,
+						"product",
+						"journeys",
+						"new_user_onboarding.md",
+					),
+					"utf-8",
+				);
+				generatedScenario = await fs.readFile(
+					path.join(
+						consumerDir,
+						"specs",
+						"features",
+						"onboarding",
+						"first_action.feature",
+					),
+					"utf-8",
+				);
 
 				({ stdout: statusOutput } = await run(uddBin, ["status", "--json"], {
 					cwd: consumerDir,
@@ -210,6 +252,30 @@ describeFeature(feature, ({ Scenario }) => {
 					"TODO: Implement user-observable proof for this scenario.",
 				);
 			});
+
+			And(
+				"starter authoring guidance should be available from the installed package",
+				() => {
+					expect(packagedAuthoringModel).toContain("UDD Spec Authoring Model");
+					expect(packagedAuthoringModel).toContain("Docs vs Specs");
+					expect(packagedAuthoringModel).toContain("Dogfooding UDD");
+					expect(packagedAuthoringModel).toContain("Language Portability");
+				},
+			);
+
+			And(
+				"generated starter files should explain how behavior detail scales",
+				() => {
+					expect(generatedUseCase).toContain(
+						"Add new scenario_paths as variants become product commitments.",
+					);
+					expect(generatedJourney).toContain("Discovery context only.");
+					expect(generatedScenario).toContain(
+						"Promote concrete variants into focused scenario files",
+					);
+					expect(generatedScenario).toContain("@phase:N before Feature:");
+				},
+			);
 		},
 	);
 });

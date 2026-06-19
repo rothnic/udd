@@ -9,6 +9,7 @@
 	"files": [
 		"dist/",
 		"scripts/patch-vitest-cucumber.mjs",
+		"docs/spec-authoring-model.md",
 		"templates/",
 		"README.md"
 	],

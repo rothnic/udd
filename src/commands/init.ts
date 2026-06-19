@@ -168,9 +168,14 @@ ${productName}
 
 1. Review and edit \`actors.md\`
 2. Add constraints in \`constraints.md\`
-3. Update use cases and feature scenarios for behavior changes
-4. Use \`udd sync\` only when optional journey discovery should refresh scenario files
-5. Run \`npm test\` to execute E2E proof
+3. Treat journeys as discovery context, not the enforceable contract
+4. Update \`../specs/use-cases/\` and \`../specs/features/\` when behavior changes
+5. Split variants into focused scenario files as details become product commitments
+6. Use \`udd sync\` only when optional journey discovery should refresh scenario files
+7. Run \`npm test\` to execute E2E proof
+
+See \`docs/spec-authoring-model.md\` in the UDD repository for the artifact model,
+phase-tag rules, Gherkin guidance, and language-adapter expectations.
 `;
 		await fs.writeFile(path.join(productDir, "README.md"), readmeContent);
 		console.log(chalk.green("✓ Created product/README.md"));
@@ -248,7 +253,11 @@ verification aligned.
 		await fs.writeFile(path.join(specsDir, "VISION.md"), visionContent);
 		console.log(chalk.green("✓ Created specs/VISION.md"));
 
-		const useCaseContent = `id: new_user_onboarding
+		const useCaseContent = `# Use cases group user-visible outcomes and link them to scenario ids.
+# Add new scenario_paths as variants become product commitments.
+# Example variants: auth/signup/email_password, auth/signup/social_google,
+# auth/signup/google_one_tap.
+id: new_user_onboarding
 name: New User Onboarding
 summary: ${primaryActor} can complete the first meaningful product action.
 phase: 1
@@ -269,6 +278,9 @@ outcomes:
 
 		const journeyContent = `# Journey: New User Onboarding
 
+> Discovery context only. Promote behavior into \`specs/use-cases/\` and
+> \`specs/features/\` before implementing it.
+
 **Actor:** ${primaryActor}  
 **Goal:** ${firstAction}
 
@@ -279,6 +291,14 @@ outcomes:
 ## Success
 
 ${primaryActor} has completed their first action.
+
+## Scaling Notes
+
+- Keep this journey as a narrative flow.
+- Add focused scenario files for concrete variants such as email signup, social
+  sign-in, Google One Tap, verification, recovery, and first-item creation.
+- Use \`@phase:N\` before \`Feature:\` when a whole scenario file belongs to a
+  future roadmap phase.
 `;
 		await fs.writeFile(
 			path.join(productDir, "journeys", `${journeySlug}.md`),

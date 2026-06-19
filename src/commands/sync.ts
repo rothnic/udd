@@ -247,6 +247,14 @@ function generateScenarioContent(journey: Journey, step: JourneyStep): string {
 	const scenarioName = step.description;
 
 	return `Feature: ${featureName}
+  # Scope: Starter scenario generated from optional journey discovery context.
+  # Promote concrete variants into focused scenario files as soon as details
+  # matter, for example:
+  #   - auth/signup/email_password.feature
+  #   - auth/signup/social_google.feature
+  #   - auth/signup/google_one_tap.feature
+  # Use @phase:N before Feature: when a whole scenario file belongs to a future
+  # roadmap phase.
 
   Scenario: ${scenarioName}
     Given I am a ${journey.actor || "User"}
