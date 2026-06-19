@@ -1,0 +1,8 @@
+id: "udd/release-candidate"
+area: "udd"
+name: "Release Candidate"
+summary: "Release-candidate verification gates and evidence for UDD."
+use_cases:
+  - "release_candidate_verification"
+phase: 3
+kind: "core"

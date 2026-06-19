@@ -83,8 +83,9 @@ function createOrchestrator(config: OrchestratorConfig): {
 describeFeature(feature, ({ Background, Scenario }) => {
 	Background(({ Given }) => {
 		Given("the OpenCode SDK is available", () => {
-			// SDK simulated for testing config logic
-			expect(true).toBe(true);
+			const orchestrator = createOrchestrator({ maxIterations: 1 });
+			expect(orchestrator.config.maxIterations).toBe(1);
+			expect(orchestrator.state.status).toBe("running");
 		});
 	});
 

@@ -1,0 +1,81 @@
+name: Production Readiness
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  release-candidate-gates:
+    name: Release Candidate Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build package runtime
+        run: npm run build
+
+      - name: Prepare evidence directory
+        run: mkdir -p docs/project/reviews/ci/latest
+
+      - name: Lint source-of-truth specs
+        run: ./bin/udd lint | tee docs/project/reviews/ci/latest/lint.txt
+
+      - name: Capture doctor evidence
+        run: ./bin/udd doctor --json | tee docs/project/reviews/ci/latest/doctor.json
+
+      - name: Check repair dry-run
+        run: ./bin/udd repair --dry-run --json | tee docs/project/reviews/ci/latest/repair-dry-run.json
+
+      - name: Capture trace evidence
+        run: ./bin/udd trace --json | tee docs/project/reviews/ci/latest/trace.json
+
+      - name: Capture impact evidence
+        run: ./bin/udd impact specs/use-cases/capture_ideas.yml --json | tee docs/project/reviews/ci/latest/impact-capture-ideas.json
+
+      - name: Capture test inventory evidence
+        run: ./bin/udd test-scan --json | tee docs/project/reviews/ci/latest/test-scan.json
+
+      - name: Enforce strict test governance
+        run: ./bin/udd gate test-governance --strict --json | tee docs/project/reviews/ci/latest/test-governance-strict.json
+
+      - name: Verify clean package install smoke
+        run: npm test -- tests/e2e/udd/cli/setup.e2e.test.ts --run | tee docs/project/reviews/ci/latest/package-install-smoke.txt
+
+      - name: Verify GitHub install smoke
+        run: |
+          tmp="$(mktemp -d)"
+          cd "$tmp"
+          npm init -y
+          npm install "git+file://${GITHUB_WORKSPACE}"
+          ./node_modules/.bin/udd --version | tee "${GITHUB_WORKSPACE}/docs/project/reviews/ci/latest/github-install-version.txt"
+          ./node_modules/.bin/udd --help | head -20 | tee "${GITHUB_WORKSPACE}/docs/project/reviews/ci/latest/github-install-help.txt"
+
+      - name: Run full test suite
+        run: npm test -- --run | tee docs/project/reviews/ci/latest/full-tests.txt
+
+      - name: Capture status evidence
+        run: ./bin/udd status --json | tee docs/project/reviews/ci/latest/status.json
+
+      - name: Capture agent evidence
+        run: ./bin/udd opencode evidence --json --goal goals/019-production-readiness-roadmap.md | tee docs/project/reviews/ci/latest/opencode-evidence.json
+
+      - name: Upload release-candidate evidence
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: production-readiness-evidence
+          path: docs/project/reviews/ci/latest

@@ -264,7 +264,6 @@ ${edgeCasesText}
 				const testDir = path.join(rootDir, "tests", "e2e", domain);
 				const testFilePath = path.join(testDir, `${name}.e2e.test.ts`);
 				const testContent = `import { describeFeature, loadFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
 
 const feature = await loadFeature("specs/${domain}/${name}.feature");
 
@@ -282,8 +281,7 @@ describeFeature(feature, ({ Scenario }) => {
 		});
 
 		Then(/(.+)/, (outcome: string) => {
-			// Verify the outcome
-			expect(true).toBe(true);
+			throw new Error("TODO: Implement user-observable proof for this scenario.");
 		});
 	});
 
@@ -297,8 +295,7 @@ describeFeature(feature, ({ Scenario }) => {
 		});
 
 		Then(/(.+)/, (response: string) => {
-			// Verify error handling
-			expect(true).toBe(true);
+			throw new Error("TODO: Implement user-observable proof for this scenario.");
 		});
 	});
 });

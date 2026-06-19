@@ -1,4 +1,6 @@
-import { z } from "zod";
+import * as zod from "zod";
+
+const z: typeof zod.z = zod.z ?? (zod as unknown as typeof zod.z);
 
 export const VisionFrontmatterSchema = z.object({
 	id: z.string(),
@@ -89,12 +91,12 @@ export const SpecChangeSchema = z.object({
 		.optional(),
 });
 
-export type VisionFrontmatter = z.infer<typeof VisionFrontmatterSchema>;
-export type UseCaseSpec = z.infer<typeof UseCaseSpecSchema>;
-export type FeatureSpec = z.infer<typeof FeatureSpecSchema>;
-export type TechnicalRequirement = z.infer<typeof TechnicalRequirementSchema>;
-export type SpecChange = z.infer<typeof SpecChangeSchema>;
-export type ResearchMetadata = z.infer<typeof ResearchMetadataSchema>;
+export type VisionFrontmatter = zod.infer<typeof VisionFrontmatterSchema>;
+export type UseCaseSpec = zod.infer<typeof UseCaseSpecSchema>;
+export type FeatureSpec = zod.infer<typeof FeatureSpecSchema>;
+export type TechnicalRequirement = zod.infer<typeof TechnicalRequirementSchema>;
+export type SpecChange = zod.infer<typeof SpecChangeSchema>;
+export type ResearchMetadata = zod.infer<typeof ResearchMetadataSchema>;
 
 export const TestReviewStatusSchema = z.enum(["clean", "dirty"]);
 
@@ -111,6 +113,6 @@ export const TestReviewManifestSchema = z.object({
 	tests: z.array(TestReviewRecordSchema).default([]),
 });
 
-export type TestReviewStatus = z.infer<typeof TestReviewStatusSchema>;
-export type TestReviewRecord = z.infer<typeof TestReviewRecordSchema>;
-export type TestReviewManifest = z.infer<typeof TestReviewManifestSchema>;
+export type TestReviewStatus = zod.infer<typeof TestReviewStatusSchema>;
+export type TestReviewRecord = zod.infer<typeof TestReviewRecordSchema>;
+export type TestReviewManifest = zod.infer<typeof TestReviewManifestSchema>;

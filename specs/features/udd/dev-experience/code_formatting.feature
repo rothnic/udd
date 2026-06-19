@@ -1,6 +1,6 @@
-Feature: Dev-experience
+Feature: Code Formatting
 
   Scenario: Code Formatting
-    Given I am in the right state
-    When I do something
-    Then something happens
+    Given I have a TypeScript file with inconsistent spacing
+    When I run the repository formatter
+    Then the file should be rewritten with the configured tab indentation

@@ -7,7 +7,9 @@ import { buildUddCommand, execAsync } from "../../../utils.js";
 // @feature udd/recovery/refuse_behavior_rewrites.feature
 describe("recovery behavior rewrite refusal", () => {
 	it("refuses to create missing behavior scenarios from manifest drift", async () => {
-		const projectDir = await fs.mkdtemp(path.join(os.tmpdir(), "udd-repair-refuse-"));
+		const projectDir = await fs.mkdtemp(
+			path.join(os.tmpdir(), "udd-repair-refuse-"),
+		);
 		const previousCwd = process.cwd();
 		try {
 			process.chdir(projectDir);
@@ -36,7 +38,9 @@ describe("recovery behavior rewrite refusal", () => {
 				expect.objectContaining({
 					kind: "manual",
 					path: "specs/features/recovery/missing.feature",
-					description: expect.stringContaining("will not rewrite behavior specs"),
+					description: expect.stringContaining(
+						"will not rewrite behavior specs",
+					),
 					reason: expect.stringContaining("missing scenario"),
 				}),
 			);
@@ -51,4 +55,3 @@ describe("recovery behavior rewrite refusal", () => {
 		}
 	});
 });
-

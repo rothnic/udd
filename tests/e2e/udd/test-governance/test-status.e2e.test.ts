@@ -1,4 +1,4 @@
-import { describe, expect, it, afterAll, beforeEach } from "vitest";
+import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { runUdd } from "../../../utils.js";
 import {
 	cleanupProject,
@@ -31,7 +31,9 @@ describe("test governance status", () => {
 		expect(evidence.test_governance.summary).toEqual(
 			status.test_governance.summary,
 		);
-		expect(evidence.test_governance.blocking_findings.length).toBeGreaterThan(0);
+		expect(evidence.test_governance.blocking_findings.length).toBeGreaterThan(
+			0,
+		);
 		expect(evidence.test_governance.next_action).toContain(":");
 	});
 });

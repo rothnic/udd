@@ -43,7 +43,7 @@ describe("test governance quality gate", () => {
 			"Orphaned feature link: tests/auth/orphaned.test.ts -> specs/features/auth/missing.feature",
 		);
 		expect(strict.stdout).toContain(
-			"Unlinked test proof: tests/misc/unlinked.test.ts",
+			"Unlinked test proof: tests/misc/unlinked.e2e.test.ts",
 		);
 		expect(strict.stdout).toContain(
 			"Dirty review: tests/billing/pay.e2e.test.ts",

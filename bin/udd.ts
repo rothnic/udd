@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import fs from "node:fs";
 import { Command } from "commander";
 import { discoverCommand } from "../src/commands/discover.js";
 import { doctorCommand } from "../src/commands/doctor.js";
@@ -23,7 +24,25 @@ import { validateCommand } from "../src/commands/validate.js";
 
 const program = new Command();
 
-program.name("udd").description("User Driven Development CLI").version("0.0.1");
+function resolvePackageVersion(): string {
+	for (const relativePath of ["../package.json", "../../package.json"]) {
+		try {
+			const packageUrl = new URL(relativePath, import.meta.url);
+			const packageJson = JSON.parse(fs.readFileSync(packageUrl, "utf-8")) as {
+				version?: string;
+			};
+			if (packageJson.version) return packageJson.version;
+		} catch {
+			// Try the next runtime layout.
+		}
+	}
+	return "0.0.0";
+}
+
+program
+	.name("udd")
+	.description("User Driven Development CLI")
+	.version(resolvePackageVersion());
 
 program.addCommand(initCommand);
 program.addCommand(syncCommand);

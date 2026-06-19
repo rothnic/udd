@@ -1,6 +1,6 @@
-Feature: Dev-experience/test Discovery
+Feature: Editor Test Status
 
   Scenario: Editor Status
-    Given I am in the right state
-    When I do something
-    Then something happens
+    Given the repository has VS Code Vitest settings
+    When I inspect ".vscode/settings.json"
+    Then static AST collection should be disabled for reliable scenario discovery

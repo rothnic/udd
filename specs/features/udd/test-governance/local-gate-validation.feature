@@ -10,7 +10,10 @@ Feature: Local Test Governance Gate
 #   - Pre-commit hooks in this slice: risks blocking unrelated local work too early
 #
 # Success Criteria:
-#   - Test scanning identifies linked, unlinked, orphaned, and stubbed tests
+#   - Test scanning identifies linked, unlinked, orphaned, and stubbed scenario
+#     proof tests
+#   - Implementation-only unit tests and manual external integration tests stay
+#     outside strict scenario-proof governance
 #   - Test review records that affect gates stay in source-controlled evidence
 #   - Ignored local cache state cannot change gate outcomes
 #   - Gate checks are explicit and advisory unless strict mode is requested
@@ -24,6 +27,14 @@ Feature: Local Test Governance Gate
     When I run "udd test-scan --json"
     Then the scan reports linked, unlinked, orphaned, and stubbed counts
     And the linked test includes its feature path
+
+  @phase:3
+  Scenario: Ignore tests outside scenario proof scope
+    Given the project has implementation-only unit tests and manual external integration tests
+    When I run "udd test-scan --json"
+    Then the scan does not report them as unlinked proof
+    When I run "udd gate test-governance --strict"
+    Then the strict gate passes
 
   @phase:3
   Scenario: Resolve feature comment references with feature extension

@@ -58,5 +58,12 @@ describe("test governance scan", () => {
 				}),
 			]),
 		);
+		const reportedPaths = scan.tests.map((test: { path: string }) => test.path);
+		expect(reportedPaths).not.toContain(
+			"tests/lib/internal-regression.test.ts",
+		);
+		expect(reportedPaths).not.toContain(
+			"tests/e2e/opencode/integration/manual.integration.test.ts",
+		);
 	});
 });

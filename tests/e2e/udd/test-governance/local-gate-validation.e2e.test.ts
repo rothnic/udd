@@ -100,7 +100,7 @@ describeFeature(feature, ({ Scenario }) => {
 `,
 					);
 					await writeTest(
-						"tests/auth/unlinked.test.ts",
+						"tests/auth/unlinked.e2e.test.ts",
 						`import { expect, test } from "vitest";
 test("unlinked", () => expect(1 + 1).toBe(2));
 `,
@@ -113,7 +113,7 @@ test("orphaned", () => expect(1 + 1).toBe(2));
 `,
 					);
 					await writeTest(
-						"tests/auth/stubbed.test.ts",
+						"tests/auth/stubbed.e2e.test.ts",
 						`import { expect, test } from "vitest";
 test("stubbed", () => expect(true).toBe(true));
 `,
@@ -144,6 +144,61 @@ test("stubbed", () => expect(true).toBe(true));
 						status: "linked",
 					}),
 				);
+			});
+		},
+	);
+
+	Scenario(
+		"Ignore tests outside scenario proof scope",
+		({ Given, When, Then }) => {
+			let scan: {
+				tests: Array<{ path: string }>;
+				summary: { unlinked: number; gate_blocking: number };
+			};
+			let strict = "";
+
+			Given(
+				"the project has implementation-only unit tests and manual external integration tests",
+				async () => {
+					await writeTest(
+						"tests/lib/internal-regression.test.ts",
+						`import { expect, test } from "vitest";
+test("implementation detail", () => expect(1 + 1).toBe(2));
+`,
+					);
+					await writeTest(
+						"tests/e2e/opencode/integration/manual.integration.test.ts",
+						`import { expect, test } from "vitest";
+test("manual external integration", () => expect(1 + 1).toBe(2));
+`,
+					);
+				},
+			);
+
+			When('I run "udd test-scan --json"', async () => {
+				const result = await runUdd("test-scan --json");
+				scan = JSON.parse(result.stdout);
+			});
+
+			Then("the scan does not report them as unlinked proof", () => {
+				const reportedPaths = scan.tests.map((test) => test.path);
+				expect(reportedPaths).not.toContain(
+					"tests/lib/internal-regression.test.ts",
+				);
+				expect(reportedPaths).not.toContain(
+					"tests/e2e/opencode/integration/manual.integration.test.ts",
+				);
+				expect(scan.summary.unlinked).toBe(0);
+				expect(scan.summary.gate_blocking).toBe(0);
+			});
+
+			When('I run "udd gate test-governance --strict"', async () => {
+				const result = await runUdd("gate test-governance --strict");
+				strict = result.stdout;
+			});
+
+			Then("the strict gate passes", () => {
+				expect(strict).toContain("Test governance gate passed");
 			});
 		},
 	);

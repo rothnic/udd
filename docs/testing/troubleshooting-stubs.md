@@ -24,24 +24,40 @@ test-governance --strict` exits non-zero when strict-mode findings are present.
 `udd doctor` and `udd health-check` remain project health diagnostics. They do
 not replace the test-governance gate.
 
-## CI Opt-In
+## Proof Scope
 
-Goal 009 does not enable repository-wide strict gates by default. Teams that are
-ready to enforce governance in CI can opt in by adding an explicit job step:
+Strict test governance is scoped to scenario proof:
+
+- `*.e2e.test.*` files are proof candidates.
+- Non-E2E tests with a `loadFeature(...)` call or `@feature` comment are proof
+  candidates because they explicitly claim scenario coverage.
+- Ordinary unit tests under `tests/lib/` are implementation regression tests.
+  They must still pass in `npm test`, but they are not counted as unlinked user
+  proof unless they explicitly link to a feature.
+- Manual OpenCode integration checks under `tests/e2e/opencode/integration/`
+  are outside the local strict gate because they require an external OpenCode
+  server and are excluded from the normal Vitest run.
+
+When a unit or manual integration test should become user proof, link it to a
+feature scenario or move the behavior into a scenario-backed E2E proof first.
+
+## CI And Strict Mode
+
+Strict governance is now part of UDD production-readiness verification. CI and
+release-candidate checks should include:
 
 ```bash
 ./bin/udd gate test-governance --strict
 ```
 
-Use the non-strict command first while triaging existing findings:
+Use the non-strict command for exploratory triage:
 
 ```bash
 ./bin/udd gate test-governance
 ```
 
-Strict mode should only be added after the repository has reviewed linked
-non-stub proof or has accepted the current blocking findings as intentional CI
-failures.
+Strict mode should pass before release-candidate evidence claims that scenario
+proof is clean.
 
 Useful local searches:
 

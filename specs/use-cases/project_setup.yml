@@ -16,3 +16,8 @@ outcomes:
       - setup
     scenario_paths:
       - udd/cli/setup
+  - description: Packaged CLI can be installed in a clean consumer project
+    scenarios:
+      - setup
+    scenario_paths:
+      - udd/cli/setup

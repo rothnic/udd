@@ -248,7 +248,25 @@ test("agent next work ranks governance review gates above stale proof refresh", 
 		conditions: [],
 		issues: [],
 	};
-	const gate = {
+	const gate: TestGateResult = {
+		passed: false,
+		entries: [],
+		dirtyReviews: [],
+		stubbedTests: [],
+		orphanedTests: [],
+		unlinkedTests: [],
+		reviewManifestIssues: [],
+		summary: {
+			total: 1,
+			linked: 1,
+			unlinked: 0,
+			orphaned: 0,
+			stubbed: 1,
+			reviewed: 0,
+			stale: 0,
+			missing: 0,
+			gate_blocking: 1,
+		},
 		blockingFindings: [
 			{
 				type: "stubbed_test",
@@ -262,7 +280,7 @@ test("agent next work ranks governance review gates above stale proof refresh", 
 				},
 			},
 		],
-	} as TestGateResult;
+	};
 
 	const base = recommendNextAgentWork(
 		status,
@@ -468,7 +486,7 @@ test("agent evidence prioritizes critical pause reasons over governance findings
 		hasProductDir: false,
 	};
 	const report: DiagnosticReport = {
-		status: "uninitialized",
+		status: "drift-detected",
 		healthy: false,
 		lastCheck: "2026-06-04T00:00:00.000Z",
 		summary: {

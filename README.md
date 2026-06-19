@@ -5,14 +5,24 @@ A spec-first CLI tool where **user-facing scenarios define behavior** and **BDD 
 ## Quick Start
 
 ```bash
-# Initialize in your project
-npm run udd -- init
+# Install the current release candidate from GitHub
+npm install github:rothnic/udd
+
+# Initialize source-of-truth files
+udd init
 
 # Sync journey discovery context to scenarios
-npm run udd -- sync
+udd sync
 
 # Check status
-npm run udd -- status
+udd status
+```
+
+The npm registry package is not published yet. When working from this repository
+checkout instead of an installed GitHub package, use the local wrapper:
+
+```bash
+npm run udd -- <command>
 ```
 
 ## How It Works
@@ -39,12 +49,22 @@ This is the canonical model for status, lint, review, and agent handoff:
 
 | Layer | Canonical artifact | Required for enforcement |
 |-------|--------------------|--------------------------|
-| Objective | Roadmap or goal item | Required when a change is planned as project work |
+| Objective | Goal file or issue | Required when a change is planned as project work |
+| Roadmap phase | `specs/roadmap.yml` | Required for timing, sequencing, and phase ownership |
 | Use Case | `specs/use-cases/*.yml` | Required for traceable outcomes |
 | Scenario | `specs/features/**/*.feature` | Required behavior contract |
 | E2E Test | `tests/e2e/**/*.test.ts` | Required proof that behavior works |
 
 Journey files and SysML-informed notes are optional discovery context. They help humans and agents ask better questions, document alternatives, and improve scenario completeness, but they are not a separate enforced layer in the current traceability contract.
+
+Current optional discovery backlog classifications live in
+[`docs/project/optional-discovery-backlog.yml`](docs/project/optional-discovery-backlog.yml).
+Those entries are advisory unless promoted into use cases, scenarios, and E2E
+proof.
+
+For the detailed authoring model, including how journeys, use cases, Gherkin
+features, phase tags, variants, and non-TypeScript proof adapters fit together,
+see [`docs/spec-authoring-model.md`](docs/spec-authoring-model.md).
 
 ## Source-Of-Truth Mode
 
@@ -53,6 +73,8 @@ source-of-truth chain directly:
 
 - `specs/use-cases/*.yml`, `specs/features/**/*.feature`, and `tests/e2e/**/*.test.ts` are the active enforced chain.
 - `product/journeys/*.md` may be used when a feature benefits from narrative user context.
+- `README.md` and `docs/**` explain the workflow, examples, rationale, and review
+  evidence. They should not be the only place where product behavior is promised.
 - Do not duplicate the same requirement across journey, use case, scenario, and requirement files. Keep the enforceable requirement in the scenario/use-case chain, and keep narrative context as comments or supporting docs.
 - Historical compatibility context remains documented in [`goals/006-source-of-truth-foundation.md`](goals/006-source-of-truth-foundation.md), but new behavior should route through the canonical use-case, scenario, and E2E test chain.
 
@@ -60,12 +82,15 @@ source-of-truth chain directly:
 
 Use this loop for behavior changes:
 
-1. Start from the objective or goal and identify the affected use case in `specs/use-cases/`.
-2. Modify the scenario in `specs/features/` first so it states the new user-observable behavior.
-3. Run the matching E2E test and confirm it fails for the expected reason.
-4. Implement the smallest behavior change needed to satisfy the scenario.
-5. Run the E2E test again and confirm it passes.
-6. Run `npm run udd -- status` and `npm run udd -- lint` to confirm the use case, scenario, and test links are still coherent.
+1. Start from one objective in `goals/` or a GitHub issue.
+2. Use `specs/roadmap.yml` only to place that objective's use case in a phase,
+   capability, and increment.
+3. Identify or update the affected use case in `specs/use-cases/`.
+4. Modify the scenario in `specs/features/` first so it states the new user-observable behavior.
+5. Run the matching E2E test and confirm it fails for the expected reason.
+6. Implement the smallest behavior change needed to satisfy the scenario.
+7. Run the E2E test again and confirm it passes.
+8. Run `npm run udd -- status` and `npm run udd -- lint` to confirm the use case, scenario, and test links are still coherent.
 
 Example: to change inbox capture behavior, update the relevant outcome in `specs/use-cases/capture_ideas.yml`, update `specs/features/udd/cli/inbox/add_item_via_cli.feature`, then run `npm test -- tests/e2e/udd/cli/inbox/add_item_via_cli.e2e.test.ts` and confirm it fails for the expected behavior gap. Implement the CLI behavior, rerun that test until it passes, then run `npm run udd -- status` and `npm run udd -- lint` to confirm trace links.
 
@@ -103,7 +128,7 @@ product/                          # Optional discovery context
 | `udd sync` | Detect journey changes and propose scenario updates |
 | `udd status` | Show use-case → scenario → test coverage |
 | `udd new journey <slug>` | Create optional discovery-context journey file |
-| `udd new scenario <domain> <action>` | Create legacy flat scenario + test stub |
+| `udd new scenario <domain> <action>` | Create one canonical scenario and print the expected E2E test path |
 | `udd new feature <domain> <feature-name>` | Create feature file from SysML-informed template |
 | `udd discover feature <domain> <name>` | Interactive feature discovery with SysML principles |
 | `udd phase current/list/set/check` | Inspect, update, and validate roadmap phase state |
@@ -126,15 +151,19 @@ Use `udd discover feature` for guided requirements analysis or see [docs/sysml-i
 UDD provides three different ways to create feature files, each optimized for different workflows:
 
 ### `udd new scenario` - Quick, Simple Scenarios
-**Use when:** You need a basic feature file and test stub quickly.
+**Use when:** You need a basic scenario file and a clear E2E proof obligation quickly.
 ```bash
 udd new scenario auth login
 ```
-- Creates: `specs/auth/login.feature` (simple scenario)
-- Creates: `tests/auth/login.e2e.test.ts` (test stub)
-- Best for: Simple, single-scenario features or when rapid prototyping
+- Creates: `specs/features/auth/auth/login.feature` by default, or
+  `specs/features/<domain>/<feature>/<slug>.feature` when you pass the optional
+  third argument.
+- Prints the expected `tests/e2e/.../*.e2e.test.ts` proof obligation without
+  creating a fake passing test.
+- Best for: Simple, single-scenario behavior contracts.
 - Context: Minimal (just basic Given/When/Then)
-- Compatibility note: this command still writes the older flat path. Prefer `udd new feature` or move the result under `specs/features/` when adding canonical traceable work.
+- Use `--use-case <id>` when the new scenario should be linked from generated
+  feature metadata.
 
 ### `udd new feature` - Template-Based Features
 **Use when:** You want a structured starting point with SysML context sections.
@@ -158,7 +187,7 @@ udd discover feature reporting/csv-export
 - Context: Fully guided with questions about users, alternatives, edge cases
 
 **Summary:**
-- **`new scenario`** = Fast & minimal → `specs/<domain>/` (legacy flat structure)
+- **`new scenario`** = Fast & minimal → canonical `specs/features/...` scenario
 - **`new feature`** = Template with guidance → `specs/features/<domain>/<name>/` (nested structure)
 - **`discover feature`** = Interactive interview → Wherever specified
 
@@ -201,14 +230,22 @@ User has created their first task within 5 minutes.
 
 ## Feature Evolution
 
-Split features as they grow:
+Split features as they grow. Keep the use case as the outcome group, and add
+focused scenario files as variants become part of the product contract:
 
 ```
 specs/features/auth/
-├── login_basic.feature       # Email + password
-├── login_2fa.feature         # Two-factor
-└── login_social.feature      # OAuth
+└── signup/
+    ├── email_password.feature       # Phase 1 account creation
+    ├── email_verification.feature   # Phase 1 email ownership
+    ├── social_google.feature        # Later OAuth variant
+    └── google_one_tap.feature       # Later one-tap variant
 ```
+
+Use `@phase:N` before the `Feature:` line when a whole scenario file belongs to
+a future roadmap phase. Update an existing scenario when existing behavior
+changes; add a new scenario when a new variant, rule, edge case, or phase-owned
+behavior appears.
 
 ## vitest-cucumber Integration
 

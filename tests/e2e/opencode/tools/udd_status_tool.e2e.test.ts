@@ -16,9 +16,9 @@ describeFeature(feature, ({ Background, Scenario }) => {
 	let statusJson: Record<string, unknown>;
 
 	Background(({ Given, And }) => {
-		Given("the OpenCode SDK is available", () => {
-			// SDK availability is assumed for CLI tests
-			expect(true).toBe(true);
+		Given("the OpenCode SDK is available", async () => {
+			const sdk = await import("@opencode-ai/sdk");
+			expect(typeof sdk.createOpencodeClient).toBe("function");
 		});
 
 		And("the udd CLI is installed", async () => {

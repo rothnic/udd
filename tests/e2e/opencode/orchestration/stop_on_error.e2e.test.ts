@@ -41,8 +41,11 @@ function detectError(response: string): {
 describeFeature(feature, ({ Background, Scenario }) => {
 	Background(({ Given, And }) => {
 		Given("the OpenCode SDK is available", () => {
-			// SDK simulated for testing error handling logic
-			expect(true).toBe(true);
+			expect(detectError("ERROR: worker failed")).toMatchObject({
+				hasError: true,
+				errorType: "error",
+				isRecoverable: true,
+			});
 		});
 
 		And("an orchestrator agent session is running", () => {

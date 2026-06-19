@@ -6,6 +6,34 @@ import { Command } from "commander";
 import { userWarn } from "../lib/cli-error.js";
 import { installCodexHooks } from "../lib/codex-hooks.js";
 
+async function ensurePackageTestScript(rootDir: string): Promise<boolean> {
+	const packagePath = path.join(rootDir, "package.json");
+	try {
+		const content = await fs.readFile(packagePath, "utf-8");
+		const packageJson = JSON.parse(content) as {
+			scripts?: Record<string, string>;
+		};
+		packageJson.scripts = packageJson.scripts ?? {};
+		if (
+			packageJson.scripts.test &&
+			!packageJson.scripts.test.includes("Error: no test specified")
+		) {
+			return false;
+		}
+		packageJson.scripts.test = "vitest run";
+		await fs.writeFile(
+			packagePath,
+			`${JSON.stringify(packageJson, null, 2)}\n`,
+		);
+		return true;
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+			return false;
+		}
+		throw error;
+	}
+}
+
 export const initCommand = new Command("init")
 	.description("Initialize UDD in a project")
 	.option("-y, --yes", "Skip prompts and use defaults")
@@ -119,6 +147,7 @@ export const initCommand = new Command("init")
 		// Create directories
 		await fs.mkdir(path.join(productDir, "journeys"), { recursive: true });
 		await fs.mkdir(path.join(specsDir, ".udd"), { recursive: true });
+		await fs.mkdir(path.join(specsDir, "use-cases"), { recursive: true });
 
 		// Create product/README.md
 		const readmeContent = `# ${productName}
@@ -130,14 +159,23 @@ ${productName}
 - [actors.md](actors.md) - Who uses this product
 - [constraints.md](constraints.md) - Non-functional requirements
 - [changelog.md](changelog.md) - Decision history
-- [journeys/](journeys/) - User journeys
+- [journeys/](journeys/) - Optional discovery context for user journeys
+- ../specs/VISION.md - Long-term product objective
+- ../specs/use-cases/ - Enforced user-visible outcomes
+- ../specs/features/ - Enforced BDD behavior contracts
 
 ## Next Steps
 
 1. Review and edit \`actors.md\`
 2. Add constraints in \`constraints.md\`
-3. Create user journeys in \`journeys/\`
-4. Run \`udd sync\` to generate BDD scenarios
+3. Treat journeys as discovery context, not the enforceable contract
+4. Update \`../specs/use-cases/\` and \`../specs/features/\` when behavior changes
+5. Split variants into focused scenario files as details become product commitments
+6. Use \`udd sync\` only when optional journey discovery should refresh scenario files
+7. Run \`npm test\` to execute E2E proof
+
+See \`docs/spec-authoring-model.md\` in the UDD repository for the artifact model,
+phase-tag rules, Gherkin guidance, and language-adapter expectations.
 `;
 		await fs.writeFile(path.join(productDir, "README.md"), readmeContent);
 		console.log(chalk.green("✓ Created product/README.md"));
@@ -190,21 +228,77 @@ Non-functional requirements and hard rules.
 		await fs.writeFile(path.join(productDir, "changelog.md"), changelogContent);
 		console.log(chalk.green("✓ Created product/changelog.md"));
 
-		// Create initial journey
+		// Create canonical source-of-truth starter specs.
 		const journeySlug = "new_user_onboarding";
 		const primaryActor = actors[0] || "User";
+		const scenarioPath = "specs/features/onboarding/first_action.feature";
+		const scenarioId = "onboarding/first_action";
+		const visionContent = `---
+id: "my_product"
+name: "${productName.replace(/"/g, '\\"')}"
+version: "0.1.0"
+goals:
+  - "Define user-visible behavior before implementation."
+use_cases:
+  - "new_user_onboarding"
+success_metrics:
+  - "A new user can complete their first meaningful action."
+---
+
+# Vision
+
+${productName} uses UDD to keep product intent, behavior scenarios, and
+verification aligned.
+`;
+		await fs.writeFile(path.join(specsDir, "VISION.md"), visionContent);
+		console.log(chalk.green("✓ Created specs/VISION.md"));
+
+		const useCaseContent = `# Use cases group user-visible outcomes and link them to scenario ids.
+# Add new scenario_paths as variants become product commitments.
+# Example variants: auth/signup/email_password, auth/signup/social_google,
+# auth/signup/google_one_tap.
+id: new_user_onboarding
+name: New User Onboarding
+summary: ${primaryActor} can complete the first meaningful product action.
+phase: 1
+actors:
+  - ${primaryActor}
+outcomes:
+  - description: ${primaryActor} can ${firstAction.toLowerCase()}.
+    scenario_paths:
+      - ${scenarioId}
+`;
+		await fs.writeFile(
+			path.join(specsDir, "use-cases", "new_user_onboarding.yml"),
+			useCaseContent,
+		);
+		console.log(
+			chalk.green("✓ Created specs/use-cases/new_user_onboarding.yml"),
+		);
+
 		const journeyContent = `# Journey: New User Onboarding
+
+> Discovery context only. Promote behavior into \`specs/use-cases/\` and
+> \`specs/features/\` before implementing it.
 
 **Actor:** ${primaryActor}  
 **Goal:** ${firstAction}
 
 ## Steps
 
-1. ${firstAction} → \`specs/auth/signup.feature\`
+1. ${firstAction} → \`${scenarioPath}\`
 
 ## Success
 
 ${primaryActor} has completed their first action.
+
+## Scaling Notes
+
+- Keep this journey as a narrative flow.
+- Add focused scenario files for concrete variants such as email signup, social
+  sign-in, Google One Tap, verification, recovery, and first-item creation.
+- Use \`@phase:N\` before \`Feature:\` when a whole scenario file belongs to a
+  future roadmap phase.
 `;
 		await fs.writeFile(
 			path.join(productDir, "journeys", `${journeySlug}.md`),
@@ -224,6 +318,12 @@ scenarios: {}
 			manifestContent,
 		);
 		console.log(chalk.green("✓ Created specs/.udd/manifest.yml"));
+
+		if (await ensurePackageTestScript(rootDir)) {
+			console.log(
+				chalk.green("✓ Added npm test script for generated E2E proof"),
+			);
+		}
 
 		if (options.codexHooks) {
 			await installCodexHooks(rootDir);

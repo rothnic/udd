@@ -1,0 +1,8 @@
+id: "udd/cli/validation"
+area: "udd"
+name: "CLI Validation"
+summary: "Validation guidance and scenario completeness checks for UDD specs."
+use_cases:
+  - "validate_specs"
+phase: 1
+kind: "core"
